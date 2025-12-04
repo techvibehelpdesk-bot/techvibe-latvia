@@ -1,0 +1,4 @@
+{
+       name: TechVibe,
+       description: TechVibe is a comprehensive online device marketplace platform for buying, selling, renting, leasing, and giving away all types of electronic devices, featuring advanced search, user profiles, repair service locator, and optional paid assistance.
+      }

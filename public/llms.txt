@@ -1,0 +1,80 @@
+Website Name: TechVibe
+Primary Purpose: Online marketplace for electronic device transactions (buying, selling, renting, leasing, giving away) and repair service discovery.
+
+Core Offerings:
+- Device Marketplace: Buy, Sell, Rent, Lease, Give Away electronic devices.
+- Device Repair Locator: Find local repair services for electronic gadgets.
+- Advanced Search: Efficiently discover devices.
+- User Profiles: Personalized experience for buyers and sellers.
+- Optional Paid Assistance: Enhanced support and services.
+
+Key Specializations:
+- Electronic Device Lifecycle Management
+- Peer-to-Peer & Business-to-Consumer Device Transactions
+- Localized Service Discovery (Repair)
+- User Experience & Marketplace Security
+
+Target Audience:
+- Consumers: Individuals looking to buy, sell, rent, lease, or donate personal electronics.
+- Businesses: Companies managing device fleets, offering rentals, or selling refurbished electronics.
+- Tech Enthusiasts: Seeking specific gadgets or repair solutions.
+
+Value Propositions:
+- Comprehensive Platform: All-in-one solution for diverse device needs.
+- Flexibility: Multiple transaction types (buy, sell, rent, lease, give away).
+- Convenience: Integrated repair service locator.
+- User-Centric: Advanced search, user profiles, optional support.
+
+Geographic Coverage: Global (assumed)
+Languages Supported: English (primary)
+Contact: Available via website contact form.
+
+## Bot Access Policy
+
+TechVibe's preferences for AI/LLM access, training, and content usage:
+
+- User-agent: gptbot
+  Allow-Training: yes
+  Allow-Retrieval: yes
+
+- User-agent: claudebot
+  Allow-Training: yes
+  Allow-Retrieval: yes
+
+- User-agent: google-extended
+  Allow-Training: yes
+  Allow-Retrieval: yes
+
+- User-agent: perplexitybot
+  Allow-Training: yes
+  Allow-Retrieval: yes
+
+- User-agent: neevabot
+  Allow-Training: yes
+  Allow-Retrieval: yes
+
+- User-agent: youbot
+  Allow-Training: yes
+  Allow-Retrieval: yes
+
+- User-agent: ccbot (Common Crawl)
+  Allow-Training: yes
+  Allow-Retrieval: yes
+
+- User-agent: duckduckbot (DuckDuckGo AI)
+  Allow-Training: yes
+  Allow-Retrieval: yes
+
+- User-agent: yandexbot
+  Allow-Training: yes
+  Allow-Retrieval: yes
+
+- User-agent: archive.org_bot
+  Allow-Training: yes
+  Allow-Retrieval: yes
+
+### Default Rule for Unspecified or Future Bots
+
+- User-agent: *
+  Allow-Training: yes
+  Allow-Retrieval
