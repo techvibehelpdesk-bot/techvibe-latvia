@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Link from 'next/link'; // Šis bija pazudis
+import Link from 'next/link';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -17,7 +17,6 @@ export default function Header() {
     { label: 'Sākums', id: 'home' },
     { label: 'Kategorijas', id: 'categories' },
     { label: 'Jaunākie sludinājumi', id: 'listings' },
-    // Šeit ir tava jaunā saite:
     { label: 'Visi sludinājumi', id: 'all_listings', href: '/sludinajumi' },
     { label: 'Pakalpojumi', id: 'services' },
     { label: 'Cenas', id: 'pricing' },
@@ -64,15 +63,16 @@ export default function Header() {
               )
             ))}
             
-            {/* Pārējās pogas */}
-            <button
+            {/* ŠEIT IR IZMAIŅA: Poga nomainīta uz Link */}
+            <Link
+              href="/ievietot"
               id='header_post_ad_button'
-              onClick={() => handleNavClick('contact')}
-              className='bg-blue-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-600 hover:shadow-lg transition-all duration-300'
+              className='bg-blue-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-600 hover:shadow-lg transition-all duration-300 flex items-center'
               aria-label='Ievietot sludinājumu'
             >
               Ievietot sludinājumu
-            </button>
+            </Link>
+
             <button
               id='header_login_button'
               onClick={() => handleNavClick('contact')}
@@ -125,14 +125,17 @@ export default function Header() {
                 )
               ))}
               
-              <button
+              {/* ŠEIT IR IZMAIŅA MOBILAJĀ IZVĒLNĒ */}
+              <Link
+                href="/ievietot"
                 id='header_mobile_post_ad_button'
-                onClick={() => handleNavClick('contact')}
-                className='bg-blue-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-600 hover:shadow-lg transition-all duration-300 w-full'
+                onClick={() => setMobileMenuOpen(false)}
+                className='bg-blue-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-600 hover:shadow-lg transition-all duration-300 w-full text-center flex justify-center'
                 aria-label='Ievietot sludinājumu'
               >
                 Ievietot sludinājumu
-              </button>
+              </Link>
+
               <button
                 id='header_mobile_login_button'
                 onClick={() => handleNavClick('contact')}
