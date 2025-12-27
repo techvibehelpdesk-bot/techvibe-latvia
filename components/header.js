@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import Link from 'next/link'; // Šis bija pazudis
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleNavClick = (sectionId) => {
+    // Mēģinām atrast sadaļu lapā
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -15,6 +17,7 @@ export default function Header() {
     { label: 'Sākums', id: 'home' },
     { label: 'Kategorijas', id: 'categories' },
     { label: 'Jaunākie sludinājumi', id: 'listings' },
+    // Šeit ir tava jaunā saite:
     { label: 'Visi sludinājumi', id: 'all_listings', href: '/sludinajumi' },
     { label: 'Pakalpojumi', id: 'services' },
     { label: 'Cenas', id: 'pricing' },
@@ -38,16 +41,30 @@ export default function Header() {
           {/* Desktop Navigation */}
           <div id='header_desktop_nav' className='hidden lg:flex items-center gap-8'>
             {navItems.map((item, index) => (
-              <button
-                key={index}
-                id={`header_nav_link_${item.id}`}
-                onClick={() => handleNavClick(item.id)}
-                className='text-primary font-medium hover:text-accent transition-colors duration-300'
-                aria-label={`Navigēt uz ${item.label}`}
-              >
-                {item.label}
-              </button>
+              // PĀRBAUDE: Vai šim elementam ir saite (href)?
+              item.href ? (
+                <Link
+                  key={index}
+                  href={item.href}
+                  className='text-primary font-medium hover:text-accent transition-colors duration-300'
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                // Ja nav saites, tad tā ir parasta poga, kas skrollē
+                <button
+                  key={index}
+                  id={`header_nav_link_${item.id}`}
+                  onClick={() => handleNavClick(item.id)}
+                  className='text-primary font-medium hover:text-accent transition-colors duration-300'
+                  aria-label={`Navigēt uz ${item.label}`}
+                >
+                  {item.label}
+                </button>
+              )
             ))}
+            
+            {/* Pārējās pogas */}
             <button
               id='header_post_ad_button'
               onClick={() => handleNavClick('contact')}
@@ -85,16 +102,29 @@ export default function Header() {
           <div id='header_mobile_nav' className='lg:hidden mt-4 pb-4 border-t border-gray-200'>
             <div id='header_mobile_nav_items' className='flex flex-col gap-4 mt-4'>
               {navItems.map((item, index) => (
-                <button
-                  key={index}
-                  id={`header_mobile_nav_link_${item.id}`}
-                  onClick={() => handleNavClick(item.id)}
-                  className='text-primary font-medium hover:text-accent transition-colors duration-300 text-left'
-                  aria-label={`Navigēt uz ${item.label}`}
-                >
-                  {item.label}
-                </button>
+                 // PĀRBAUDE arī mobilajā versijā
+                 item.href ? (
+                  <Link
+                    key={index}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)} // Aizveram menu, kad noklikšķina
+                    className='text-primary font-medium hover:text-accent transition-colors duration-300 text-left'
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <button
+                    key={index}
+                    id={`header_mobile_nav_link_${item.id}`}
+                    onClick={() => handleNavClick(item.id)}
+                    className='text-primary font-medium hover:text-accent transition-colors duration-300 text-left'
+                    aria-label={`Navigēt uz ${item.label}`}
+                  >
+                    {item.label}
+                  </button>
+                )
               ))}
+              
               <button
                 id='header_mobile_post_ad_button'
                 onClick={() => handleNavClick('contact')}
