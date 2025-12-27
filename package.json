@@ -11,7 +11,8 @@
     "next": "13.4.19",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "next-sitemap": "^4.2.3"
+    "next-sitemap": "^4.2.3",
+    "@supabase/supabase-js": "^2.39.0"
   },
   "devDependencies": {
     "tailwindcss": "3.3.3",
