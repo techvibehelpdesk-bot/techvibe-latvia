@@ -15,6 +15,7 @@ export default function Header() {
     { label: 'Sākums', id: 'home' },
     { label: 'Kategorijas', id: 'categories' },
     { label: 'Jaunākie sludinājumi', id: 'listings' },
+    { label: 'Visi sludinājumi', id: 'all_listings', href: '/sludinajumi' },
     { label: 'Pakalpojumi', id: 'services' },
     { label: 'Cenas', id: 'pricing' },
     { label: 'BUJ', id: 'faq' },
