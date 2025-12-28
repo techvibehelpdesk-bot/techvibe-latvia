@@ -1,6 +1,6 @@
-// pages/ievietot.js - SS.COM stila kategorijas + mūsu dizains
-
+// pages/ievietot.js - SS.COM stila ar kategorijām + Atpakaļ poga
 import Head from "next/head";
+import Link from "next/link";
 
 const categories = [
   { id: 1, name: "Telefoni un aksesuāri", icon: "📱" },
@@ -25,12 +25,23 @@ export default function IevietotSludinajumu() {
 
       <main className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-10">
         <div className="max-w-4xl mx-auto px-4">
+          
+          {/* ATBALKA POGA AUGŠĀ */}
+          <div className="mb-6">
+            <Link 
+              href="/" 
+              className="inline-flex items-center px-6 py-3 bg-white hover:bg-gray-50 border-2 border-gray-200 rounded-xl shadow-sm text-lg font-semibold text-gray-800 hover:text-purple-600 hover:border-purple-400 transition-all"
+            >
+              ← Atpakaļ uz sākuma lapu
+            </Link>
+          </div>
+
           <div className="bg-white shadow-xl rounded-2xl p-8 mb-8">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-8">
               Ievietot jaunu sludinājumu
             </h1>
 
-            {/* KATEGORIJU IZvēLE kā ss.com */}
+            {/* KATEGORIJU IZVĒLE */}
             <div className="mb-8 p-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border-2 border-dashed border-indigo-200">
               <label className="block text-lg font-semibold mb-4 text-gray-800">
                 1. Izvēlies kategoriju
@@ -99,12 +110,23 @@ export default function IevietotSludinajumu() {
                 </div>
               </div>
 
+              {/* PUBLICĒT POGA */}
               <button
                 type="submit"
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-xl text-lg shadow-lg hover:shadow-xl transition-all"
               >
                 🚀 Publicēt sludinājumu
               </button>
+
+              {/* ATBALKA POGA ZEM FORMAS */}
+              <div className="pt-6 border-t border-gray-200">
+                <Link 
+                  href="/" 
+                  className="inline-flex items-center px-6 py-3 bg-white hover:bg-gray-50 border-2 border-gray-200 rounded-xl shadow-sm text-lg font-semibold text-gray-700 hover:text-purple-600 hover:border-purple-400 transition-all"
+                >
+                  ← Atpakaļ uz sākuma lapu
+                </Link>
+              </div>
             </form>
           </div>
         </div>
