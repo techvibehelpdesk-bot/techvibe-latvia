@@ -1,4 +1,4 @@
-// pages/[kategorija].js - UZLABOTĀS KATEGORIJAS ar plašiem filtriem
+// pages/[kategorija].js - SALABOTĀS CENA + STĀVOKĻA FILTŖI
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Head from "next/head";
@@ -7,7 +7,6 @@ export default function Kategorija() {
   const router = useRouter();
   const { kategorija } = router.query;
 
-  // PLAŠĀKS ZĪMOLU KLĀSTS + vairāki filtri
   const kategorijuDati = {
     telefoni: {
       nosaukums: "Telefoni un aksesuāri",
@@ -20,7 +19,7 @@ export default function Kategorija() {
         { id: 5, virsraksts: "Xiaomi 14 Pro 512GB", cena: "680€", datums: "4 dienas", zīmols: "Xiaomi" },
       ],
       zīmoli: ["Apple", "Samsung", "Google", "Xiaomi", "Huawei", "OnePlus", "Sony", "Nokia", "Motorola"],
-      stavoklis: ["Jauns", "Lietots", "Nomainīt"],
+      stavoklis: ["Jauns", "Lietots", "Detalās", "Cits", "Īrē/Iznomā", "Atdot par brīvu"],
     },
     auto: {
       nosaukums: "Auto un moto",
@@ -32,7 +31,7 @@ export default function Kategorija() {
         { id: 4, virsraksts: "Audi A4 2.0 TFSI", cena: "22 000€", datums: "3 dienas", zīmols: "Audi" },
       ],
       zīmoli: ["VW", "BMW", "Audi", "Mercedes", "Toyota", "Skoda", "Volvo", "Hyundai", "Kia", "Ford", "Opel", "Peugeot"],
-      stavoklis: ["Jauns", "Lietots", "Nomainīt"],
+      stavoklis: ["Jauns", "Lietots", "Detalās", "Cits", "Īrē/Iznomā", "Atdot par brīvu"],
     },
     datori: {
       nosaukums: "Datori un programmatūra",
@@ -44,7 +43,7 @@ export default function Kategorija() {
         { id: 4, virsraksts: "Lenovo Legion 5", cena: "1 450€", datums: "4 dienas", zīmols: "Lenovo" },
       ],
       zīmoli: ["Apple", "Dell", "HP", "Lenovo", "Asus", "Acer", "MSI", "Custom", "Alienware"],
-      stavoklis: ["Jauns", "Lietots", "Nomainīt"],
+      stavoklis: ["Jauns", "Lietots", "Detalās", "Cits", "Īrē/Iznomā", "Atdot par brīvu"],
     },
   };
 
@@ -66,30 +65,39 @@ export default function Kategorija() {
             </Link>
           </div>
 
-          {/* UZLABOTI FILTŖI + SLUDINĀJUMI - LABĀKĀ LAYOUT */}
+          {/* SALABOTI FILTŖI + SLUDINĀJUMI */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             
-            {/* FILTŖU PANELIS - PLAŠĀKS */}
+            {/* FILTŖU PANELIS - SALABOTA CENA */}
             <div className="lg:col-span-1 bg-white shadow-xl rounded-2xl p-6 sticky top-8 h-fit">
               <h2 className="text-xl font-bold mb-6 text-gray-900 border-b pb-4">Filtri</h2>
               
               <div className="space-y-6">
-                {/* CENA */}
-                <div>
+                {/* SALABOTA CENA - VISPĀR PLAŠĀKA */}
+                <div className="w-full">
                   <label className="block text-sm font-semibold mb-3 text-gray-700">Cena (€)</label>
-                  <div className="space-y-2">
-                    <div className="flex space-x-2">
-                      <input type="number" className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="Min" />
-                      <span className="self-center text-gray-400">-</span>
-                      <input type="number" className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="Max" />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <input 
+                        type="number" 
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" 
+                        placeholder="Min" 
+                      />
+                    </div>
+                    <div>
+                      <input 
+                        type="number" 
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" 
+                        placeholder="Max" 
+                      />
                     </div>
                   </div>
                 </div>
 
-                {/* STĀVOKLIS */}
+                {/* PAPLAŠINĀTS STĀVOKLIS */}
                 <div>
                   <label className="block text-sm font-semibold mb-3 text-gray-700">Stāvoklis</label>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                  <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
                     {kategorijaData.stavoklis.map((stav) => (
                       <label key={stav} className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
                         <input type="checkbox" className="mr-3 w-4 h-4 rounded" />
@@ -99,7 +107,7 @@ export default function Kategorija() {
                   </div>
                 </div>
 
-                {/* ZĪMOLS - SCROLL + PLAŠĀKS */}
+                {/* ZĪMOLS */}
                 <div>
                   <label className="block text-sm font-semibold mb-3 text-gray-700">Zīmols</label>
                   <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
@@ -118,7 +126,7 @@ export default function Kategorija() {
               </div>
             </div>
 
-            {/* SLUDINĀJUMI - VAIRĀK SPACE */}
+            {/* SLUDINĀJUMI */}
             <div className="lg:col-span-4">
               <div className="flex justify-between items-center mb-8">
                 <div>
