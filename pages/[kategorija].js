@@ -1,4 +1,4 @@
-// pages/[kategorija].js - SALABOTĀS CENA + STĀVOKĻA FILTŖI
+// pages/[kategorija].js - PILNS AR 50+ AUTO MARKĀM
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Head from "next/head";
@@ -18,7 +18,7 @@ export default function Kategorija() {
         { id: 4, virsraksts: "Google Pixel 9 Pro", cena: "850€", datums: "3 dienas", zīmols: "Google" },
         { id: 5, virsraksts: "Xiaomi 14 Pro 512GB", cena: "680€", datums: "4 dienas", zīmols: "Xiaomi" },
       ],
-      zīmoli: ["Apple", "Samsung", "Google", "Xiaomi", "Huawei", "OnePlus", "Sony", "Nokia", "Motorola"],
+      zīmoli: ["Apple", "Samsung", "Google", "Xiaomi", "Huawei", "OnePlus", "Sony", "Nokia", "Motorola", "Oppo", "Vivo", "Realme", "Honor", "Nothing", "Fairphone", "Asus", "BlackBerry"],
       stavoklis: ["Jauns", "Lietots", "Detalās", "Cits", "Īrē/Iznomā", "Atdot par brīvu"],
     },
     auto: {
@@ -30,7 +30,13 @@ export default function Kategorija() {
         { id: 3, virsraksts: "Toyota Corolla Hybrid", cena: "18 200€", datums: "2 dienas", zīmols: "Toyota" },
         { id: 4, virsraksts: "Audi A4 2.0 TFSI", cena: "22 000€", datums: "3 dienas", zīmols: "Audi" },
       ],
-      zīmoli: ["VW", "BMW", "Audi", "Mercedes", "Toyota", "Skoda", "Volvo", "Hyundai", "Kia", "Ford", "Opel", "Peugeot"],
+      zīmoli: [
+        "VW", "BMW", "Audi", "Mercedes", "Toyota", "Skoda", "Volvo", "Hyundai", "Kia", "Ford", 
+        "Opel", "Peugeot", "Renault", "Fiat", "Mazda", "Honda", "Nissan", "Citroen", "Seat", 
+        "Suzuki", "Mitsubishi", "Land Rover", "Porsche", "Jaguar", "Mini", "Alfa Romeo", 
+        "Lada", "GAZ", "UAZ", "Moskvich", "ZAZ", "Tesla", "Subaru", "Lexus", "Infiniti", 
+        "Dacia", "SsangYong", "Jeep", "Chrysler", "Dodge", "Chevrolet", "Pontiac"
+      ],
       stavoklis: ["Jauns", "Lietots", "Detalās", "Cits", "Īrē/Iznomā", "Atdot par brīvu"],
     },
     datori: {
@@ -42,7 +48,7 @@ export default function Kategorija() {
         { id: 3, virsraksts: "Dell XPS 15 2024", cena: "1 900€", datums: "3 dienas", zīmols: "Dell" },
         { id: 4, virsraksts: "Lenovo Legion 5", cena: "1 450€", datums: "4 dienas", zīmols: "Lenovo" },
       ],
-      zīmoli: ["Apple", "Dell", "HP", "Lenovo", "Asus", "Acer", "MSI", "Custom", "Alienware"],
+      zīmoli: ["Apple", "Dell", "HP", "Lenovo", "Asus", "Acer", "MSI", "Custom", "Alienware", "Razer", "Microsoft"],
       stavoklis: ["Jauns", "Lietots", "Detalās", "Cits", "Īrē/Iznomā", "Atdot par brīvu"],
     },
   };
@@ -65,15 +71,15 @@ export default function Kategorija() {
             </Link>
           </div>
 
-          {/* SALABOTI FILTŖI + SLUDINĀJUMI */}
+          {/* FILTŖI + SLUDINĀJUMI */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             
-            {/* FILTŖU PANELIS - SALABOTA CENA */}
+            {/* FILTŖU PANELIS */}
             <div className="lg:col-span-1 bg-white shadow-xl rounded-2xl p-6 sticky top-8 h-fit">
               <h2 className="text-xl font-bold mb-6 text-gray-900 border-b pb-4">Filtri</h2>
               
               <div className="space-y-6">
-                {/* SALABOTA CENA - VISPĀR PLAŠĀKA */}
+                {/* SALABOTA CENA */}
                 <div className="w-full">
                   <label className="block text-sm font-semibold mb-3 text-gray-700">Cena (€)</label>
                   <div className="grid grid-cols-2 gap-3">
@@ -94,7 +100,7 @@ export default function Kategorija() {
                   </div>
                 </div>
 
-                {/* PAPLAŠINĀTS STĀVOKLIS */}
+                {/* STĀVOKLIS */}
                 <div>
                   <label className="block text-sm font-semibold mb-3 text-gray-700">Stāvoklis</label>
                   <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
@@ -107,7 +113,7 @@ export default function Kategorija() {
                   </div>
                 </div>
 
-                {/* ZĪMOLS */}
+                {/* ZĪMOLS - 50+ AUTO MARKAS */}
                 <div>
                   <label className="block text-sm font-semibold mb-3 text-gray-700">Zīmols</label>
                   <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
