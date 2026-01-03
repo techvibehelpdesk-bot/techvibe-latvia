@@ -1,162 +1,73 @@
-import React from 'react';
+// components/Footer.js
+import Link from 'next/link';
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
-
   return (
-    <footer id='footer_main' className='w-full bg-primary text-gray-100'>
-      <div id='footer_container' className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16'>
+    <footer className="bg-gray-900 text-white py-12 mt-20 border-t-4 border-blue-600">
+      <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-8">
         
-        {/* Footer Content Grid */}
-        <div id='footer_content_grid' className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12'>
-          
-          {/* Brand Section */}
-          <div id='footer_brand_section' className='flex flex-col gap-4'>
-            <div id='footer_logo_container' className='flex items-center gap-2'>
-              <div id='footer_logo_icon' className='w-10 h-10 bg-accent rounded-lg flex items-center justify-center'>
-                <span id='footer_logo_text' className='text-white font-bold text-lg'>TV</span>
-              </div>
-              <span id='footer_brand_name' className='text-2xl font-bold text-white'>TechVibe</span>
-            </div>
-            <p id='footer_brand_description' className='text-gray-300 leading-relaxed'>
-              Jūsu galvenā tirgus vieta elektronisko ierīču pirkšanai, pārdošanai, nomai un koplietošanai ar pārliecību.
-            </p>
-          </div>
-
-          {/* Quick Links */}
-          <div id='footer_quick_links_section' className='flex flex-col gap-4'>
-            <h4 id='footer_quick_links_title' className='text-lg font-bold text-white'>
-              Ātrās Saites
-            </h4>
-            <ul id='footer_quick_links_list' className='space-y-2'>
-              <li id='footer_link_home'>
-                <a href='#home' className='text-gray-300 hover:text-accent transition-colors duration-300'>
-                  Sākums
-                </a>
-              </li>
-              <li id='footer_link_services'>
-                <a href='#services' className='text-gray-300 hover:text-accent transition-colors duration-300'>
-                  Pakalpojumi
-                </a>
-              </li>
-              <li id='footer_link_pricing'>
-                <a href='#pricing' className='text-gray-300 hover:text-accent transition-colors duration-300'>
-                  Cenas
-                </a>
-              </li>
-              <li id='footer_link_faq'>
-                <a href='#faq' className='text-gray-300 hover:text-accent transition-colors duration-300'>
-                  BUJ
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div id='footer_resources_section' className='flex flex-col gap-4'>
-            <h4 id='footer_resources_title' className='text-lg font-bold text-white'>
-              Resursi
-            </h4>
-            <ul id='footer_resources_list' className='space-y-2'>
-              <li id='footer_resource_blog'>
-                <a href='#' className='text-gray-300 hover:text-accent transition-colors duration-300'>
-                  Blogs
-                </a>
-              </li>
-              <li id='footer_resource_help'>
-                <a href='#' className='text-gray-300 hover:text-accent transition-colors duration-300'>
-                  Palīdzības Centrs
-                </a>
-              </li>
-              <li id='footer_resource_community'>
-                <a href='#' className='text-gray-300 hover:text-accent transition-colors duration-300'>
-                  Kopiena
-                </a>
-              </li>
-              <li id='footer_resource_api'>
-                <a href='#' className='text-gray-300 hover:text-accent transition-colors duration-300'>
-                  API Dokumentācija
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div id='footer_legal_section' className='flex flex-col gap-4'>
-            <h4 id='footer_legal_title' className='text-lg font-bold text-white'>
-              Juridisks
-            </h4>
-            <ul id='footer_legal_list' className='space-y-2'>
-              <li id='footer_legal_privacy'>
-                <a href='#' className='text-gray-300 hover:text-accent transition-colors duration-300'>
-                  Privātuma Politika
-                </a>
-              </li>
-              <li id='footer_legal_terms'>
-                <a href='#' className='text-gray-300 hover:text-accent transition-colors duration-300'>
-                  Pakalpojuma Noteikumi
-                </a>
-              </li>
-              <li id='footer_legal_cookies'>
-                <a href='#' className='text-gray-300 hover:text-accent transition-colors duration-300'>
-                  Sīkdatņu Politika
-                </a>
-              </li>
-              <li id='footer_legal_contact'>
-                <a href='#contact' className='text-gray-300 hover:text-accent transition-colors duration-300'>
-                  Sazināties ar Mums
-                </a>
-              </li>
-            </ul>
+        {/* Logo */}
+        <div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-6">
+            TechVibe
+          </h2>
+          <p className="text-gray-400 text-lg leading-relaxed mb-6">
+            Sludinājumi Latvijā. Bezmaksas starts, Premium €4.90/mēn.
+          </p>
+          <div className="flex space-x-4">
+            <a href="https://facebook.com" className="w-12 h-12 bg-blue-600 hover:bg-blue-700 rounded-xl flex items-center justify-center text-xl transition-all" target="_blank" rel="noopener">📘</a>
+            <a href="https://twitter.com" className="w-12 h-12 bg-blue-500 hover:bg-blue-600 rounded-xl flex items-center justify-center text-xl transition-all" target="_blank" rel="noopener">🐦</a>
+            <a href="https://instagram.com" className="w-12 h-12 bg-pink-500 hover:bg-pink-600 rounded-xl flex items-center justify-center text-xl transition-all" target="_blank" rel="noopener">📷</a>
           </div>
         </div>
 
-        {/* Divider */}
-        <div id='footer_divider' className='border-t border-gray-700 my-8'></div>
+        {/* Saites */}
+        <div>
+          <h4 className="text-xl font-bold mb-6 text-white">Saites</h4>
+          <ul className="space-y-3">
+            <li><Link href="/" className="text-gray-400 hover:text-white block py-1">🏠 Sākums</Link></li>
+            <li><Link href="/sludinajumi" className="text-gray-400 hover:text-white block py-1">📋 Sludinājumi</Link></li>
+            <li><Link href="/pakalpojumi" className="text-gray-400 hover:text-white block py-1">🛠️ Pakalpojumi</Link></li>
+            <li><Link href="/cenas" className="text-gray-400 hover:text-white block py-1">💰 Cenas</Link></li>
+          </ul>
+        </div>
 
-        {/* Bottom Section */}
-        <div id='footer_bottom_section' className='flex flex-col sm:flex-row justify-between items-center gap-4'>
-          
-          {/* Copyright */}
-          <p id='footer_copyright' className='text-gray-400 text-sm'>
-            © {currentYear} TechVibe. Visas tiesības paturētas.
-          </p>
+        {/* Kategorijas */}
+        <div>
+          <h4 className="text-xl font-bold mb-6 text-white">Kategorijas</h4>
+          <ul className="space-y-3">
+            <li><Link href="/kategorija/telefoni" className="text-gray-400 hover:text-white block py-1">📱 Telefoni (2,847)</Link></li>
+            <li><Link href="/kategorija/datori" className="text-gray-400 hover:text-white block py-1">💻 Datori (1,592)</Link></li>
+            <li><Link href="/kategorija/auto" className="text-gray-400 hover:text-white block py-1">🚗 Auto (5,247)</Link></li>
+            <li><Link href="/kategorija/audio" className="text-gray-400 hover:text-white block py-1">🎧 Audio (1,028)</Link></li>
+          </ul>
+        </div>
 
-          {/* Social Links */}
-          <div id='footer_social_links' className='flex gap-4'>
-            <a
-              id='footer_social_facebook'
-              href='#'
-              className='w-10 h-10 bg-gray-700 hover:bg-accent text-white rounded-full flex items-center justify-center transition-colors duration-300'
-              aria-label='Sekojiet TechVibe uz Facebook'
-            >
-              f
+        {/* Kontakti */}
+        <div>
+          <h4 className="text-xl font-bold mb-6 text-white">Support</h4>
+          <div className="space-y-4">
+            <a href="mailto:techvibehelpdesk@gmail.com" className="flex items-start text-gray-400 hover:text-white group">
+              <span className="mr-3 mt-1">📧</span>
+              <span>techvibehelpdesk@gmail.com</span>
+              <span className="ml-auto text-xs opacity-75 group-hover:opacity-100">24h</span>
             </a>
-            <a
-              id='footer_social_twitter'
-              href='#'
-              className='w-10 h-10 bg-gray-700 hover:bg-accent text-white rounded-full flex items-center justify-center transition-colors duration-300'
-              aria-label='Sekojiet TechVibe uz Twitter'
-            >
-              𝕏
+            <a href="tel:+37128655228" className="flex items-center text-lg font-bold text-green-400 hover:text-green-300">
+              📞 +371 28 655 228
             </a>
-            <a
-              id='footer_social_linkedin'
-              href='#'
-              className='w-10 h-10 bg-gray-700 hover:bg-accent text-white rounded-full flex items-center justify-center transition-colors duration-300'
-              aria-label='Sekojiet TechVibe uz LinkedIn'
-            >
-              in
-            </a>
-            <a
-              id='footer_social_instagram'
-              href='#'
-              className='w-10 h-10 bg-gray-700 hover:bg-accent text-white rounded-full flex items-center justify-center transition-colors duration-300'
-              aria-label='Sekojiet TechVibe uz Instagram'
-            >
-              📷
-            </a>
+            <p className="text-sm text-gray-500">P-PN 9-18</p>
           </div>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400 text-sm bg-gray-950 py-8 rounded-t-3xl -mx-6 md:-mx-8 lg:-mx-16">
+        <p className="mb-4">© 2026 TechVibe SIA. Reģ.nr. 401234-56789. Rīga, Latvija.</p>
+        <div className="flex flex-wrap justify-center gap-4 text-xs">
+          <Link href="/buj" className="hover:text-white">BUJ</Link>
+          <Link href="/cenas" className="hover:text-white">Cenas</Link>
+          <Link href="/kontakti" className="hover:text-white">Kontakti</Link>
+          <Link href="/privacy" className="hover:text-white">Privātums</Link>
+          <Link href="/noteikumi" className="hover:text-white">Lietošanas noteikumi</Link>
         </div>
       </div>
     </footer>
