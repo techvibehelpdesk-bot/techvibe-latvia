@@ -5,17 +5,17 @@ export default function Home() {
     <div 
       className="min-h-screen" 
       style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-4.0.3&fit=crop&w=2560&q=80')`,
+        backgroundImage: `url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&fit=crop&w=2560&q=85')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
         backgroundBlendMode: 'overlay',
-        backgroundColor: 'rgba(241,245,249,0.95)'
+        backgroundColor: 'rgba(248, 250, 252, 0.98)'
       }}
     >
       
       {/* Hero */}
-      <section className="pt-24 pb-20 px-4 relative z-10 bg-white/90 backdrop-blur-md">
+      <section className="pt-24 pb-20 px-4 relative z-10 bg-white/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
             TechVibe
