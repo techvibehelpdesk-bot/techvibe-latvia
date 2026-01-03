@@ -68,4 +68,39 @@ export default function Header() {
           {/* Mobile button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className
+            className='lg:hidden p-2'
+          >
+            ☰
+          </button>
+        </div>
+
+        {/* Mobile Navigation - FIKSĒTS! */}
+        {mobileMenuOpen && (
+          <div className='lg:hidden mt-4 pb-4 border-t'>
+            <div className='flex flex-col gap-4'>
+              {navItems.map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.href || '#'}
+                  onClick={(e) => {
+                    setMobileMenuOpen(false);
+                    if (!item.href) {
+                      e.preventDefault();
+                      handleNavClick(null, item.id);
+                    }
+                  }}
+                  className='text-blue-600 font-medium py-2 hover:text-purple-600'
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <Link href="/ievietot" className='bg-blue-500 text-white py-3 rounded-lg text-center font-bold'>
+                Ievietot sludinājumu
+              </Link>
+            </div>
+          </div>
+        )}
+      </nav>
+    </header>
+  );
+}
