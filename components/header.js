@@ -13,16 +13,16 @@ export default function Header() {
     }
   };
 
-  const navItems = [
-    { label: 'Sākums', id: 'home' },
-    { label: 'Kategorijas', id: 'categories' },
-    { label: 'Jaunākie sludinājumi', id: 'listings' },
-    { label: 'Visi sludinājumi', id: 'all_listings', href: '/sludinajumi' },
-    { label: 'Pakalpojumi', id: 'services' },
-    { label: 'Cenas', id: 'pricing' },
-    { label: 'BUJ', id: 'faq' },
-    { label: 'Kontakti', id: 'contact' }
-  ];
+const navItems = [
+  {label: 'Sākums', href: '/'},
+  {label: 'Kategorijas', href: '/kategorijas'},     // ← ŠIS PIENĀC!
+  {label: 'Jaunākie sludinājumi', href: '/sludinajumi'},
+  {label: 'Pakalpojumi', href: '/pakalpojumi'},
+  {label: 'Cenas', href: '/cenas'},
+  {label: 'BUJ', href: '/buj'},
+  {label: 'Kontakti', href: '/kontakti'}
+];
+
 
   return (
     <header id='header_main_container' className='sticky top-0 z-50 bg-white shadow-md'>
