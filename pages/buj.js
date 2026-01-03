@@ -79,8 +79,8 @@ export default function Buj() {
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <p className="text-lg text-gray-700 mb-4">
-                  <strong>Email:</strong> support@techvibe.lv<br/>
-                  <strong>Tālrunis:</strong> +371 20 123 456 (P-PN 9-18)
+                  <strong>Email:</strong> techvibehelpdesk@gmail.com<br/>
+                  <strong>Tālrunis:</strong> +371 28655228 (P-PN 9-18)
                 </p>
                 <p className="text-sm text-gray-500">Atbilde 24h laikā</p>
               </div>
