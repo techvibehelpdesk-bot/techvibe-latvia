@@ -4,24 +4,9 @@ import Link from 'next/link';
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // JAUNA loģika - skroll tikai JA nav href!
-  const handleNavClick = (href, sectionId) => {
-    if (href) {
-      // Ja ir href, izmanto Link (navigācija)
-      window.location.href = href;
-    } else {
-      // Ja nav href, skroll
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-    setMobileMenuOpen(false);
-  };
-
   const navItems = [
     { label: 'Sākums', href: '/' },
-    { label: 'Kategorijas', href: '/kategorijas' },     // ✅ STRĀDĀS!
+    { label: 'Kategorijas', href: '/kategorijas' },
     { label: 'Jaunākie sludinājumi', href: '/sludinajumi' },
     { label: 'Pakalpojumi', href: '/pakalpojumi' },
     { label: 'Cenas', href: '/cenas' },
@@ -42,18 +27,12 @@ export default function Header() {
             <span className='text-2xl font-bold text-blue-600 hidden sm:inline'>TechVibe</span>
           </div>
 
-          {/* Desktop Navigation - FIKSĒTS! */}
+          {/* Desktop Navigation - ✅ SALABOJUSI */}
           <div className='hidden lg:flex items-center gap-8'>
             {navItems.map((item, index) => (
               <Link
                 key={index}
-                href={item.href || '#'}  // Vienmēr izmanto Link!
-                onClick={(e) => {
-                  if (!item.href) {
-                    e.preventDefault();
-                    handleNavClick(null, item.id);
-                  }
-                }}
+                href={item.href}
                 className='text-blue-600 font-medium hover:text-purple-600 transition-colors duration-300'
               >
                 {item.label}
@@ -68,33 +47,31 @@ export default function Header() {
           {/* Mobile button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className='lg:hidden p-2'
+            className='lg:hidden p-2 text-2xl'
           >
             ☰
           </button>
         </div>
 
-        {/* Mobile Navigation - FIKSĒTS! */}
+        {/* Mobile Navigation - ✅ SALABOJUSI */}
         {mobileMenuOpen && (
-          <div className='lg:hidden mt-4 pb-4 border-t'>
+          <div className='lg:hidden mt-4 pb-4 border-t border-gray-200'>
             <div className='flex flex-col gap-4'>
               {navItems.map((item, index) => (
                 <Link
                   key={index}
-                  href={item.href || '#'}
-                  onClick={(e) => {
-                    setMobileMenuOpen(false);
-                    if (!item.href) {
-                      e.preventDefault();
-                      handleNavClick(null, item.id);
-                    }
-                  }}
-                  className='text-blue-600 font-medium py-2 hover:text-purple-600'
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className='text-blue-600 font-medium py-3 px-4 hover:text-purple-600 border-l-4 border-transparent hover:border-blue-500'
                 >
                   {item.label}
                 </Link>
               ))}
-              <Link href="/ievietot" className='bg-blue-500 text-white py-3 rounded-lg text-center font-bold'>
+              <Link 
+                href="/ievietot" 
+                onClick={() => setMobileMenuOpen(false)}
+                className='bg-blue-500 text-white py-3 px-4 rounded-lg text-center font-bold hover:bg-blue-600'
+              >
                 Ievietot sludinājumu
               </Link>
             </div>
