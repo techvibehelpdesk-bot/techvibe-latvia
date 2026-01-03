@@ -2,20 +2,12 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div 
-      className="min-h-screen" 
-      style={{
-        backgroundImage: `url('https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-4.0.3&fit=crop&w=2560&q=85')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-        backgroundBlendMode: 'overlay',
-        backgroundColor: 'rgba(248, 250, 252, 0.98)'
-      }}
-    >
+    <div className="min-h-screen bg-gradient-to-br from-slate-50/90 via-blue-50/90 to-indigo-50/90 
+                    bg-[url('https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-4.0.3&fit=crop&w=2560&q=85')] 
+                    bg-blend-overlay bg-cover bg-center bg-fixed">
       
       {/* Hero */}
-      <section className="pt-24 pb-20 px-4 relative z-10 bg-white/95 backdrop-blur-md">
+      <section className="pt-24 pb-20 px-4 relative z-10 bg-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
             TechVibe
@@ -35,7 +27,7 @@ export default function Home() {
       </section>
 
       {/* Kategorijas */}
-      <section className="py-20 bg-white/95 backdrop-blur-md relative z-10">
+      <section className="py-20 bg-white/80 backdrop-blur-sm relative z-10">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">Populārākās kategorijas</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -45,7 +37,7 @@ export default function Home() {
               { icon: '🚗', name: 'Auto', href: '/kategorija/auto', count: '5,247' },
               { icon: '🎧', name: 'Audio', href: '/kategorija/audio', count: '1,028' }
             ].map((cat, i) => (
-              <Link key={i} href={cat.href} className="group bg-white backdrop-blur-sm rounded-2xl p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition-all border hover:border-blue-200 shadow-lg">
+              <Link key={i} href={cat.href} className="group bg-white/90 backdrop-blur-sm rounded-2xl p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition-all border hover:border-blue-200 shadow-lg">
                 <div className="text-4xl mb-4 group-hover:scale-110">{cat.icon}</div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{cat.name}</h3>
                 <p className="text-2xl font-bold text-blue-600">{cat.count}</p>
@@ -56,7 +48,7 @@ export default function Home() {
       </section>
 
       {/* Sludinājumi */}
-      <section className="py-20 px-4 bg-white/90 backdrop-blur-md relative z-10">
+      <section className="py-20 px-4 bg-white/80 backdrop-blur-sm relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900">Jaunākie sludinājumi</h2>
@@ -69,7 +61,7 @@ export default function Home() {
               { img: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=300', title: 'BMW X5 2023', price: '€45,000', city: 'Daugavpils' },
               { img: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=300', title: 'Sony WH-1000XM5', price: '€350', city: 'Liepāja' }
             ].map((ad, i) => (
-              <Link key={i} href="/sludinajums/1" className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all">
+              <Link key={i} href="/sludinajums/1" className="group bg-white/90 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all backdrop-blur-sm">
                 <div className="h-48 bg-cover bg-center" style={{backgroundImage: `url(${ad.img})`}} />
                 <div className="p-6">
                   <h3 className="font-bold text-xl mb-2 group-hover:text-blue-600 line-clamp-2">{ad.title}</h3>
