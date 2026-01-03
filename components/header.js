@@ -5,15 +5,15 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { label: 'Sākums', href: '/' },
-    { label: 'Kategorijas', href: '/kategorijas' },
-    { label: 'Jaunākie sludinājumi', href: '/sludinajumi' },
-    { label: 'Pakalpojumi', href: '/pakalpojumi' },
-    { label: 'Cenas', href: '/cenas' },
-    { label: 'BUJ', href: '/buj' },
-    { label: 'Kontakti', href: '/kontakti' }
-  ];
-
+  { label: 'Sākums', href: '/' },
+  { label: 'Kategorijas', href: '/kategorijas' },
+  { label: 'Visi sludinājumi', href: '/sludinajumi' },     // ← ŠIS ATGRIEŽAS!
+  { label: 'Jaunākie sludinājumi', href: '/jaunakie' },   // ← ŠIS JAUNS!
+  { label: 'Pakalpojumi', href: '/pakalpojumi' },
+  { label: 'Cenas', href: '/cenas' },
+  { label: 'BUJ', href: '/buj' },
+  { label: 'Kontakti', href: '/kontakti' }
+];
   return (
     <header className='sticky top-0 z-50 bg-white shadow-md'>
       <nav className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4'>
