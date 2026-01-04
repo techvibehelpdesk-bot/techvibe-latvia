@@ -30,16 +30,21 @@ export default function Kategorija() {
   }, [kategorija]);
 
   const fetchSludinajumi = async () => {
-    const { data } = await supabase
-      .from('sludinajumi')
-      .select('*')
-      .eq('category', kategorija)
-      .eq('status', 'publicēts')
-      .order('created_at', { ascending: false });
-    
-    setSludinajumi(data || []);
-    setLoading(false);
-  };
+  console.log('🔍 Meklē:', kategorija); // F12 Console
+  
+  const { data, error } = await supabase
+    .from('sludinajumi')
+    .select('*')
+    .eq('status', 'publicēts')
+    .eq('category', kategorija)  // 'telefoni'
+    .order('created_at', { ascending: false });
+  
+  console.log('📊 Data:', data);  // Cik atrada?
+  console.log('❌ Error:', error);
+  
+  setSludinajumi(data || []);
+  setLoading(false);
+};
 
   if (!config || loading) {
     return (
