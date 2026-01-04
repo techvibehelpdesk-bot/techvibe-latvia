@@ -2,11 +2,47 @@ import Link from 'next/link';
 
 export default function Admin() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center p-8">
-      <div className="bg-white/95 backdrop-blur-xl p-16 rounded-3xl shadow-3xl max-w-4xl w-full">
-        <h1 className="text-5xl font-black text-center text-gray-900 mb-12 drop-shadow-2xl">🔐 Admin Panelis</h1>
+    <div style={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem',
+      fontFamily: 'system-ui'
+    }}>
+      <div style={{
+        background: 'rgba(255,255,255,0.95)',
+        backdropFilter: 'blur(20px)',
+        padding: '4rem',
+        borderRadius: '2rem',
+        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+        maxWidth: '800px',
+        width: '100%',
+        textAlign: 'center'
+      }}>
+        <h1 style={{
+          fontSize: '3rem',
+          fontWeight: '900',
+          color: '#1f2937',
+          marginBottom: '3rem',
+          textShadow: '0 4px 8px rgba(0,0,0,0.1)'
+        }}>
+          🔐 Admin Panelis
+        </h1>
         
-        <div className="grid lg:grid-cols-2 gap-12 mb-16">
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '3rem',
+          marginBottom: '3rem'
+        }}>
           
-          {/* SUPABASE SOLI */}
-          <div className="bg-blue
+          {/* SUPABASE */}
+          <div style={{
+            background: '#eff6ff',
+            border: '4px solid #bfdbfe',
+            padding: '3rem',
+            borderRadius: '2rem'
+          }}>
+            <h3 style={{ fontSize: '2rem
