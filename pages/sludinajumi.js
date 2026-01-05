@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 
+// SVARĪGI: Pārliecinies, ka tev ir pareizie Supabase dati
+// Ja tev ir atsevišķs fails 'lib/supabaseClient.js', vari importēt no turienes.
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -12,43 +14,97 @@ export default function VisiSludinajumi() {
 
   useEffect(() => {
     async function fetchSludinajumi() {
+      setLoading(true);
+      // Velkam datus no tabulas 'sludinajumi'
       const { data, error } = await supabase
         .from('sludinajumi')
         .select('*')
-        .order('created_at', { ascending: false });
-      
-      console.log('Data:', data, 'Error:', error); // Debug F12
-      if (error) console.error(error);
-      else setSludinajumi(data || []);
+        .order('created_at', { ascending: false }); // Jaunākie augšā
+
+      if (error) {
+        console.error('Kļūda:', error);
+      } else {
+        setSludinajumi(data);
+      }
       setLoading(false);
     }
+
     fetchSludinajumi();
   }, []);
 
-  if (loading) return <div>Ielādē...</div>;
-  if (sludinajumi.length === 0) return <div>Nav sludinājumu</div>;
-
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4">
-        <h1 className="text-4xl font-bold mb-12">Visi Sludinājumi</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sludinajumi.map((item) => (
-            <div key={item.id} className="bg-white rounded-xl shadow p-6">
-              <h3 className="font-bold text-xl mb-2">{item.nosaukums || item.title}</h3>
-              <p className="text-gray-600 mb-4">{item.apraksts || item.description}</p>
-              <div className="text-2xl font-bold text-green-600 mb-4">
-                {item.cena || item.price}€
-              </div>
-              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                {item.kategorija || item.category}
-              </span>
-              <Link href={`/sludinajums/${item.id}`} className="block mt-4 bg-blue-600 text-white py-3 rounded-lg text-center font-bold">
-                Skatīt vairāk
-              </Link>
-            </div>
-          ))}
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* Augšdaļa ar virsrakstu un Atpakaļ pogu */}
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-extrabold text-gray-900">
+            Visi Sludinājumi
+          </h1>
+          <Link href="/" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+            ← Atpakaļ uz sākumu
+          </Link>
         </div>
+
+        {/* Ielādes indikators */}
+        {loading ? (
+          <div className="text-center py-20">
+            <p className="text-xl text-gray-500">Ielādē sludinājumus...</p>
+          </div>
+        ) : sludinajumi.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-lg shadow">
+            <p className="text-xl text-gray-500">Šobrīd nav neviena sludinājuma.</p>
+          </div>
+        ) : (
+          
+          /* ŠEIT SĀKAS REŽĢIS (GRID) */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            
+            {sludinajumi.map((sludinajums) => (
+              <div key={sludinajums.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-gray-100 flex flex-col">
+                
+                {/* Bilde */}
+                <div className="h-48 bg-gray-200 relative">
+                  {sludinajums.bilde ? (
+                    <img 
+                      src={sludinajums.bilde} 
+                      alt={sludinajums.nosaukums}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      Nav attēla
+                    </div>
+                  )}
+                  {/* Cena stūrītī */}
+                  <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full font-bold">
+                    {sludinajums.cena} €
+                  </div>
+                </div>
+
+                {/* Apraksts */}
+                <div className="p-4 flex flex-col flex-grow">
+                  <h2 className="text-lg font-bold text-gray-800 mb-1 truncate">
+                    {sludinajums.nosaukums}
+                  </h2>
+                  <p className="text-sm text-gray-500 mb-4 line-clamp-2">
+                    {sludinajums.apraksts}
+                  </p>
+                  
+                  <div className="mt-auto flex items-center justify-between">
+                    <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+                      {sludinajums.atrasanas_vieta || 'Rīga'}
+                    </span>
+                    <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                      Skatīt vairāk →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+          </div>
+        )}
       </div>
     </div>
   );
