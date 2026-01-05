@@ -91,4 +91,21 @@ export default function Home() {
             <div className="mx-auto w-32 h-32 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-3xl flex items-center justify-center mb-8 shadow-2xl">
               <span className="text-4xl">📱</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 to-gray-70
+            <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
+              TechVibe – Tavs sludinājumu portāls
+            </h1>
+            <p className="text-2xl text-gray-500 mb-8 max-w-2xl mx-auto">
+              Pārdod un pērc ātri un viegli. Telefoni, auto, datori, nekustamais īpašums un daudz kas cits.
+            </p>
+            <Link 
+              href="/ievietot" 
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-8 py-4 rounded-xl text-xl font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-block"
+            >
+              Būt pirmais – ievieto sludinājumu!
+            </Link>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
