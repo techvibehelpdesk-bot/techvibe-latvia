@@ -35,48 +35,101 @@ export default function Telefoni() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-xl">Ielādē telefoni sludinājumus...</div>
-      </div>
-    );
+    return <div style={{minHeight: '100vh', background: 'linear-gradient(to bottom right, #eff6ff, #e0e7ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem'}}>📱 Ielādē telefoni...</div>;
   }
 
   return (
     <>
       <Head>
-        <title>Telefoni - TechVibe.lv</title>
-        <meta name="description" content="Telefoni sludinājumi Rīgai un Latvijai" />
+        <title>📱 Telefoni - TechVibe.lv</title>
       </Head>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900">📱 Telefoni</h1>
-              <p className="mt-2 text-xl text-gray-600">
-                {sludinajumi.length} sludinājumi | ss.com stils
-              </p>
-            </div>
+      <div style={{minHeight: '100vh', background: 'linear-gradient(to bottom right, #eff6ff, #e0e7ff)', padding: '2rem 1rem'}}>
+        <div style={{maxWidth: '1200px', margin: '0 auto'}}>
+          <div style={{marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
+            <h1 style={{fontSize: '2.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem'}}>📱 Telefoni</h1>
+            <p style={{fontSize: '1.25rem', color: '#6b7280', marginBottom: '1rem'}}>{sludinajumi.length} sludinājumi</p>
             <Link 
               href="/ievietot" 
-              className="mt-4 sm:mt-0 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+              style={{
+                background: '#059669', color: 'white', padding: '0.75rem 2rem', borderRadius: '0.75rem', 
+                fontWeight: '600', textDecoration: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s'
+              }}
+              onMouseEnter={(e) => {e.target.style.background = '#047857'; e.target.style.boxShadow = '0 20px 25px -5px rgba(0,0,0,0.1)';}}
+              onMouseLeave={(e) => {e.target.style.background = '#059669'; e.target.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)';}}
             >
-              + Ievietot sludinājumu
+              ➕ Ievietot sludinājumu
             </Link>
           </div>
 
           {sludinajumi.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="text-6xl mb-4">📱</div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Vēl nav telefonu sludinājumu</h2>
+            <div style={{textAlign: 'center', padding: '5rem 1rem'}}>
+              <div style={{fontSize: '4rem', marginBottom: '1rem'}}>📱</div>
+              <h2 style={{fontSize: '2rem', fontWeight: 'bold', color: '#111827', marginBottom: '1rem'}}>Vēl nav sludinājumu</h2>
               <Link 
                 href="/ievietot" 
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 inline-block"
+                style={{
+                  background: '#059669', color: 'white', padding: '0.75rem 2rem', borderRadius: '0.75rem', 
+                  fontWeight: '600', textDecoration: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                  transition: 'all 0.3s', display: 'inline-block'
+                }}
               >
-                Būt pirmais – ievieto sludinājumu!
+                Būt pirmais!
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem'}}>
               {sludinajumi.map((sludinajums) => (
-                <div key={sludinajums.id} className="bg-white rou
+                <div 
+                  key={sludinajums.id} 
+                  style={{
+                    background: 'white', borderRadius: '1rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                    transition: 'all 0.3s', overflow: 'hidden'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(0,0,0,0.25)';
+                    e.currentTarget.style.transform = 'scale(1.02)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <div style={{height: '12rem', background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', position: 'relative', overflow: 'hidden'}}>
+                    {sludinajums.images && sludinajums.images[0] ? (
+                      <img 
+                        src={sludinajums.images[0]} 
+                        alt={sludinajums.title}
+                        style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                      />
+                    ) : (
+                      <div style={{width: '100%', height: '100%', background: 'linear-gradient(to right, #d1d5db, #9ca3af)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        <span style={{color: '#6b7280', fontSize: '1.125rem'}}>Nav bildes</span>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{padding: '1.5rem'}}>
+                    <h3 style={{fontWeight: 'bold', fontSize: '1.25rem', color: '#111827', marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>
+                      {sludinajums.title}
+                    </h3>
+                    <p style={{color: '#6b7280', marginBottom: '1rem', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>
+                      {sludinajums.description}
+                    </p>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                      <span style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#059669'}}>
+                        {sludinajums.price} €
+                      </span>
+                      <span style={{fontSize: '0.875rem', color: '#6b7280'}}>
+                        {new Date(sludinajums.created_at).toLocaleDateString('lv-LV')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
