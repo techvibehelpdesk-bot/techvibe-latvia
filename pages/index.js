@@ -90,6 +90,67 @@ export default function Home() {
           </Link>
         </div>
       </section>
+        {/* 🔥 IZSOLES SEKCIJA – TOP kā ss.com special */}
+<div style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', margin: '3rem 0', borderRadius: '1.5rem', overflow: 'hidden'}}>
+  <div style={{maxWidth: '1200px', margin: '0 auto', padding: '2.5rem'}}>
+    <div style={{display: 'flex', alignItems: 'center', marginBottom: '2rem'}}>
+      <div style={{fontSize: '3rem', marginRight: '1rem'}}>⚡</div>
+      <div>
+        <h2 style={{fontSize: '2.5rem', fontWeight: 'bold', color: 'white', marginBottom: '0.25rem'}}>
+          TOP Izsoles – uzvar tagad!
+        </h2>
+        <p style={{color: 'rgba(255,255,255,0.9)', fontSize: '1.25rem'}}>
+          Reāllaika bidēšana • Beidzas šodien
+        </p>
+      </div>
+      <Link href="/izsole" style={{marginLeft: 'auto', background: 'rgba(255,255,255,0.2)', color: 'white', padding: '0.75rem 2rem', borderRadius: '50px', fontWeight: '600', textDecoration: 'none'}}>
+        Skatīt visas →
+      </Link>
+    </div>
+    
+    <div style={{display: 'flex', gap: '1.5rem', overflowX: 'auto', paddingBottom: '1rem'}}>
+      {/* Izsole 1 */}
+      <div style={{minWidth: '320px', background: 'rgba(255,255,255,0.95)', borderRadius: '1rem', padding: '1.5rem', flexShrink: 0}}>
+        <div style={{height: '160px', background: 'linear-gradient(45deg, #f3f4f6, #e5e7eb)', borderRadius: '0.75rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem'}}>📱</div>
+        <h3 style={{fontWeight: 'bold', fontSize: '1.25rem', marginBottom: '0.5rem'}}>iPhone 15 Pro Max 256GB</h3>
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
+          <span style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#059669'}}>€850 <span style={{fontSize: '0.875rem', color: '#6b7280'}}>(12 bids)</span></span>
+          <span style={{color: '#ef4444', fontWeight: '600'}}>2h 15m</span>
+        </div>
+        <Link href="/izsole/1" style={{width: '100%', background: '#059669', color: 'white', padding: '0.75rem', borderRadius: '0.5rem', textAlign: 'center', fontWeight: '600', textDecoration: 'none', display: 'block'}}>
+          Bidēt tagad!
+        </Link>
+      </div>
+      
+      {/* Izsole 2 */}
+      <div style={{minWidth: '320px', background: 'rgba(255,255,255,0.95)', borderRadius: '1rem', padding: '1.5rem', flexShrink: 0}}>
+        <div style={{height: '160px', background: 'linear-gradient(45deg, #f3f4f6, #e5e7eb)', borderRadius: '0.75rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem'}}>🚗</div>
+        <h3 style={{fontWeight: 'bold', fontSize: '1.25rem', marginBottom: '0.5rem'}}>BMW X5 2020</h3>
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
+          <span style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#059669'}}>€18,500 <span style={{fontSize: '0.875rem', color: '#6b7280'}}>(47 bids)</span></span>
+          <span style={{color: '#ef4444', fontWeight: '600'}}>45m</span>
+        </div>
+        <Link href="/izsole/2" style={{width: '100%', background: '#059669', color: 'white', padding: '0.75rem', borderRadius: '0.5rem', textAlign: 'center', fontWeight: '600', textDecoration: 'none', display: 'block'}}>
+          Bidēt tagad!
+        </Link>
+      </div>
+      
+      {/* Izsole 3 */}
+      <div style={{minWidth: '320px', background: 'rgba(255,255,255,0.95)', borderRadius: '1rem', padding: '1.5rem', flexShrink: 0}}>
+        <div style={{height: '160px', background: 'linear-gradient(45deg, #f3f4f6, #e5e7eb)', borderRadius: '0.75rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem'}}>💻</div>
+        <h3 style={{fontWeight: 'bold', fontSize: '1.25rem', marginBottom: '0.5rem'}}>MacBook Pro M3 Max</h3>
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
+          <span style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#059669'}}>€2,450 <span style={{fontSize: '0.875rem', color: '#6b7280'}}>(29 bids)</span></span>
+          <span style={{color: '#ef4444', fontWeight: '600'}}>1h 30m</span>
+        </div>
+        <Link href="/izsole/3" style={{width: '100%', background: '#059669', color: 'white', padding: '0.75rem', borderRadius: '0.5rem', textAlign: 'center', fontWeight: '600', textDecoration: 'none', display: 'block'}}>
+          Bidēt tagad!
+        </Link>
+      </div>
+    </div>
+  </div>
+</div>
+
     </div>
   );
 }
