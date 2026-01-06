@@ -1,129 +1,64 @@
-import Link from "next/link";
-import Head from "next/head";
-// NOŅĒMU: import Footer from "../components/Footer";
+import Link from 'next/link';
+import Head from 'next/head';
 
-export default function VisasKategorijas() {
+export default function Kategorijas() {
+  const kategorijas = [
+    { href: '/telefoni', emoji: '📱', nosaukums: 'Telefoni', skaits: '2,847' },
+    { href: '/auto', emoji: '🚗', nosaukums: 'Auto', skaits: '5,247' },
+    { href: '/datori', emoji: '💻', nosaukums: 'Datori', skaits: '1,592' },
+    { href: '/mebeles', emoji: '🏠', nosaukums: 'Mēbeles', skaits: '3,128' },
+    { href: '/sports', emoji: '⚽', nosaukums: 'Sports', skaits: '2,456' },
+    { href: '/darbs', emoji: '💼', nosaukums: 'Darbs', skaits: '8,742' },
+  ];
+
   return (
     <>
       <Head>
-        <title>Visas kategorijas | TechVibe</title>
+        <title>Kategorijas - TechVibe.lv</title>
       </Head>
-
-      <main className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          
-          {/* ATBALKA POGA */}
-          <div className="mb-12 pt-8">
-            <Link href="/" className="inline-flex items-center px-8 py-4 bg-white hover:bg-gray-50 border-2 border-gray-200 rounded-2xl shadow-lg text-xl font-bold text-gray-800 hover:shadow-xl hover:-translate-y-1 transition-all">
-              ← Sākums
-            </Link>
-          </div>
-
-          {/* HEADER */}
-          <div className="text-center mb-20">
-            <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-6 drop-shadow-2xl">
-              🗂️ Visas kategorijas
+      <div style={{minHeight: '100vh', background: 'linear-gradient(to bottom right, #eff6ff, #e0e7ff)', padding: '2rem 1rem'}}>
+        <div style={{maxWidth: '1200px', margin: '0 auto'}}>
+          <div style={{textAlign: 'center', marginBottom: '3rem'}}>
+            <h1 style={{fontSize: '3rem', fontWeight: 'bold', color: '#111827', marginBottom: '1rem'}}>
+              🏷️ Visas kategorijas
             </h1>
-            <p className="text-2xl md:text-3xl text-gray-600 drop-shadow-lg">
-              12,847 aktīvi sludinājumi
+            <p style={{fontSize: '1.25rem', color: '#6b7280'}}>
+              Izvēlies interesējošo sadaļu – ss.com stils
             </p>
           </div>
-
-          {/* POPULĀRĀKĀS */}
-          <div className="mb-24">
-            <h2 className="text-4xl md:text-5xl font-black text-center text-gray-900 mb-16 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent drop-shadow-lg">
-              Populārākās
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {[
-                { icon: '🚗', name: 'Auto', count: '5,247', href: '/kategorija/auto' },
-                { icon: '📱', name: 'Telefoni', count: '2,847', href: '/kategorija/telefoni' },
-                { icon: '🏠', name: 'Dzīvokļi', count: '3,128', href: '/kategorija/dzivokli' },
-                { icon: '💻', name: 'Datori', count: '1,592', href: '/kategorija/datori' },
-                { icon: '🎧', name: 'Audio', count: '1,028', href: '/kategorija/audio' },
-                { icon: '🛋️', name: 'Mēbeles', count: '2,890', href: '/kategorija/mebeles' },
-                { icon: '🔧', name: 'Rīki', count: '1,456', href: '/kategorija/riki' },
-                { icon: '👕', name: 'Apģērbs', count: '2,340', href: '/kategorija/apgerbs' }
-              ].map((cat, i) => (
-                <Link key={i} href={cat.href} className="group bg-white shadow-xl rounded-3xl p-8 hover:shadow-2xl hover:-translate-y-2 transition-all border hover:border-purple-300">
-                  <div className="text-6xl mb-6 group-hover:scale-110">{cat.icon}</div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-purple-600">{cat.name}</h3>
-                  <p className="text-3xl font-bold text-blue-600">{cat.count}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* GRUPOTĀS KATEGORIJAS */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {[
-              {
-                nosaukums: "🚙 Transports",
-                count: "8,456",
-                kategorijas: [
-                  { name: "Vieglie auto", count: "5,247", href: "/kategorija/auto" },
-                  { name: "Kravu auto", count: "892", href: "/kategorija/kravu-auto" },
-                  { name: "Moto", count: "456", href: "/kategorija/moto" },
-                  { name: "Velo", count: "789", href: "/kategorija/velo" }
-                ]
-              },
-              {
-                nosaukums: "🏠 Mājai",
-                count: "9,876",
-                kategorijas: [
-                  { name: "Dzīvokļi", count: "3,128", href: "/kategorija/dzivokli" },
-                  { name: "Mēbeles", count: "2,890", href: "/kategorija/mebeles" },
-                  { name: "Remonts", count: "1,678", href: "/kategorija/remonts" },
-                  { name: "Sadzīves tehnika", count: "2,180", href: "/kategorija/sadzive" }
-                ]
-              },
-              {
-                nosaukums: "💼 Bizness",
-                count: "3,456",
-                kategorijas: [
-                  { name: "Darbs", count: "1,890", href: "/kategorija/darbs" },
-                  { name: "Pakalpojumi", count: "1,247", href: "/pakalpojumi" },
-                  { name: "Bizness", count: "319", href: "/kategorija/bizness" }
-                ]
-              },
-              {
-                nosaukums: "🐕 Dzīvnieki",
-                count: "1,234",
-                kategorijas: [
-                  { name: "Suņi", count: "567", href: "/kategorija/suni" },
-                  { name: "Kaķi", count: "456", href: "/kategorija/kaki" },
-                  { name: "Citi", count: "211", href: "/kategorija/dzivnieki" }
-                ]
-              }
-            ].map((group, i) => (
-              <div key={i} className="bg-white shadow-2xl rounded-3xl p-10 border-4 border-gray-100 hover:shadow-3xl hover:border-blue-200 hover:-translate-y-2 transition-all group">
-                <h2 className="text-4xl font-black text-gray-900 mb-8 flex items-center">
-                  {group.nosaukums}
-                  <span className="ml-4 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-xl font-bold">
-                    {group.count}
-                  </span>
-                </h2>
-                <div className="space-y-3">
-                  {group.kategorijas.map((cat, j) => (
-                    <Link key={j} href={cat.href} className="flex items-center p-6 rounded-2xl hover:bg-blue-50 hover:text-blue-700 font-semibold text-xl transition-all hover:pl-8 hover:shadow-md border hover:border-blue-200">
-                      {cat.name}
-                      <span className="ml-auto text-blue-600 font-bold">{cat.count}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
+          
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem'}}>
+            {kategorijas.map((kat) => (
+              <Link 
+                key={kat.nosaukums}
+                href={kat.href}
+                style={{
+                  display: 'block', textDecoration: 'none',
+                  background: 'white', borderRadius: '1rem', padding: '2rem',
+                  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                  transition: 'all 0.3s', textAlign: 'center'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(0,0,0,0.25)';
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <div style={{fontSize: '3rem', marginBottom: '1rem'}}>{kat.emoji}</div>
+                <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem'}}>
+                  {kat.nosaukums}
+                </h3>
+                <p style={{color: '#059669', fontWeight: '600', fontSize: '1.25rem'}}>
+                  {kat.skaits}
+                </p>
+              </Link>
             ))}
           </div>
-
-          {/* CTA */}
-          <div className="text-center mt-32">
-            <Link href="/ievietot" className="inline-flex items-center px-20 py-10 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-3xl rounded-3xl shadow-2xl hover:shadow-4xl hover:scale-105 hover:-translate-y-2 transition-all">
-              ➕ Publicēt sludinājumu BEZ MAKSAS!
-            </Link>
-          </div>
-
         </div>
-      </main>
+      </div>
     </>
   );
 }
