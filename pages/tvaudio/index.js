@@ -20,7 +20,7 @@ export default function TvAudio() {
       const { data, error } = await supabase
         .from('sludinajumi')
         .select('*')
-        .eq('category', 'tv')  // 📺 TV/AUDIO KATEGORIJA
+        .eq('category', 'tvaudio')  // 📺 TV/AUDIO 
         .eq('status', 'publicēts')
         .order('created_at', { ascending: false });
 
@@ -34,7 +34,7 @@ export default function TvAudio() {
   };
 
   if (loading) {
-    return <div style={{minHeight: '100vh', background: 'linear-gradient(to bottom right, #eab308, #ca8a04)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', color: 'white'}}>📺 Ielādē TV un audio...</div>;
+    return <div style={{minHeight: '100vh', background: 'linear-gradient(to bottom right, #eab308, #ca8a04)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', color: 'white'}}>📺 Ielādē TV/audio...</div>;
   }
 
   return (
@@ -45,17 +45,11 @@ export default function TvAudio() {
       <div style={{minHeight: '100vh', background: 'linear-gradient(to bottom right, #eab308, #ca8a04)', padding: '2rem 1rem'}}>
         <div style={{maxWidth: '1200px', margin: '0 auto'}}>
           <div style={{marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
-            <h1 style={{fontSize: '2.5rem', fontWeight: 'bold', color: 'white', marginBottom: '0.5rem'}}>📺 TV un Audio</h1>
+            <h1 style={{fontSize: '2.5rem', fontWeight: 'bold', color: 'white', marginBottom: '0.5rem'}}>📺 TV un Audio tehnika</h1>
             <p style={{fontSize: '1.25rem', color: 'rgba(255,255,255,0.9)', marginBottom: '1rem'}}>
-              {sludinajumi.length} TV un audio sludinājumi
+              {sludinajumi.length} sludinājumi Rīgai un Latvijai
             </p>
-            <Link 
-              href="/ievietot" 
-              style={{
-                background: 'white', color: '#ca8a04', padding: '0.75rem 2rem', borderRadius: '0.75rem', 
-                fontWeight: '600', textDecoration: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
-              }}
-            >
+            <Link href="/ievietot" style={{background: 'white', color: '#ca8a04', padding: '0.75rem 2rem', borderRadius: '0.75rem', fontWeight: '600', textDecoration: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}}>
               ➕ Ievietot sludinājumu
             </Link>
           </div>
@@ -67,7 +61,7 @@ export default function TvAudio() {
                 Vēl nav TV un audio sludinājumu
               </h2>
               <Link href="/ievietot" style={{background: 'white', color: '#ca8a04', padding: '0.75rem 2rem', borderRadius: '0.75rem', fontWeight: '600', textDecoration: 'none'}}>
-                Būt pirmais!
+                ➕ Būt pirmais!
               </Link>
             </div>
           ) : (
@@ -82,11 +76,11 @@ export default function TvAudio() {
                   }}
                 >
                   <div style={{height: '12rem', background: 'linear-gradient(to right, #f59e0b, #d97706)', position: 'relative', overflow: 'hidden'}}>
-                    {sludinajums.images && sludinajums.images[0] ? (
+                    {sludinajums.images?.[0] ? (
                       <img src={sludinajums.images[0]} alt={sludinajums.title} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
                     ) : (
                       <div style={{width: '100%', height: '100%', background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <span style={{color: '#92400e', fontSize: '1.125rem'}}>📺 Nav bildes</span>
+                        <span style={{color: '#92400e', fontSize: '1.125rem'}}>📺</span>
                       </div>
                     )}
                   </div>
@@ -94,9 +88,7 @@ export default function TvAudio() {
                     <h3 style={{fontWeight: 'bold', fontSize: '1.25rem', color: '#1f2937', marginBottom: '0.5rem'}}>
                       {sludinajums.title}
                     </h3>
-                    <p style={{color: '#6b7280', marginBottom: '1rem'}}>
-                      {sludinajums.description}
-                    </p>
+                    <p style={{color: '#6b7280', marginBottom: '1rem'}}>{sludinajums.description}</p>
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                       <span style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#ca8a04'}}>
                         {sludinajums.price} €
