@@ -12,11 +12,7 @@ export default function Moto() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSludinajumi();
-  }, []);
-
-  const fetchSludinajumi = async () => {
-    try {
+    async function fetchSludinajumi() {
       const { data, error } = await supabase
         .from('sludinajumi')
         .select('*')
@@ -24,24 +20,20 @@ export default function Moto() {
         .eq('status', 'publicēts')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setSludinajumi(data || []);
-    } catch (error) {
-      console.error('Kļūda ielādējot moto:', error);
-    } finally {
+      if (error) {
+        console.error('Kļūda:', error);
+      } else {
+        setSludinajumi(data || []);
+      }
       setLoading(false);
     }
-  };
+    fetchSludinajumi();
+  }, []);
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: '100vh', 
-        background: 'linear-gradient(to bottom right, #fefce8, #fde047)', 
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '1.5rem', fontWeight: 'bold'
-      }}>
-        🏍️ Ielādē moto sludinājumus...
+      <div className="min-h-screen bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+        <div className="text-white text-2xl">Ielādē...</div>
       </div>
     );
   }
@@ -49,145 +41,96 @@ export default function Moto() {
   return (
     <>
       <Head>
-        <title>🏍️ Moto transports - TechVibe.lv</title>
-        <meta name="description" content="Motocikli, skūteri, kvadracikli - pērc Rīgā un Latvijā!" />
+        <title>Moto un transportlīdzekļi - TechVibe.lv</title>
+        <meta name="description" content="Moto, motocikli, skūteri - pērc un pārdod Rīgā un Latvijā!" />
       </Head>
-
-      {/* HEADER */}
-      <header style={{
-        background: 'white', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 50
-      }}>
-        <div style={{maxWidth: '1200px', margin: '0 auto', padding: '1rem 2rem'}}>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-            <Link href="/" style={{
-              fontSize: '1.75rem', fontWeight: 'bold', 
-              background: 'linear-gradient(to right, #ea580c, #c2410c)', 
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
-            }}>
-              TechVibe.lv
-            </Link>
-            <div style={{display: 'flex', gap: '1rem'}}>
-              <Link href="/kategorijas" style={{color: '#6b7280', fontWeight: 500}}>Kategorijas</Link>
-              <Link href="/izsole" style={{color: '#6b7280', fontWeight: 500}}>Izsoles</Link>
-              <Link href="/ievietot" style={{
-                background: '#ea580c', color: 'white', padding: '0.5rem 1.5rem', 
-                borderRadius: '0.5rem', fontWeight: 600, textDecoration: 'none'
-              }}>
-                ➕ Pievienot
-              </Link>
+      <div className="min-h-screen bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600">
+        {/* Header */}
+        <header className="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="flex justify-between items-center">
+              <Link href="/" className="text-2xl font-bold text-orange-600">🏍️ TechVibe.lv</Link>
+              <nav className="hidden md:flex space-x-6">
+                <Link href="/moto" className="text-orange-600 font-semibold hover:underline">Moto</Link>
+                <Link href="/velosipedi" className="text-gray-700 hover:text-orange-600">Velosipēdi</Link>
+                <Link href="/dzivokli" className="text-gray-700 hover:text-orange-600">Dzīvokļi</Link>
+                <Link href="/telefoni" className="text-gray-700 hover:text-orange-600">Telefoni</Link>
+              </nav>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <div style={{
-        minHeight: 'calc(100vh - 140px)', 
-        background: 'linear-gradient(to bottom right, #fefce8, #fde047)', 
-        padding: '2rem 1rem'
-      }}>
-        <div style={{maxWidth: '1200px', margin: '0 auto'}}>
-          {/* TITLE */}
-          <div style={{marginBottom: '3rem', textAlign: 'center'}}>
-            <h1 style={{
-              fontSize: '3rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '1rem',
-              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}>
-              🏍️ Moto transports
+        <main className="max-w-7xl mx-auto px-4 py-12">
+          <div className="text-center mb-16">
+            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+              🏍️ Moto un transportlīdzekļi
             </h1>
-            <p style={{fontSize: '1.25rem', color: '#6b7280'}}>
-              {sludinajumi.length} motociklu, skūteru un kvadraciklu sludinājumi Rīgā un Latvijā
+            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+              Motocikli, skūteri, kvadracikli - ātri, jaudīgi, gatavi ceļiem!
             </p>
           </div>
 
           {sludinajumi.length === 0 ? (
-            <div style={{textAlign: 'center', padding: '5rem 2rem'}}>
-              <div style={{fontSize: '6rem', marginBottom: '2rem'}}>🏍️</div>
-              <h2 style={{fontSize: '2.5rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '1rem'}}>
-                Vēl nav moto sludinājumu
+            <div className="text-center py-24">
+              <div className="text-8xl mb-8">🏍️</div>
+              <h2 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
+                Vēl nav sludinājumu šajā kategorijā
               </h2>
-              <p style={{fontSize: '1.25rem', color: '#6b7280', marginBottom: '2rem'}}>
-                Esi pirmais! Pievieno savu motocikli vai skūteri.
+              <p className="text-xl text-white/90 mb-8 max-w-lg mx-auto">
+                Esi pirmais! Pievieno savu moto sludinājumu un sasniec tūkstošiem pircēju Latvijā.
               </p>
-              <Link href="/ievietot" style={{
-                background: '#ea580c', color: 'white', padding: '1rem 2.5rem', 
-                borderRadius: '1rem', fontSize: '1.25rem', fontWeight: 600, 
-                textDecoration: 'none', boxShadow: '0 10px 20px rgba(234,88,12,0.3)'
-              }}>
-                ➕ Gass uz riteņiem! Ievietot sludinājumu
+              <Link 
+                href="/pievienot" 
+                className="bg-white text-orange-600 px-12 py-4 rounded-full text-xl font-bold hover:bg-orange-50 transition-all duration-300 shadow-2xl hover:shadow-3xl"
+              >
+                ➕ Pievienot sludinājumu
               </Link>
             </div>
           ) : (
-            <div style={{
-              display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
-              gap: '2rem', marginBottom: '3rem'
-            }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {sludinajumi.map((sludinajums) => (
                 <Link 
                   key={sludinajums.id} 
                   href={`/sludinajums/${sludinajums.id}`}
-                  style={{
-                    background: 'white', borderRadius: '1.5rem', boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                    overflow: 'hidden', textDecoration: 'none', display: 'block',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = '0 25px 50px rgba(0,0,0,0.2)';
-                    e.currentTarget.style.transform = 'translateY(-8px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
+                  className="group bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-500 overflow-hidden border border-white/50 hover:border-orange-200"
                 >
-                  <div style={{
-                    height: '200px', background: 'linear-gradient(135deg, #ea580c, #c2410c)', 
-                    position: 'relative', overflow: 'hidden'
-                  }}>
-                    {sludinajums.image_url ? (
-                      <img src={sludinajums.image_url} alt={sludinajums.title} 
-                           style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                  <div className="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden mb-6 group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+                    {sludinajums.images && sludinajums.images.length > 0 ? (
+                      <img 
+                        src={sludinajums.images[0]} 
+                        alt={sludinajums.title}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
-                      <div style={{
-                        position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                        fontSize: '3rem', opacity: 0.8
-                      }}>
-                        🏍️
-                      </div>
+                      <div className="text-6xl">🏍️</div>
                     )}
                   </div>
-                  <div style={{padding: '1.5rem'}}>
-                    <h3 style={{fontWeight: 'bold', fontSize: '1.25rem', color: '#1f2937', marginBottom: '0.5rem'}}>
+                  <div className="space-y-4">
+                    <h3 className="text-2xl font-bold text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors">
                       {sludinajums.title}
                     </h3>
-                    {sludinajums.description && (
-                      <p style={{color: '#6b7280', marginBottom: '1rem', fontSize: '0.95rem'}}>
-                        {sludinajums.description.slice(0, 100)}...
-                      </p>
-                    )}
-                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                      <span style={{fontSize: '1.75rem', fontWeight: 'bold', color: '#ea580c'}}>
-                        {sludinajums.price ? sludinajums.price.toLocaleString('lv-LV') + ' €' : 'Sazinies'}
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-3xl font-bold text-orange-600">
+                        {sludinajums.price ? `${sludinajums.price.toLocaleString()} €` : 'Sazinies'}
                       </span>
-                      <span style={{fontSize: '0.875rem', color: '#9ca3af', fontWeight: 500}}>
-                        {new Date(sludinajums.created_at).toLocaleDateString('lv-LV')}
-                      </span>
+                      <span className="text-sm text-gray-500">{sludinajums.location}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-500">
+                      <span>{new Date(sludinajums.created_at).toLocaleDateString('lv-LV')}</span>
                     </div>
                   </div>
                 </Link>
               ))}
             </div>
           )}
-        </div>
-      </div>
+        </main>
 
-      {/* FOOTER */}
-      <footer style={{
-        background: 'white', borderTop: '1px solid #e5e7eb', padding: '2rem', textAlign: 'center'
-      }}>
-        <p style={{color: '#6b7280', margin: 0}}>
-          © 2026 TechVibe.lv - Ātrākais sludinājumu portāls Latvijā 🏍️🚀
-        </p>
-      </footer>
+        <footer className="bg-white/80 backdrop-blur-md mt-24 border-t border-white/50">
+          <div className="max-w-7xl mx-auto px-4 py-12 text-center text-gray-600">
+            <p>&copy; 2026 TechVibe.lv - Tava sludinājumu platforma Latvijā 🏍️</p>
+          </div>
+        </footer>
+      </div>
     </>
   );
 }
