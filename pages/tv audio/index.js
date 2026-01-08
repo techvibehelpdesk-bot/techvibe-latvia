@@ -7,102 +7,164 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export default function TvAudio() {
+export default function Tv() {
   const [sludinajumi, setSludinajumi] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSludinajumi();
-  }, []);
-
-  const fetchSludinajumi = async () => {
-    try {
+    async function fetchTv() {
       const { data, error } = await supabase
         .from('sludinajumi')
         .select('*')
-        .eq('category', 'tvaudio')  // 📺 TV/AUDIO 
+        .eq('category', 'tv')
         .eq('status', 'publicēts')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setSludinajumi(data || []);
-    } catch (error) {
-      console.error('Kļūda ielādējot TV sludinājumus:', error);
-    } finally {
+      if (error) {
+        console.error('Kļūda ielādējot TV sludinājumus:', error);
+      } else {
+        setSludinajumi(data || []);
+      }
       setLoading(false);
     }
-  };
 
-  if (loading) {
-    return <div style={{minHeight: '100vh', background: 'linear-gradient(to bottom right, #eab308, #ca8a04)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', color: 'white'}}>📺 Ielādē TV/audio...</div>;
-  }
+    fetchTv();
+  }, []);
 
   return (
     <>
       <Head>
-        <title>📺 TV un Audio - TechVibe.lv</title>
+        <title>TV un audio tehnika 📺 | TechVibe</title>
+        <meta
+          name="description"
+          content="TV un audio tehnikas sludinājumi Latvijā – televizori, mājas kino, soundbari, skaļruņi."
+        />
       </Head>
-      <div style={{minHeight: '100vh', background: 'linear-gradient(to bottom right, #eab308, #ca8a04)', padding: '2rem 1rem'}}>
-        <div style={{maxWidth: '1200px', margin: '0 auto'}}>
-          <div style={{marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
-            <h1 style={{fontSize: '2.5rem', fontWeight: 'bold', color: 'white', marginBottom: '0.5rem'}}>📺 TV un Audio tehnika</h1>
-            <p style={{fontSize: '1.25rem', color: 'rgba(255,255,255,0.9)', marginBottom: '1rem'}}>
-              {sludinajumi.length} sludinājumi Rīgai un Latvijai
-            </p>
-            <Link href="/ievietot" style={{background: 'white', color: '#ca8a04', padding: '0.75rem 2rem', borderRadius: '0.75rem', fontWeight: '600', textDecoration: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}}>
-              ➕ Ievietot sludinājumu
+
+      <div className="min-h-screen bg-gradient-to-br from-yellow-500 to-amber-600 text-gray-900">
+        <header className="border-b border-yellow-300/40 bg-yellow-50/40 backdrop-blur">
+          <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <Link href="/">
+              <span className="text-xl font-bold tracking-tight cursor-pointer">
+                TechVibe<span className="text-amber-600">.lv</span>
+              </span>
             </Link>
+            <nav className="flex gap-3 text-sm">
+              <Link href="/velosipedi" className="hover:underline">
+                🚲 Velosipēdi
+              </Link>
+              <Link href="/moto" className="hover:underline">
+                🏍️ Moto
+              </Link>
+              <Link href="/auto" className="hover:underline">
+                🚗 Auto
+              </Link>
+              <Link href="/tv" className="font-semibold underline">
+                📺 TV & Audio
+              </Link>
+            </nav>
+          </div>
+        </header>
+
+        <main className="max-w-6xl mx-auto px-4 py-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold flex items-center gap-2">
+                📺 TV un audio tehnika
+              </h1>
+              <p className="text-sm text-yellow-100/90 mt-1">
+                Televizori, mājas kino, soundbari, skaļruņi un cita audio/video tehnika.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="px-4 py-2 rounded-lg bg-black/10 hover:bg-black/20 text-sm font-medium shadow-sm border border-yellow-200/60"
+            >
+              ➕ Pievienot sludinājumu
+            </button>
           </div>
 
-          {sludinajumi.length === 0 ? (
-            <div style={{textAlign: 'center', padding: '5rem 1rem'}}>
-              <div style={{fontSize: '4rem', marginBottom: '1rem'}}>📺</div>
-              <h2 style={{fontSize: '2rem', fontWeight: 'bold', color: 'white', marginBottom: '1rem'}}>
+          {loading ? (
+            <div className="text-center text-yellow-50 py-16">
+              Ielādē TV un audio sludinājumus...
+            </div>
+          ) : sludinajumi.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 bg-black/5 rounded-2xl border border-yellow-200/40">
+              <div className="text-5xl mb-3">📺</div>
+              <h2 className="text-xl font-semibold mb-1">
                 Vēl nav TV un audio sludinājumu
               </h2>
-              <Link href="/ievietot" style={{background: 'white', color: '#ca8a04', padding: '0.75rem 2rem', borderRadius: '0.75rem', fontWeight: '600', textDecoration: 'none'}}>
-                ➕ Būt pirmais!
-              </Link>
+              <p className="text-sm text-yellow-100/90 mb-4">
+                Esi pirmais, kas pievieno televizoru vai audio sistēmu.
+              </p>
+              <button
+                type="button"
+                className="px-4 py-2 rounded-lg bg-yellow-100 text-amber-800 text-sm font-semibold shadow hover:bg-yellow-200"
+              >
+                ➕ Pievienot sludinājumu
+              </button>
             </div>
           ) : (
-            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem'}}>
-              {sludinajumi.map((sludinajums) => (
-                <Link 
-                  key={sludinajums.id} 
-                  href={`/sludinajums/${sludinajums.id}`}
-                  style={{
-                    background: 'rgba(255,255,255,0.95)', borderRadius: '1rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
-                    transition: 'all 0.3s', overflow: 'hidden', textDecoration: 'none', color: 'inherit', display: 'block'
-                  }}
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {sludinajumi.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/sludinajums/${item.id}`}
+                  className="group block"
                 >
-                  <div style={{height: '12rem', background: 'linear-gradient(to right, #f59e0b, #d97706)', position: 'relative', overflow: 'hidden'}}>
-                    {sludinajums.images?.[0] ? (
-                      <img src={sludinajums.images[0]} alt={sludinajums.title} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-                    ) : (
-                      <div style={{width: '100%', height: '100%', background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <span style={{color: '#92400e', fontSize: '1.125rem'}}>📺</span>
+                  <div className="bg-yellow-50/80 border border-yellow-200/70 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition transform hover:-translate-y-0.5">
+                    <div className="aspect-video bg-gradient-to-br from-amber-500 to-yellow-400 relative">
+                      {item.image_url && (
+                        <img
+                          src={item.image_url}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      <div className="absolute top-2 left-2 px-2 py-1 text-xs rounded-full bg-black/40 text-yellow-50">
+                        📺 TV & Audio
                       </div>
-                    )}
-                  </div>
-                  <div style={{padding: '1.5rem'}}>
-                    <h3 style={{fontWeight: 'bold', fontSize: '1.25rem', color: '#1f2937', marginBottom: '0.5rem'}}>
-                      {sludinajums.title}
-                    </h3>
-                    <p style={{color: '#6b7280', marginBottom: '1rem'}}>{sludinajums.description}</p>
-                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                      <span style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#ca8a04'}}>
-                        {sludinajums.price} €
-                      </span>
-                      <span style={{fontSize: '0.875rem', color: '#6b7280'}}>
-                        {new Date(sludinajums.created_at).toLocaleDateString('lv-LV')}
-                      </span>
+                      {item.price && (
+                        <div className="absolute bottom-2 right-2 px-3 py-1 text-sm rounded-full bg-black/70 text-yellow-50 font-semibold">
+                          {item.price} €
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="p-3">
+                      <h2 className="font-semibold text-sm mb-1 line-clamp-2">
+                        {item.title}
+                      </h2>
+                      {item.city && (
+                        <p className="text-xs text-amber-900/80 mb-1">
+                          {item.city}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between text-[11px] text-amber-900/70 mt-1">
+                        <span>
+                          {item.created_at
+                            ? new Date(item.created_at).toLocaleDateString(
+                                'lv-LV'
+                              )
+                            : ''}
+                        </span>
+                        <span className="group-hover:text-amber-700 font-medium">
+                          Apskatīt sludinājumu →
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </Link>
               ))}
             </div>
           )}
-        </div>
+        </main>
+
+        <footer className="mt-10 border-t border-yellow-300/40 bg-yellow-50/40">
+          <div className="max-w-6xl mx-auto px-4 py-4 text-xs text-amber-900/80 text-center">
+            <p>&copy; 2026 TechVibe.lv – TV un audio sludinājumi Latvijā 📺</p>
+          </div>
+        </footer>
       </div>
     </>
   );
