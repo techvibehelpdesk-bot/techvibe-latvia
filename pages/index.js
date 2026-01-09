@@ -37,21 +37,20 @@ export default function Home() {
       <section className="py-20 px-4 relative z-10" style={{background: 'rgba(255,255,255,0.85)'}}>
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">Populārākās kategorijas</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { icon: '📱', name: 'Telefoni', href: '/kategorija/telefoni', count: '2,847' },
-              { icon: '💻', name: 'Datori', href: '/kategorija/datori', count: '1,592' },
-              { icon: '🚗', name: 'Auto', href: '/kategorija/auto', count: '5,247' },
-              { icon: '🎧', name: 'Audio', href: '/kategorija/audio', count: '1,028' }
-            ].map((cat, i) => (
-              <Link key={i} href={cat.href} className="group bg-white rounded-2xl p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition-all border hover:border-blue-200 shadow-lg inline-block">
-                <div className="text-4xl mb-4 group-hover:scale-110">{cat.icon}</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{cat.name}</h3>
-                <p className="text-2xl font-bold text-blue-600">{cat.count}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
+         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+  {[
+    { icon: '📱', name: 'Telefoni', href: '/telefoni', count: '2,847' },
+    { icon: '💻', name: 'Datori', href: '/datori', count: '1,592' },
+    { icon: '🚗', name: 'Auto', href: '/auto', count: '5,247' },
+    { icon: '📺', name: 'TV/Audio', href: '/tv', count: '1,234' }  // Mainīts no Audio uz TV + href='/tv'
+  ].map((cat, i) => (
+    <Link key={i} href={cat.href} className="group bg-white rounded-2xl p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition-all border hover:border-blue-200 shadow-lg inline-block">
+      <div className="text-4xl mb-4 group-hover:scale-110">{cat.icon}</div>
+      <h3 className="text-2xl font-bold text-gray-900 mb-2">{cat.name}</h3>
+      <p className="text-2xl font-bold text-blue-600">{cat.count}</p>
+    </Link>
+  ))}
+</div>
       </section>
 
       {/* Sludinājumi */}
