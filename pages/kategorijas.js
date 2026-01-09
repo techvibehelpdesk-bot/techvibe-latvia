@@ -19,11 +19,13 @@ export default function Kategorijas() {
     // Elektrotehnika
     { href: '/telefoni', emoji: '📱', nosaukums: 'Telefoni', skaits: '2,847' },
     { href: '/datori', emoji: '💻', nosaukums: 'Datori', skaits: '1,592' },
-    { href: '/tv-audio', emoji: '📺', nosaukums: 'TV, Audio', skaits: '1,234' },
+    
+    // Sadzīves tehnika – šeit ievietosi TV/Audio vēlāk
+    { href: '/sadzives-tehnika', emoji: '⚡', nosaukums: 'Sadzīves tehnika', skaits: '4,567' },
     
     // Darbs & Bizness
-    { href: '/darbs', emoji: '💼', nosaukums: 'Darbs', skaits: '8,742' },
-    { href: '/vakances', emoji: '📋', nosaukums: 'Vakances', skaits: '3,282' },
+    { href: '/darbs-vakances', emoji: '💼', nosaukums: 'Darbs & Vakances', skaits: '12,024' },
+    { href: '/blakusdarbs', emoji: '📋', nosaukums: 'Blakusdarbs', skaits: '2,156' },
     
     // Citas ss.com kategorijas
     { href: '/berniem', emoji: '👶', nosaukums: 'Bērniem', skaits: '4,567' },
