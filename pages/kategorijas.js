@@ -3,13 +3,13 @@ import Head from 'next/head';
 
 export default function Kategorijas() {
   const kategorijas = [
-    // Transports (ss.com TOP)
+    // Transports
     { href: '/auto', emoji: '🚗', nosaukums: 'Auto', skaits: '5,247' },
     { href: '/moto', emoji: '🏍️', nosaukums: 'Moto transports', skaits: '1,892' },
     { href: '/velosipedi', emoji: '🚲', nosaukums: 'Velosipēdi', skaits: '856' },
     
     // Nekustamie īpašumi
-    { href: 'dzivokli', emoji: '🏢', nosaukums: 'Dzīvokļi', skaits: '2,347' },
+    { href: '/dzivokli', emoji: '🏢', nosaukums: 'Dzīvokļi', skaits: '2,347' },
     { href: '/majas', emoji: '🏠', nosaukums: 'Mājas, vasarnīcas', skaits: '1,128' },
     
     // Celtniecība & Mājai
@@ -21,11 +21,10 @@ export default function Kategorijas() {
     { href: '/datori', emoji: '💻', nosaukums: 'Datori', skaits: '1,592' },
     { href: '/tv-audio', emoji: '📺', nosaukums: 'TV, Audio', skaits: '1,234' },
     
-    // Darbs & Bizness
+    // Darbs & Bizness (bez vakances pagaidām)
     { href: '/darbs', emoji: '💼', nosaukums: 'Darbs', skaits: '8,742' },
-    { href: '/vakances', emoji: '📋', nosaukums: 'Vakances', skaits: '3,282' },
     
-    // Citas ss.com kategorijas
+    // Citas
     { href: '/berniem', emoji: '👶', nosaukums: 'Bērniem', skaits: '4,567' },
     { href: '/dazadi', emoji: '🔄', nosaukums: 'Dažādi', skaits: '12,345' },
   ];
@@ -37,11 +36,11 @@ export default function Kategorijas() {
         <div style={{maxWidth: '1400px', margin: '0 auto'}}>
           <div style={{textAlign: 'center', marginBottom: '3rem'}}>
             <h1 style={{fontSize: '3.5rem', fontWeight: 'bold', color: '#111827'}}>🏷️ Visas kategorijas</h1>
-            <p style={{fontSize: '1.375rem', color: '#6b7280'}}>Kā ss.com – izvēlies sadaļu Rīgas sludinājumiem</p>
+            <p style={{fontSize: '1.375rem', color: '#6b7280'}}>Izvēlies sadaļu Rīgas sludinājumiem kā ss.com</p>
           </div>
           
           <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem'}}>
-            {kategorijas.map((kat, index) => (
+            {kategorijas.map((kat) => (
               <Link 
                 key={kat.nosaukums}
                 href={kat.href}
