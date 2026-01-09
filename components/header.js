@@ -11,7 +11,7 @@ export default function Header() {
   { label: 'Jaunākie sludinājumi', href: '/jaunakie' },   // ← ŠIS JAUNS!
   { label: 'Pakalpojumi', href: '/pakalpojumi' },
   { label: 'Cenas', href: '/cenas' },
-  { label: 'BUJ', href: '/buj' },
+  { label: 'Jautājumi', href: '/jautajumi' },
   { label: 'Kontakti', href: '/kontakti' }
 ];
   return (
