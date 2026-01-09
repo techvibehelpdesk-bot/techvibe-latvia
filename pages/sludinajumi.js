@@ -1,111 +1,130 @@
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
+import Head from 'next/head';
+import Image from 'next/image';
 
-// SVARĪGI: Pārliecinies, ka tev ir pareizie Supabase dati
-// Ja tev ir atsevišķs fails 'lib/supabaseClient.js', vari importēt no turienes.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-export default function VisiSludinajumi() {
+export default function VisuSludinajumi() {
   const [sludinajumi, setSludinajumi] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('visi');
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-    async function fetchSludinajumi() {
-      setLoading(true);
-      // Velkam datus no tabulas 'sludinajumi'
-      const { data, error } = await supabase
-        .from('sludinajumi')
-        .select('*')
-        .order('created_at', { ascending: false }); // Jaunākie augšā
-
-      if (error) {
-        console.error('Kļūda:', error);
-      } else {
-        setSludinajumi(data);
-      }
-      setLoading(false);
-    }
-
-    fetchSludinajumi();
+    // Fake dati - vēlāk Supabase
+    const dati = [
+      { id: 1, img: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=450&fit=crop', title: 'iPhone 15 Pro Max 256GB Titan', price: '€899', category: 'telefoni' },
+      { id: 2, img: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=450&fit=crop', title: 'Samsung Galaxy S24 Ultra', price: '€799', category: 'telefoni' },
+      { id: 3, img: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=450&fit=crop', title: 'MacBook Pro M3 16"', price: '€2199', category: 'datori' },
+      { id: 4, img: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=450&fit=crop', title: 'Dell XPS 13', price: '€1299', category: 'datori' },
+      { id: 5, img: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=450&fit=crop', title: 'BMW X5 2023', price: '€55,000', category: 'auto' },
+      { id: 6, img: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=450&fit=crop', title: 'Mercedes E-Class', price: '€45,000', category: 'auto' },
+      { id: 7, img: 'https://images.unsplash.com/photo-1583121274602-d9e8a7ad08a6?w=450&fit=crop', title: 'PS5 + Spider-Man 2', price: '€550', category: 'speles' },
+      { id: 8, img: 'https://images.unsplash.com/photo-1605146380459-7a3ed1db1ca3?w=450&fit=crop', title: 'IKEA Skandi sofa', price: '€299', category: 'mebeles' },
+    ];
+    setSludinajumi(dati);
   }, []);
 
+  const filtered = filter === 'visi' ? sludinajumi : sludinajumi.filter(s => s.category === filter);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % Math.ceil(filtered.length / 4));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [filtered.length]);
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        
-        {/* Augšdaļa ar virsrakstu un Atpakaļ pogu */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900">
-            Visi Sludinājumi
+    <>
+      <Head>
+        <title>Visi sludinājumi - TechVibe</title>
+      </Head>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Visi sludinājumi ({filtered.length})
           </h1>
-          <Link href="/" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-            ← Atpakaļ uz sākumu
-          </Link>
-        </div>
 
-        {/* Ielādes indikators */}
-        {loading ? (
-          <div className="text-center py-20">
-            <p className="text-xl text-gray-500">Ielādē sludinājumus...</p>
+          {/* Filtrs */}
+          <div className="flex justify-center mb-8">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="px-6 py-3 bg-white border-2 border-blue-200 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+            >
+              <option value="visi">Visi sludinājumi</option>
+              <option value="telefoni">📱 Telefoni</option>
+              <option value="datori">💻 Datori</option>
+              <option value="auto">🚗 Auto</option>
+              <option value="speles">🎮 Spēles</option>
+              <option value="mebeles">🏠 Mēbeles</option>
+            </select>
           </div>
-        ) : sludinajumi.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-lg shadow">
-            <p className="text-xl text-gray-500">Šobrīd nav neviena sludinājuma.</p>
-          </div>
-        ) : (
-          
-          /* ŠEIT SĀKAS REŽĢIS (GRID) */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            
-            {sludinajumi.map((sludinajums) => (
-              <div key={sludinajums.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-gray-100 flex flex-col">
-                
-                {/* Bilde */}
-                <div className="h-48 bg-gray-200 relative">
-                  {sludinajums.bilde ? (
-                    <img 
-                      src={sludinajums.bilde} 
-                      alt={sludinajums.nosaukums}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      Nav attēla
+
+          {/* Karuselis */}
+          <div className="relative overflow-hidden rounded-3xl shadow-2xl mb-12" style={{ height: '400px' }}>
+            <div
+              className="flex transition-transform duration-1000 ease-in-out h-full"
+              style={{ transform: `translateX(-${currentSlide * 25}%)` }}
+              id="visuCarousel"
+            >
+              {filtered.slice(0, Math.ceil(filtered.length / 4) * 4).map((s, i) => (
+                <div key={s.id} className="flex-shrink-0 w-1/4 p-4 h-full">
+                  <Link href={`/sludinajums/${s.id}`} className="block h-full">
+                    <div className="bg-white rounded-2xl p-6 h-full flex flex-col shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2">
+                      <div className="relative w-full h-48 rounded-xl overflow-hidden mb-4 bg-gray-100">
+                        <Image
+                          src={s.img}
+                          alt={s.title}
+                          fill
+                          className="object-cover hover:scale-110 transition-transform duration-500"
+                          placeholder="blur"
+                          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltocR3bY9p6jQ2U1j1qW5Y5j//Z"
+                        />
+                      </div>
+                      <h3 className="font-bold text-xl mb-2 line-clamp-2">{s.title}</h3>
+                      <p className="text-2xl font-black text-blue-600 mb-4">{s.price}</p>
+                      <span className="text-sm text-gray-500">Skatīt sludinājumu →</span>
                     </div>
-                  )}
-                  {/* Cena stūrītī */}
-                  <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full font-bold">
-                    {sludinajums.cena} €
-                  </div>
+                  </Link>
                 </div>
-
-                {/* Apraksts */}
-                <div className="p-4 flex flex-col flex-grow">
-                  <h2 className="text-lg font-bold text-gray-800 mb-1 truncate">
-                    {sludinajums.nosaukums}
-                  </h2>
-                  <p className="text-sm text-gray-500 mb-4 line-clamp-2">
-                    {sludinajums.apraksts}
-                  </p>
-                  
-                  <div className="mt-auto flex items-center justify-between">
-                    <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
-                      {sludinajums.atrasanas_vieta || 'Rīga'}
-                    </span>
-                    <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                      Skatīt vairāk →
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-
+              ))}
+            </div>
+            {/* Bultiņas */}
+            <button
+              onClick={() => setCurrentSlide((prev) => (prev - 1 + Math.ceil(filtered.length / 4)) % Math.ceil(filtered.length / 4))}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg transition-all"
+            >
+              ←
+            </button>
+            <button
+              onClick={() => setCurrentSlide((prev) => (prev + 1) % Math.ceil(filtered.length / 4))}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg transition-all"
+            >
+              →
+            </button>
           </div>
-        )}
+
+          {/* Grid sludinājumi */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filtered.map((s) => (
+              <Link key={s.id} href={`/sludinajums/${s.id}`} className="block">
+                <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-3">
+                  <div className="relative w-full h-48 rounded-xl overflow-hidden mb-4 bg-gray-100">
+                    <Image
+                      src={s.img}
+                      alt={s.title}
+                      fill
+                      className="object-cover hover:scale-110 transition-transform duration-500"
+                      placeholder="blur"
+                    />
+                  </div>
+                  <h3 className="font-bold text-xl mb-3 line-clamp-2">{s.title}</h3>
+                  <p className="text-2xl font-black text-green-600 mb-4">{s.price}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
