@@ -5,142 +5,458 @@ export default function Home() {
     <div 
       style={{
         minHeight: '100vh',
-        backgroundImage: `url('https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-4.0.3&fit=crop&w=2560&q=85')`,
+        backgroundImage: "url('https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-4.0.3&fit=crop&w=2560&q=85')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-        backgroundColor: 'rgba(255,255,255,0.15)'
+        backgroundAttachment: 'fixed'
       }}
     >
-      {/* Hero */}
-      <section style={{paddingTop: '6rem', paddingBottom: '5rem', paddingLeft: '1rem', paddingRight: '1rem', position: 'relative', zIndex: 10, background: 'rgba(255,255,255,0.9)'}}>
-        <div style={{maxWidth: '80rem', margin: '0 auto', textAlign: 'center'}}>
-          <h1 style={{fontSize: '3rem', fontWeight: 'bold', background: 'linear-gradient(to right, #2563eb, #7c3aed, #4f46e5)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '1.5rem'}}>
-            TechVibe
-          </h1>
-          <p style={{fontSize: '1.25rem', color: '#374151', marginBottom: '3rem', maxWidth: '48rem', marginLeft: 'auto', marginRight: 'auto'}}>
-            Sludinājumi un preces visā Latvijā
-          </p>
-          <div style={{display: 'flex', flexDirection: 'column', gap: '1rem', justifyContent: 'center', alignItems: 'center'}}>
-            <Link href="/ievietot" style={{background: '#2563eb', color: 'white', padding: '1rem 2rem', borderRadius: '1rem', fontSize: '1.25rem', fontWeight: 'bold', boxShadow: '0 10px 25px -3px rgba(37,99,235,0.4)', display: 'inline-block', textDecoration: 'none'}}>
-              ➕ Ievietot sludinājumu
-            </Link>
-            <Link href="/sludinajumi" style={{border: '2px solid #2563eb', color: '#2563eb', padding: '1rem 2rem', borderRadius: '1rem', fontSize: '1.25rem', fontWeight: 'bold', display: 'inline-block', textDecoration: 'none'}}>
-              👀 Apskatīt sludinājumus
-            </Link>
-          </div>
-        </div>
+      {/* Hero Section */}
+      <section style={{ 
+        background: 'rgba(255,255,255,0.9)', 
+        backdropFilter: 'blur(10px)', 
+        padding: '4rem 2rem', 
+        textAlign: 'center',
+        borderRadius: '0 0 2rem 2rem'
+      }}>
+        <h1 style={{ fontSize: '3.5rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '1rem' }}>
+          TechVibe.lv – Tavas sludinājumi!
+        </h1>
+        <p style={{ fontSize: '1.5rem', color: '#6b7280', marginBottom: '2rem', maxWidth: '600px', margin: '0 auto' }}>
+          Pārdod, pērc, apmainies – ātri un droši kā ss.com
+        </p>
+        <Link 
+          href="/kategorijas"
+          style={{
+            display: 'inline-block',
+            background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+            color: 'white',
+            padding: '1.25rem 3rem',
+            fontSize: '1.5rem',
+            fontWeight: '700',
+            borderRadius: '2rem',
+            textDecoration: 'none',
+            boxShadow: '0 10px 30px rgba(59,130,246,0.4)',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.transform = 'translateY(-5px)';
+            e.target.style.boxShadow = '0 20px 40px rgba(59,130,246,0.6)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 10px 30px rgba(59,130,246,0.4)';
+          }}
+        >
+          Sākt pārlūkot – BEZ REĢISTRĀcijas!
+        </Link>
       </section>
 
-      {/* Kategorijas – LABOTAS href */}
-      <section style={{padding: '5rem 1rem', position: 'relative', zIndex: 10, background: 'rgba(255,255,255,0.85)'}}>
-        <div style={{maxWidth: '80rem', margin: '0 auto'}}>
-          <h2 style={{fontSize: '2.5rem', fontWeight: 'bold', textAlign: 'center', color: '#111827', marginBottom: '4rem'}}>Populārākās kategorijas</h2>
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(18rem, 1fr))', gap: '1.5rem'}}>
+      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '4rem 2rem' }}>
+        
+        {/* Populārākās kategorijas */}
+        <section style={{ marginBottom: '6rem' }}>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', textAlign: 'center', color: '#111827', marginBottom: '3rem' }}>
+            🔥 Populārākās kategorijas
+          </h2>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+            gap: '2rem',
+            maxWidth: '1200px',
+            margin: '0 auto'
+          }}>
             {[
-              { icon: '📱', name: 'Telefoni', href: '/telefoni', count: '2,847' },
-              { icon: '💻', name: 'Datori', href: '/datori', count: '1,592' },
-              { icon: '🚗', name: 'Auto', href: '/auto', count: '5,247' },
-              { icon: '📺', name: 'TV/Audio', href: '/tv', count: '1,234' }
-            ].map((cat, i) => (
-              <Link key={i} href={cat.href} style={{
-                display: 'block', background: 'white', borderRadius: '1rem', padding: '2rem', textAlign: 'center',
-                boxShadow: '0 10px 25px -3px rgba(0,0,0,0.1)', transition: 'all 0.3s', textDecoration: 'none', border: '1px solid transparent'
-              }} onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(0,0,0,0.25)';
-                e.currentTarget.style.transform = 'translateY(-0.5rem)';
-                e.currentTarget.style.borderColor = '#2563eb';
-              }} onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 10px 25px -3px rgba(0,0,0,0.1)';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'transparent';
-              }}>
-                <div style={{fontSize: '3rem', marginBottom: '1rem'}}>{cat.icon}</div>
-                <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem'}}>{cat.name}</h3>
-                <p style={{color: '#2563eb', fontWeight: 'bold', fontSize: '1.5rem'}}>{cat.count}</p>
+              { icon: '📱', name: 'Telefoni', href: '/telefoni', count: '1,247' },
+              { icon: '💻', name: 'Datori', href: '/datori', count: '892' },
+              { icon: '🚗', name: 'Auto', href: '/auto', count: '2,156' },
+              { icon: '📺', name: 'TV/Audio', href: '/tv', count: '456' },
+              { icon: '👨‍💼', name: 'Darbs', href: '/vakances', count: '3,210' },
+              { icon: '🛋️', name: 'Mēbeles', href: '/mebeles', count: '789' }
+            ].map((cat) => (
+              <Link 
+                key={cat.href}
+                href={cat.href}
+                style={{
+                  display: 'block',
+                  background: 'rgba(255,255,255,0.9)',
+                  backdropFilter: 'blur(10px)',
+                  padding: '2.5rem 2rem',
+                  borderRadius: '1.5rem',
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                  transition: 'all 0.3s ease',
+                  border: '2px solid transparent'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.transform = 'translateY(-10px)';
+                  e.target.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
+                  e.target.style.borderColor = '#3b82f6';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                  e.target.style.borderColor = 'transparent';
+                }}
+              >
+                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>
+                  {cat.icon}
+                </div>
+                <h3 style={{ fontSize: '1.75rem', fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem' }}>
+                  {cat.name}
+                </h3>
+                <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#10b981' }}>
+                  {cat.count}
+                </p>
               </Link>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Sludinājumi */}
-      <section style={{padding: '5rem 1rem', position: 'relative', zIndex: 10, background: 'rgba(255,255,255,0.85)'}}>
-        <div style={{maxWidth: '80rem', margin: '0 auto'}}>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem'}}>
-            <h2 style={{fontSize: '2.5rem', fontWeight: 'bold', color: '#111827'}}>Jaunākie sludinājumi</h2>
-            <Link href="/sludinajumi" style={{color: '#2563eb', fontWeight: 'bold', fontSize: '1.25rem', textDecoration: 'none'}}>Skatīt visus →</Link>
-          </div>
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(20rem, 1fr))', gap: '1.5rem'}}>
+        {/* Jaunākie sludinājumi */}
+        <section style={{ marginBottom: '6rem' }}>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', textAlign: 'center', color: '#111827', marginBottom: '3rem' }}>
+            🆕 Jaunākie sludinājumi
+          </h2>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
+            gap: '2rem',
+            maxWidth: '1200px',
+            margin: '0 auto'
+          }}>
             {[
-              { img: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300', title: 'iPhone 15 Pro Max', price: '€850', city: 'Rīga' },
-              { img: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300', title: 'MacBook Pro M3', price: '€1,800', city: 'Jūrmala' },
-              { img: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=300', title: 'BMW X5 2023', price: '€45,000', city: 'Daugavpils' },
-              { img: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=300', title: 'Sony WH-1000XM5', price: '€350', city: 'Liepāja' }
-            ].map((ad, i) => (
-              <Link key={i} href="/sludinajums/1" style={{
-                display: 'block', background: 'white', borderRadius: '1rem', overflow: 'hidden',
-                boxShadow: '0 10px 25px -3px rgba(0,0,0,0.1)', transition: 'all 0.3s', textDecoration: 'none'
-              }} onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(0,0,0,0.25)';
-                e.currentTarget.style.transform = 'translateY(-0.5rem)';
-              }} onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 10px 25px -3px rgba(0,0,0,0.1)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}>
-                <div style={{height: '12rem', backgroundImage: `url(${ad.img})`, backgroundSize: 'cover', backgroundPosition: 'center'}} />
-                <div style={{padding: '1.5rem'}}>
-                  <h3 style={{fontWeight: 'bold', fontSize: '1.25rem', marginBottom: '0.75rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{ad.title}</h3>
-                  <p style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#2563eb', marginBottom: '0.75rem'}}>{ad.price}</p>
-                  <span style={{background: '#dbeafe', color: '#1e40af', padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.875rem', fontWeight: '500'}}>{ad.city}</span>
+              { title: 'iPhone 15 Pro Max 256GB Titan Gray', price: '€899', img: 'iphone', href: '/sludinasana/1' },
+              { title: 'MacBook Pro M3 16" 1TB Space Black', price: '€2,899', img: 'macbook', href: '/sludinasana/2' },
+              { title: 'Samsung 55" QLED 4K Smart TV', price: '€649', img: 'tv', href: '/sludinasana/3' },
+              { title: 'BMW X5 2023 3.0d xDrive', price: '€72,900', img: 'bmw', href: '/sludinasana/4' }
+            ].map((item, index) => (
+              <Link 
+                key={index}
+                href={item.href}
+                style={{
+                  display: 'block',
+                  background: 'rgba(255,255,255,0.95)',
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: '1.5rem',
+                  overflow: 'hidden',
+                  textDecoration: 'none',
+                  boxShadow: '0 15px 35px rgba(0,0,0,0.1)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.transform = 'translateY(-8px)';
+                  e.target.style.boxShadow = '0 25px 50px rgba(0,0,0,0.15)';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 15px 35px rgba(0,0,0,0.1)';
+                }}
+              >
+                <div style={{
+                  height: '200px',
+                  background: `linear-gradient(135deg, ${index % 2 ? '#3b82f6' : '#10b981'}20 0%, ${index % 2 ? '#1d4ed8' : '#059669'}20 100%), 
+                              url('https://images.unsplash.com/photo-1542393545-2fb3648ec94d?w=400') center/cover`,
+                  backgroundBlendMode: 'overlay'
+                }} />
+                <div style={{ padding: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827', marginBottom: '0.75rem', lineHeight: '1.4' }}>
+                    {item.title}
+                  </h3>
+                  <p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#ef4444', marginBottom: '1rem' }}>
+                    {item.price}
+                  </p>
+                  <div style={{ 
+                    background: 'linear-gradient(90deg, #10b981, #059669)', 
+                    color: 'white', 
+                    padding: '0.75rem 1.5rem', 
+                    borderRadius: '9999px', 
+                    fontWeight: '600', 
+                    display: 'inline-block',
+                    fontSize: '0.95rem'
+                  }}>
+                    Skatīt sludinājumu →
+                  </div>
                 </div>
               </Link>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA */}
-      <section style={{padding: '5rem 1rem', background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)'}}>
-        <div style={{maxWidth: '64rem', margin: '0 auto', textAlign: 'center', color: 'white'}}>
-          <h2 style={{fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1.5rem'}}>Gatavs pārdot vai pirkt?</h2>
-          <Link href="/ievietot" style={{
-            display: 'inline-block', background: 'white', color: '#2563eb', padding: '1.25rem 3rem',
-            fontSize: '1.5rem', fontWeight: 'bold', borderRadius: '1rem', textDecoration: 'none', boxShadow: '0 10px 25px -3px rgba(255,255,255,0.3)'
+        {/* 🔥 IZSOLES SEKCIJA – TOP kā ss.com */}
+        <section style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          margin: '6rem 0',
+          borderRadius: '2rem',
+          overflow: 'hidden',
+          position: 'relative'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.1)',
+            zIndex: 1
+          }} />
+          <div style={{ 
+            maxWidth: '1400px', 
+            margin: '0 auto', 
+            padding: '4rem 2rem',
+            position: 'relative',
+            zIndex: 2
           }}>
-            Sākt tagad – BEZ MAKSAS!
-          </Link>
-        </div>
-      </section>
-
-      {/* Izsoles */}
-      <div style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', margin: '3rem 1rem', borderRadius: '1.5rem', overflow: 'hidden'}}>
-        <div style={{maxWidth: '76.8rem', margin: '0 auto', padding: '2.5rem'}}>
-          <div style={{display: 'flex', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap'}}>
-            <div style={{fontSize: '3rem', marginRight: '1rem'}}>⚡</div>
-            <div style={{flex: 1}}>
-              <h2 style={{fontSize: '2rem', fontWeight: 'bold', color: 'white', marginBottom: '0.25rem'}}>TOP Izsoles – uzvar tagad!</h2>
-              <p style={{color: 'rgba(255,255,255,0.9)', fontSize: '1.125rem'}}>Reāllaika bidēšana • Beidzas šodien</p>
-            </div>
-            <Link href="/izsole" style={{background: 'rgba(255,255,255,0.2)', color: 'white', padding: '0.75rem 2rem', borderRadius: '2rem', fontWeight: '600', textDecoration: 'none', whiteSpace: 'nowrap'}}>
-              Skatīt visas →
-            </Link>
-          </div>
-          
-          <div style={{display: 'flex', gap: '1.5rem', overflowX: 'auto', paddingBottom: '1rem'}}>
-            {/* Izsole 1 */}
-            <div style={{minWidth: '20rem', background: 'rgba(255,255,255,0.95)', borderRadius: '1rem', padding: '1.5rem', flexShrink: 0}}>
-              <div style={{height: '10rem', background: 'linear-gradient(45deg, #f3f4f6, #e5e7eb)', borderRadius: '0.75rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem'}}>📱</div>
-              <h3 style={{fontWeight: 'bold', fontSize: '1.125rem', marginBottom: '0.5rem'}}>iPhone 15 Pro Max 256GB</h3>
-              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
-                <span style={{fontSize: '1.25rem', fontWeight: 'bold', color: '#059669'}}>€850 <span style={{fontSize: '0.75rem', color: '#6b7280'}}>(12 bids)</span></span>
-                <span style={{color: '#ef4444', fontWeight: '600'}}>2h 15m</span>
+            <h2 style={{ 
+              fontSize: '3rem', 
+              fontWeight: 'bold', 
+              textAlign: 'center', 
+              color: 'white', 
+              marginBottom: '4rem',
+              textShadow: '0 4px 12px rgba(0,0,0,0.3)'
+            }}>
+              ⚡ TOP Izsoles – beidzas šodien!
+            </h2>
+            <div style={{ 
+              display: 'flex', 
+              gap: '3rem', 
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}>
+              
+              {/* Izsole 1 */}
+              <div style={{
+                minWidth: '320px',
+                background: 'rgba(255,255,255,0.95)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '2rem',
+                padding: '2.5rem 2rem',
+                boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+                textAlign: 'center',
+                flex: '1',
+                maxWidth: '380px'
+              }}>
+                <div style={{
+                  height: '12rem',
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                  borderRadius: '1.5rem',
+                  marginBottom: '1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '4rem'
+                }}>
+                  ⌚
+                </div>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '1rem' }}>
+                  Rolex Submariner Date
+                </h3>
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <p style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#ef4444', margin: '0 0 0.5rem 0' }}>
+                    €12,500
+                  </p>
+                  <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>
+                    Starta cena €10,000 • 23 piedāvājumi
+                  </p>
+                </div>
+                <p style={{ color: '#059669', fontWeight: '700', fontSize: '1.2rem', marginBottom: '1.5rem' }}>
+                  Beidzas pēc 2h 47min ⏰
+                </p>
+                <Link 
+                  href="/izsole/rolex-submariner"
+                  style={{
+                    background: '#059669',
+                    color: 'white',
+                    padding: '1rem 2rem',
+                    borderRadius: '1rem',
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    textDecoration: 'none',
+                    display: 'block',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 8px 25px rgba(5,150,105,0.4)'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.transform = 'translateY(-3px)';
+                    e.target.style.boxShadow = '0 12px 35px rgba(5,150,105,0.6)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 8px 25px rgba(5,150,105,0.4)';
+                  }}
+                >
+                  Bidēt tagad!
+                </Link>
               </div>
-              <Link href="/izsole/1" style={{width: '100%', background: '#059669', color: 'white', padding: '0.75rem', borderRadius: '0.5rem', textAlign: 'center', fontWeight: '600', textDecoration: 'none', display: 'block'}}>
-                Bidēt tagad!
-              </Link>
+
+              {/* Izsole 2 */}
+              <div style={{
+                minWidth: '320px',
+                background: 'rgba(255,255,255,0.95)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '2rem',
+                padding: '2.5rem 2rem',
+                boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+                textAlign: 'center',
+                flex: '1',
+                maxWidth: '380px'
+              }}>
+                <div style={{
+                  height: '12rem',
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                  borderRadius: '1.5rem',
+                  marginBottom: '1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '4rem'
+                }}>
+                  🎮
+                </div>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '1rem' }}>
+                  PS5 Slim + Spider-Man 2
+                </h3>
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <p style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#ef4444', margin: '0 0 0.5rem 0' }}>
+                    €429
+                  </p>
+                  <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>
+                    Starta cena €350 • 18 piedāvājumi
+                  </p>
+                </div>
+                <p style={{ color: '#059669', fontWeight: '700', fontSize: '1.2rem', marginBottom: '1.5rem' }}>
+                  Beidzas pēc 4h 12min ⏰
+                </p>
+                <Link 
+                  href="/izsole/ps5-spiderman"
+                  style={{
+                    background: '#059669',
+                    color: 'white',
+                    padding: '1rem 2rem',
+                    borderRadius: '1rem',
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    textDecoration: 'none',
+                    display: 'block',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 8px 25px rgba(5,150,105,0.4)'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.transform = 'translateY(-3px)';
+                    e.target.style.boxShadow = '0 12px 35px rgba(5,150,105,0.6)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 8px 25px rgba(5,150,105,0.4)';
+                  }}
+                >
+                  Bidēt tagad!
+                </Link>
+              </div>
+
+              {/* Izsole 3 */}
+              <div style={{
+                minWidth: '320px',
+                background: 'rgba(255,255,255,0.95)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '2rem',
+                padding: '2.5rem 2rem',
+                boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+                textAlign: 'center',
+                flex: '1',
+                maxWidth: '380px'
+              }}>
+                <div style={{
+                  height: '12rem',
+                  background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                  borderRadius: '1.5rem',
+                  marginBottom: '1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '4rem'
+                }}>
+                  👟
+                </div>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '1rem' }}>
+                  Nike Air Jordan 1 High OG
+                </h3>
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <p style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#ef4444', margin: '0 0 0.5rem 0' }}>
+                    €289
+                  </p>
+                  <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>
+                    Starta cena €220 • 31 piedāvājumi
+                  </p>
+                </div>
+                <p style={{ color: '#059669', fontWeight: '700', fontSize: '1.2rem', marginBottom: '1.5rem' }}>
+                  Beidzas pēc 1h 33min ⏰
+                </p>
+                <Link 
+                  href="/izsole/nike-jordan"
+                  style={{
+                    background: '#059669',
+                    color: 'white',
+                    padding: '1rem 2rem',
+                    borderRadius: '1rem',
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    textDecoration: 'none',
+                    display: 'block',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 8px 25px rgba(5,150,105,0.4)'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.transform = 'translateY(-3px)';
+                    e.target.style.boxShadow = '0 12px 35px rgba(5,150,105,0.6)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 8px 25px rgba(5,150,105,0.4)';
+                  }}
+                >
+                  Bidēt tagad!
+                </Link>
+              </div>
+
             </div>
-            
-            {/* Izsole 2 */}
-            <div style={{minWidth: '20rem', background: 'rgba(255,255,255,0.95)', borderRadius: '1rem', padding: '1.5rem', flexShrink: 0}}>
-              <div style={{height: '10rem', background: 'linear-gradient(45deg
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section style={{ 
+          textAlign: 'center', 
+          padding: '4rem 2rem', 
+          background: 'rgba(59,130,246,0.05)',
+          borderRadius: '2rem',
+          marginBottom: '4rem'
+        }}>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '1.5rem' }}>
+            Gatavs pievienot savu sludinājumu?
+          </h2>
+          <p style={{ fontSize: '1.25rem', color: '#6b7280', marginBottom: '2.5rem', maxWidth: '600px', margin: '0 auto' }}>
+            Reģistrējies tagad un sāc pelnīt – pirmie 10 sludinājumi BEZ MAKSAS!
+          </p>
+          <Link 
+            href="/reģistrēties"
+            style={{
+              display: 'inline-block',
+              background: '#10b981',
+              color: 'white',
+              padding: '1.25rem 3rem',
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              borderRadius: '2rem',
+              textDecoration: 'none',
+              boxShadow: '0 10px 30px rgba(16,185,129,0.4)'
+            }}
+          >
+            Reģistrēties tagad – 2 minūtes!
+          </Link>
+        </section>
+
+      </main>
+    </div>
+  );
+}
