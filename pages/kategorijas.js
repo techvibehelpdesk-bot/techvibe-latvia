@@ -16,12 +16,11 @@ export default function Kategorijas() {
     { href: '/mebeles', emoji: '🛋️', nosaukums: 'Mēbeles', skaits: '3,456' },
     { href: '/buvmateriali', emoji: '🔨', nosaukums: 'Būvmateriāli', skaits: '2,789' },
     
-    // Elektrotehnika
+    // Elektrotehnika (bez tv-audio pagaidām)
     { href: '/telefoni', emoji: '📱', nosaukums: 'Telefoni', skaits: '2,847' },
     { href: '/datori', emoji: '💻', nosaukums: 'Datori', skaits: '1,592' },
-    { href: '/tv-audio', emoji: '📺', nosaukums: 'TV, Audio', skaits: '1,234' },
     
-    // Darbs & Bizness (bez vakances pagaidām)
+    // Darbs & Bizness (bez vakances)
     { href: '/darbs', emoji: '💼', nosaukums: 'Darbs', skaits: '8,742' },
     
     // Citas
