@@ -101,7 +101,7 @@ export default function Home() {
                 TOP Izsoles – uzvar tagad!
               </h2>
               <p style={{color: 'rgba(255,255,255,0.9)', fontSize: '1.25rem'}}>
-                Reāllaika bidēšana • Beidzas šodien
+                Reāl laika bidēšana • Beidzas šodien
               </p>
             </div>
             <Link href="/izsole" style={{marginLeft: 'auto', background: 'rgba(255,255,255,0.2)', color: 'white', padding: '0.75rem 2rem', borderRadius: '50px', fontWeight: '600', textDecoration: 'none'}}>
