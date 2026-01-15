@@ -21,7 +21,7 @@ export default function Auto() {
       const { data, error } = await supabase
         .from('sludinajumi')
         .select('*')
-        .eq('kategorija_id', 2)  // ✅ AUTO = 2 no Supabase tabulas
+        .eq('category', 'Auto')  // ✅ category string
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -49,13 +49,10 @@ export default function Auto() {
             <p style={{fontSize: '1.25rem', color: '#6b7280', marginBottom: '1rem'}}>
               {sludinajumi.length} auto sludinājumi Rīgai un Latvijai
             </p>
-            <Link 
-              href="/ievietot" 
-              style={{
-                background: '#059669', color: 'white', padding: '0.75rem 2rem', borderRadius: '0.75rem', 
-                fontWeight: '600', textDecoration: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
-              }}
-            >
+            <Link href="/ievietot" style={{
+              background: '#059669', color: 'white', padding: '0.75rem 2rem', borderRadius: '0.75rem', 
+              fontWeight: '600', textDecoration: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
+            }}>
               ➕ Ievietot auto sludinājumu
             </Link>
           </div>
@@ -72,10 +69,14 @@ export default function Auto() {
             </div>
           ) : (
             <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem'}}>
-              {sludinajumi.map((sludinajums) => (
-                <div 
-                  key={sludinajums.id} 
-                  style={{
+              {sludinajumi.map((sludinajums) => {
+                // Parse images_url ja JSON/string
+                const images = sludinajums.images_url ? 
+                  (typeof sludinajums.images_url === 'string' ? JSON.parse(sludinajums.images_url) : sludinajums.images_url) : 
+                  [];
+                
+                return (
+                  <div key={sludinajums.id} style={{
                     background: 'white', borderRadius: '1rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
                     transition: 'all 0.3s', overflow: 'hidden'
                   }}
@@ -87,34 +88,35 @@ export default function Auto() {
                     e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)';
                     e.currentTarget.style.transform = 'scale(1)';
                   }}
-                >
-                  <div style={{height: '12rem', background: 'linear-gradient(to right, #3b82f6, #1d4ed8)', position: 'relative', overflow: 'hidden'}}>
-                    {sludinajums.attelumi && sludinajums.attelumi[0] ? (  // ✅ attelumi no Supabase
-                      <img src={sludinajums.attelumi[0]} alt={sludinajums.nosaukums} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-                    ) : (
-                      <div style={{width: '100%', height: '100%', background: '#d1d5db', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <span style={{color: '#6b7280', fontSize: '1.125rem'}}>Nav bildes</span>
+                  >
+                    <div style={{height: '12rem', background: 'linear-gradient(to right, #3b82f6, #1d4ed8)', position: 'relative', overflow: 'hidden'}}>
+                      {images[0] ? (
+                        <img src={images[0]} alt={sludinajums.title} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                      ) : (
+                        <div style={{width: '100%', height: '100%', background: '#d1d5db', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                          <span style={{color: '#6b7280', fontSize: '1.125rem'}}>Nav bildes</span>
+                        </div>
+                      )}
+                    </div>
+                    <div style={{padding: '1.5rem'}}>
+                      <h3 style={{fontWeight: 'bold', fontSize: '1.25rem', color: '#1f2937', marginBottom: '0.5rem'}}>
+                        {sludinajums.title}
+                      </h3>
+                      <p style={{color: '#6b7280', marginBottom: '1rem', lineHeight: '1.5'}}>
+                        {sludinajums.description}
+                      </p>
+                      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <span style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#059669'}}>
+                          €{sludinajums.price}
+                        </span>
+                        <span style={{fontSize: '0.875rem', color: '#6b7280'}}>
+                          {new Date(sludinajums.created_at).toLocaleDateString('lv-LV')}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                  <div style={{padding: '1.5rem'}}>
-                    <h3 style={{fontWeight: 'bold', fontSize: '1.25rem', color: '#1f2937', marginBottom: '0.5rem'}}>
-                      {sludinajums.nosaukums}  // ✅ nosaukums no tabulas
-                    </h3>
-                    <p style={{color: '#6b7280', marginBottom: '1rem'}}>
-                      {sludinajums.apraksts}  // ✅ apraksts
-                    </p>
-                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                      <span style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#059669'}}>
-                        {sludinajums.cena} €  // ✅ cena
-                      </span>
-                      <span style={{fontSize: '0.875rem', color: '#6b7280'}}>
-                        {new Date(sludinajums.created_at).toLocaleDateString('lv-LV')}
-                      </span>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
