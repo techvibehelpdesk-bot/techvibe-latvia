@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -7,79 +6,78 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export default function Auto() {
-  const [sludinajumi, setSludinajumi] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default async function Auto() {
+  let sludinajumi = [];
+  let error = null;
 
-  useEffect(() => {
-    fetchSludinajumi();
-  }, []);
+  try {
+    const { data, error: fetchError } = await supabase
+      .from('sludinajumi')
+      .select('*, image_urls')  // Angliskas kolonnas + bildes
+      .eq('status', 'publicēts')  // Vai 'approved'?
+      .ilike('category', '%auto%')  // ILIKE tavai category kolonnai!
+      .order('created_at', { ascending: false });
 
-  const fetchSludinajumi = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('sludinajumi')
-        .select('*, image_urls');  // VISU tabula!
-
-      console.log('Auto sludinājumi:', data);  // F12 redz BMW!
-
-      if (error) throw error;
-      setSludinajumi(data || []);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getFirstImage = (sludinajums) => {
-    return sludinajums.image_urls || 'https://via.placeholder.com/500x300/e2e8f0/4a5568?text=🚗+Auto+bez+bildes';
-  };
-
-  if (loading) return <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center"><div>Ielādē...</div></div>;
+    console.log('AUTO DEBUG:', { count: data?.length || 0, error: fetchError });
+    
+    sludinajumi = data || [];
+  } catch (err) {
+    console.error('AUTO KĻŪDA:', err);
+    error = err.message;
+  }
 
   return (
     <>
-      <Head><title>Auto - TechVibe.lv</title></Head>
-      <main className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4">🚗 Auto un moto</h1>
-              <p className="text-xl text-gray-600">Visi auto sludinājumi Latvijā</p>
-            </div>
-            <Link href="/ievietot" className="mt-4 md:mt-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all">
-              + Ievietot auto
+      <Head>
+        <title>🚗 Auto un Moto | TechVibe</title>
+        <meta name="description" content="Auto un moto sludinājumi Latvijā" />
+      </Head>
+      <main className="max-w-7xl mx-auto p-6">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">🚗 Auto un Moto</h1>
+          <Link href="/ievietot?cat=auto" className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600">
+            + Ievietot sludinājumu
+          </Link>
+        </div>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            Kļūda: {error}. Pārbaudi Supabase.
+          </div>
+        )}
+
+        {sludinajumi.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-xl text-gray-500 mb-4">Vēl nav auto sludinājumu</p>
+            <Link href="/ievietot?cat=auto" className="bg-purple-500 text-white px-8 py-3 rounded-lg hover:bg-purple-600">
+              Būt pirmais!
             </Link>
           </div>
-
-          {sludinajumi.length === 0 ? (
-            <div className="text-center py-20">
-              <h2 className="text-3xl font-bold text-gray-700 mb-4">Vēl nav sludinājumu</h2>
-              <Link href="/ievietot" className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold py-4 px-10 rounded-xl shadow-lg transition-all">📤 Ievietot pirmo</Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {sludinajumi.map((s) => (
-                <Link key={s.id} href={`/sludinajums/${s.id}`} className="group">
-                  <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden transition-all hover:-translate-y-2 border">
-                    <div className="h-64 overflow-hidden">
-                      <img src={getFirstImage(s)} alt={s.nosaukums} className="w-full h-full object-cover group-hover:scale-110 transition-transform" onError={e => e.target.src='https://via.placeholder.com/500x300?text=🚗'} />
-                    </div>
-                    <div className="p-6">
-                      <h3 className="font-bold text-xl mb-2">{s.nosaukums}</h3>
-                      <div className="flex justify-between mb-4">
-                        <span className="text-2xl font-bold text-emerald-600">€{s.cena}</span>
-                        <span className="text-sm text-gray-500">{s.kontakts}</span>
-                      </div>
-                      <p className="text-gray-600 text-sm line-clamp-3">{s.apraksts}</p>
-                    </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {sludinajumi.map((s) => (
+              <Link key={s.id} href={`/sludinajums/${s.id}`} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow border overflow-hidden">
+                <div className="h-48 bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
+                  {s.image_urls && s.image_urls[0] ? (
+                    <img src={s.image_urls[0]} alt={s.title || s.nosaukums} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-white text-lg font-semibold">Bez bildes</span>
+                  )}
+                </div>
+                <div className="p-6">
+                  <h3 className="font-bold text-xl mb-2 line-clamp-2">{s.title || s.nosaukums}</h3>
+                  <div className="text-2xl font-bold text-green-600 mb-3">
+                    €{(s.price || s.cena)?.toLocaleString()}
                   </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
+                  <p className="text-sm text-gray-500 mb-4 line-clamp-3">{s.description || s.apraksts}</p>
+                  <div className="flex items-center text-sm text-gray-600">
+                    📞 {s.phone || s.kontakts}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </main>
     </>
   );
