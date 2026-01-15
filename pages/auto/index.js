@@ -8,7 +8,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export default function Auto() {
+export default function auto() {
   const [sludinajumi, setSludinajumi] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,7 +21,7 @@ export default function Auto() {
       const { data, error } = await supabase
         .from('sludinajumi')
         .select('*')
-        .eq('category', 'Auto')  // ✅ category string
+        .eq('category', 'auto')  // ✅ category string
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -40,7 +40,7 @@ export default function Auto() {
   return (
     <>
       <Head>
-        <title>🚗 Auto - TechVibe.lv</title>
+        <title>🚗 auto - TechVibe.lv</title>
       </Head>
       <div style={{minHeight: '100vh', background: 'linear-gradient(to bottom right, #fef3c7, #fde68a)', padding: '2rem 1rem'}}>
         <div style={{maxWidth: '1200px', margin: '0 auto'}}>
@@ -124,3 +124,4 @@ export default function Auto() {
     </>
   );
 }
+
