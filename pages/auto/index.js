@@ -21,8 +21,7 @@ export default function Auto() {
       const { data, error } = await supabase
         .from('sludinajumi')
         .select('*')
-        .eq('category', 'auto')  // 🚗 AUTO KATEGORIJA
-        .eq('status', 'publicēts')
+        .eq('kategorija_id', 2)  // ✅ AUTO = 2 no Supabase tabulas
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -90,8 +89,8 @@ export default function Auto() {
                   }}
                 >
                   <div style={{height: '12rem', background: 'linear-gradient(to right, #3b82f6, #1d4ed8)', position: 'relative', overflow: 'hidden'}}>
-                    {sludinajums.images && sludinajums.images[0] ? (
-                      <img src={sludinajums.images[0]} alt={sludinajums.title} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                    {sludinajums.attelumi && sludinajums.attelumi[0] ? (  // ✅ attelumi no Supabase
+                      <img src={sludinajums.attelumi[0]} alt={sludinajums.nosaukums} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
                     ) : (
                       <div style={{width: '100%', height: '100%', background: '#d1d5db', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                         <span style={{color: '#6b7280', fontSize: '1.125rem'}}>Nav bildes</span>
@@ -100,14 +99,14 @@ export default function Auto() {
                   </div>
                   <div style={{padding: '1.5rem'}}>
                     <h3 style={{fontWeight: 'bold', fontSize: '1.25rem', color: '#1f2937', marginBottom: '0.5rem'}}>
-                      {sludinajums.title}
+                      {sludinajums.nosaukums}  // ✅ nosaukums no tabulas
                     </h3>
                     <p style={{color: '#6b7280', marginBottom: '1rem'}}>
-                      {sludinajums.description}
+                      {sludinajums.apraksts}  // ✅ apraksts
                     </p>
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                       <span style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#059669'}}>
-                        {sludinajums.price} €
+                        {sludinajums.cena} €  // ✅ cena
                       </span>
                       <span style={{fontSize: '0.875rem', color: '#6b7280'}}>
                         {new Date(sludinajums.created_at).toLocaleDateString('lv-LV')}
@@ -123,5 +122,3 @@ export default function Auto() {
     </>
   );
 }
-
-
