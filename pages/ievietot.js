@@ -68,15 +68,20 @@ export default function IevietotSludinajumu() {
     }
 
     // Sludinājuma objekts ar image_urls masīvu (jsonb laukam)
-    const data = {
-      title: formData.get("virsraksts"),
-      description: formData.get("apraksts"),
-      price: parseFloat(formData.get("cena")) || 0,
-      category: formData.get("category"),
-      contact: formData.get("kontakts"),
-      image_urls: imageUrls,
-      status: "gaida",
-    };
+ // Saglabā URL tabulā!
+const publicUrl = supabase.storage.from('sludinajumi').getPublicUrl(fileName).data.publicUrl;
+
+// data objekts:
+const data = {
+  title: formData.get("virsraksts"),
+  description: formData.get("apraksts"),
+  price: parseFloat(formData.get("cena")) || 0,
+  category: formData.get("category"),
+  contact: formData.get("kontakts"),
+  images_url: imageUrls.length ? imageUrls[0] : null,  // ✅ PIRMĀ bilde!
+  status: "publicēts"
+};
+
 
     try {
       const { error } = await supabase.from("sludinajumi").insert([data]);
