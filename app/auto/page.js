@@ -9,24 +9,33 @@ export default function AutoPage() {
 
   useEffect(() => {
     // Tavi mock dati PRECĪZI kā vajag
-    const mockData = [
-      {
-        id: 1,
-        title: 'BMW 3 Series 320i',
-        description: 'Pilnīgi jauns, 1 īpašnieks',
-        price: '28 900',
-        images: ['https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400'],
-        created_at: '2026-01-15T10:30:00Z'
-      },
-      {
-        id: 2,
-        title: 'Audi A6 Avant',
-        description: 'Quattro, 120tkm, labs stāvoklis',
-        price: '24 500',
-        images: ['https://images.unsplash.com/photo-1603796846092-bee2d6aa653e?w=400'],
-        created_at: '2026-01-14T14:20:00Z'
-      }
-    ];
+   const mockData = [
+  {
+    id: 1,
+    title: 'BMW 3 Series 320i',
+    description: 'Pilnīgi jauns, 1 īpašnieks',
+    price: '28 900',
+    images: ['https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400'],
+    created_at: '2026-01-15T10:30:00Z'
+  },
+  {
+    id: 2,
+    title: 'Audi A6 Avant',
+    description: 'Quattro, 120tkm, labs stāvoklis',
+    price: '24 500',
+    images: ['https://images.unsplash.com/photo-1603796846092-bee2d6aa653e?w=400'],
+    created_at: '2026-01-14T14:20:00Z'
+  },
+  {
+    id: 3,
+    title: 'Mercedes C200',
+    description: 'AMG Line, 2 gadu garantija',
+    price: '32 900',
+    images: ['https://images.unsplash.com/photo-1583121274602-d9e62e3d1e1f?w=400'],
+    created_at: '2026-01-13T09:15:00Z'
+  }
+];
+
     setSludinajumi(mockData);
     setLoading(false);
   }, []);
