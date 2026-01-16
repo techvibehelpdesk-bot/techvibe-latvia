@@ -18,7 +18,6 @@ export default function AutoPage() {
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
       
-      // Bez stingra filtra - ņem visus, client filtrē auto
       const response = await fetch(
         `${supabaseUrl}/rest/v1/sludinajumi?select=*&status=eq.published`,
         {
@@ -37,7 +36,6 @@ export default function AutoPage() {
       const data = await response.json();
       console.log('✅ TABULA sludinajumi OK:', data.length, 'ieraksti');
       
-      // Client-side auto filtrs (ignore case)
       const autoData = data.filter(item => 
         item.category && item.category.toLowerCase().includes('auto')
       );
@@ -62,10 +60,10 @@ export default function AutoPage() {
         {sludinajumi.map((s) => (
           <Link key={s.id} href={`/auto/${s.id}`} className="bg-white rounded-2xl shadow-lg hover:shadow-2xl p-6 hover:-translate-y-2 transition-all border">
             <div className="h-48 bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl flex items-center justify-center mb-4 overflow-hidden">
-              {s.thumbnail_url ? (
+              {s.image_public_urls?.[0] ? (
                 <img 
-                  src={s.thumbnail_url} 
-                  alt={s.title} 
+                  src={s.image_public_urls[0]} 
+                  alt={s.nosaukums} 
                   className="w-full h-full object-cover rounded-xl"
                   onError={(e) => { e.target.style.display = 'none'; }}
                 />
@@ -73,12 +71,14 @@ export default function AutoPage() {
                 <span className="text-gray-400 text-lg">Nav bildes</span>
               )}
             </div>
-            <h3 className="text-xl font-bold mb-2 line-clamp-2">{s.title}</h3>
-            <p className="text-gray-600 mb-4 line-clamp-3">{s.description}</p>
+            <h3 className="text-xl font-bold mb-2 line-clamp-2">{s.nosaukums}</h3>
+            <p className="text-gray-600 mb-4 line-clamp-3">{s.apraksts}</p>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-2xl font-bold text-green-600">€{s.price?.toLocaleString()}</span>
+              <span className="text-2xl font-bold text-green-600">
+                €{Number(s.cena)?.toLocaleString() || 'Nav norādīta'}
+              </span>
               <span className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-                {s.city}
+                {s.pilseta || 'Rīga'}
               </span>
             </div>
             <p className="text-xs text-gray-500">
