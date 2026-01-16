@@ -18,10 +18,8 @@ export default function AutoPage() {
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
       
-      console.log('🔍 Connecting to', supabaseUrl); // Debug
-      
       const response = await fetch(
-        `${supabaseUrl}/rest/v1/sludinajumi?select=*`,
+        `${supabaseUrl}/rest/v1/sludinajumi?select=*&category=ilike.auto`,
         {
           headers: {
             'Authorization': `Bearer ${supabaseKey}`,
@@ -30,23 +28,12 @@ export default function AutoPage() {
         }
       );
       
-      if (!response.ok) {
-        const err = await response.text();
-        throw new Error(`Error ${response.status}: ${err}`);
-      }
+      if (!response.ok) throw new Error(`Error ${response.status}`);
       
       const data = await response.json();
-      console.log('✅ TABULA sludinajumi OK:', data.length, 'ieraksti');
+      console.log('✅ Jauna tabula OK:', data.length, 'ieraksti');
       
-      // Auto filtrs (pielāgo pēc Console)
-      const autoData = data.filter(item => 
-        item.category && item.category.toLowerCase().includes('auto')
-      );
-      
-      console.log('🚗 AUTO ieraksti:', autoData.length);
-      console.table(autoData.slice(0, 3)); // Pirmie 3 auto
-      
-      setSludinajumi(autoData);
+      setSludinajumi(data);
     } catch (err) {
       console.error('❌ KĻŪDA:', err);
       setError(err.message);
@@ -65,14 +52,14 @@ export default function AutoPage() {
         {sludinajumi.map((s) => (
           <Link key={s.id} href={`/auto/${s.id}`} className="bg-white rounded-2xl shadow-lg hover:shadow-2xl p-6 hover:-translate-y-2 transition-all border">
             <div className="h-48 bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl flex items-center justify-center mb-4">
-              {s.image_urls && s.image_urls[0] ? (
-                <img src={s.image_urls[0]} alt="Auto" className="w-full h-full object-cover rounded-xl" />
+              {s.thumbnail_url ? (
+                <img src={s.thumbnail_url} alt="Auto" className="w-full h-full object-cover rounded-xl" />
               ) : 'Nav bildes'}
             </div>
-            <h3 className="text-xl font-bold mb-2">{s.title || 'Bez nosaukuma'}</h3>
+            <h3 className="text-xl font-bold mb-2">{s.title}</h3>
             <p className="text-gray-600 mb-4 line-clamp-3">{s.description}</p>
             <div className="flex justify-between items-center">
-              <span className="text-2xl font-bold text-green-600">€{s.price || 'Cenā'}</span>
+              <span className="text-2xl font-bold text-green-600">€{s.price}</span>
               <span className="text-sm bg-blue-100 px-3 py-1 rounded-full">{s.city}</span>
             </div>
             <p className="text-sm text-gray-500 mt-2">{s.status} • {new Date(s.created_at).toLocaleDateString('lv-LV')}</p>
