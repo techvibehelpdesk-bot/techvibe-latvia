@@ -6,156 +6,106 @@ import Link from 'next/link';
 export default function AutoPage() {
   const [sludinajumi, setSludinajumi] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Tavi mock dati PRECĪZI kā vajag
-    const mockData = [
-      {
-        id: 1,
-        title: 'BMW 3 Series 320i',
-        description: 'Pilnīgi jauns, 1 īpašnieks',
-        price: '28 900',
-        images: ['https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400'],
-        created_at: '2026-01-15T10:30:00Z'
-      },
-      {
-        id: 2,
-        title: 'Audi A6 Avant',
-        description: 'Quattro, 120tkm, labs stāvoklis',
-        price: '24 500',
-        images: ['https://images.unsplash.com/photo-1603796846092-bee2d6aa653e?w=400'],
-        created_at: '2026-01-14T14:20:00Z'
-      }
-    ];
-    setSludinajumi(mockData);
-    setLoading(false);
+    fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <div style={{
-        minHeight: '100vh', 
-        background: 'linear-gradient(to bottom right, #fef3c7, #fde68a)', 
-        display: 'flex', alignItems: 'center', justifyContent: 'center', 
-        fontSize: '1.25rem', color: '#6b7280'
-      }}>
-        🚗 Ielādē auto sludinājumus...
-      </div>
-    );
+  async function fetchData() {
+    try {
+      setLoading(true);
+      setError(null);
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+      const response = await fetch(
+        `${supabaseUrl}/rest/v1/sludinajumi?select=*&category=ilike.*auto*&status=eq.published`,
+        {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`
+          }
+        }
+      );
+
+      if (!response.ok) throw new Error('Fetch kļūda');
+      const data = await response.json();
+      console.log('🚗 AUTO ieraksti:', data);
+      setSludinajumi(data);
+    } catch (err) {
+      console.error('Error:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  return (
-    <div style={{
-      minHeight: '100vh', 
-      background: 'linear-gradient(to bottom right, #fef3c7, #fde68a)', 
-      padding: '2rem 1rem'
-    }}>
-      <div style={{maxWidth: '1200px', margin: '0 auto'}}>
-        {/* Header PRECĪZI kā tavā kodā */}
-        <div style={{
-          marginBottom: '2rem', 
-          display: 'flex', flexDirection: 'column', alignItems: 'flex-start'
-        }}>
-          <h1 style={{
-            fontSize: '2.5rem', 
-            fontWeight: 'bold', 
-            color: '#1f2937', 
-            marginBottom: '0.5rem'
-          }}>
-            🚗 Auto
-          </h1>
-          <p style={{
-            fontSize: '1.25rem', 
-            color: '#6b7280', 
-            marginBottom: '1rem'
-          }}>
-            {sludinajumi.length} auto sludinājumi Rīgai un Latvijai
-          </p>
-          <Link 
-            href="/ievietot" 
-            style={{
-              background: '#059669', 
-              color: 'white', 
-              padding: '0.75rem 2rem', 
-              borderRadius: '0.75rem', 
-              fontWeight: '600', 
-              textDecoration: 'none', 
-              boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
-            }}
-          >
-            ➕ Ievietot auto sludinājumu
-          </Link>
-        </div>
+  if (loading) return (
+    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-8">
+      <div className="text-center py-20">Ielādē auto sludinājumus...</div>
+    </main>
+  );
 
-        {/* Kartītes PRECĪZI kā screenshot */}
-        <div style={{
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-          gap: '1.5rem'
-        }}>
-          {sludinajumi.map((sludinajums) => (
-            <div 
-              key={sludinajums.id} 
-              style={{
-                background: 'white', 
-                borderRadius: '1rem', 
-                boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
-                transition: 'all 0.3s', 
-                overflow: 'hidden'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(0,0,0,0.25)';
-                e.currentTarget.style.transform = 'scale(1.02)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
+  return (
+    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-8">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-4xl font-bold text-center mb-12 text-gray-800 flex items-center justify-center gap-4">
+          🚗 Auto sludinājumi ({sludinajumi.length})
+        </h1>
+        
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-800 p-6 rounded-xl mb-8 text-center">
+            Kļūda: {error}. <button onClick={fetchData} className="underline">Mēģināt vēlreiz</button>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {sludinajumi.map((s) => (
+            <Link 
+              key={s.id} 
+              href={`/auto/${s.id}`}
+              className="bg-white rounded-2xl shadow-lg hover:shadow-2xl p-6 hover:-translate-y-2 transition-all group border border-gray-100"
             >
-              {/* Attēls */}
-              <div style={{
-                height: '12rem', 
-                background: 'linear-gradient(to right, #3b82f6, #1d4ed8)', 
-                position: 'relative', 
-                overflow: 'hidden'
-              }}>
+              <div className="relative w-full h-48 bg-gray-200 rounded-xl overflow-hidden group-hover:scale-105 transition-transform mb-4">
                 <img 
-                  src={sludinajums.images[0]} 
-                  alt={sludinajums.title}
-                  style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                  src={s.image_urls?.[0] || '/placeholder-auto.jpg'} 
+                  alt={s.title} 
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => { e.target.src = '/placeholder-auto.jpg'; }}
                 />
-              </div>
-              
-              {/* Saturs */}
-              <div style={{padding: '1.5rem'}}>
-                <h3 style={{
-                  fontWeight: 'bold', 
-                  fontSize: '1.25rem', 
-                  color: '#1f2937', 
-                  marginBottom: '0.5rem'
-                }}>
-                  {sludinajums.title}
-                </h3>
-                <p style={{color: '#6b7280', marginBottom: '1rem'}}>
-                  {sludinajums.description}
-                </p>
-                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                  <span style={{
-                    fontSize: '1.5rem', 
-                    fontWeight: 'bold', 
-                    color: '#059669'
-                  }}>
-                    {sludinajums.price} €
+                {s.image_urls?.length > 1 && (
+                  <span className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 text-xs rounded-full">
+                    +{s.image_urls.length - 1}
                   </span>
-                  <span style={{fontSize: '0.875rem', color: '#6b7280'}}>
-                    {new Date(sludinajums.created_at).toLocaleDateString('lv-LV')}
-                  </span>
-                </div>
+                )}
               </div>
-            </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{s.title}</h3>
+              <p className="text-2xl font-bold text-green-600 mb-4">{s.price} €</p>
+              <p className="text-gray-600 text-sm line-clamp-3 mb-4">{s.description}</p>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-500">Gaida apstiprinājumu</span>
+                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                  Jauns
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
+
+        {sludinajumi.length === 0 && !loading && (
+          <div className="text-center mt-20 p-12 bg-yellow-50 rounded-2xl">
+            <p className="text-2xl mb-4 text-gray-700">Nav auto sludinājumu</p>
+            <Link 
+              href="/ievietot" 
+              className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors inline-block"
+            >
+              ➕ Pievienot pirmo sludinājumu
+            </Link>
+          </div>
+        )}
       </div>
-    </div>
+    </main>
   );
 }
