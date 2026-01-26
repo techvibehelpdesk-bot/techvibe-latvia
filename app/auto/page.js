@@ -19,8 +19,9 @@ export default function AutoPage() {
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-      const response = await fetch(
-        `${supabaseUrl}/rest/v1/sludinajumi?select=*&category=ilike.*auto*&status=eq.published`,
+    const response = await fetch(
+  `${supabaseUrl}/rest/v1/sludinajumi?select=*`,
+
         {
           headers: {
             'apikey': supabaseKey,
