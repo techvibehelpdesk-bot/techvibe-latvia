@@ -121,7 +121,7 @@ export default function AutoPage() {
             background: 'white', color: '#d97706',
             padding: '1rem 2.5rem', borderRadius: '50px',
             fontWeight: 'bold', textDecoration: 'none', whiteSpace: 'nowrap'
-          }}>➕ Piedāvāt auto</Link>
+          }}>➕ Iievietot sludinājumu </Link>
         </div>
 
         {/* Auto sludinājumi */}
@@ -210,7 +210,7 @@ export default function AutoPage() {
               fontSize: '1.5rem', fontWeight: 'bold',
               textDecoration: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
             }}>
-              ➕ Publicēt pirmo auto – BEZ MAKSAS!
+              ➕ Publicē savu pirmo sludinājumu– BEZ MAKSAS!
             </Link>
           </div>
         )}
@@ -222,7 +222,7 @@ export default function AutoPage() {
             borderRadius: '2rem', backdropFilter: 'blur(20px)'
           }}>
             <h2 style={{fontSize: '2.5rem', marginBottom: '1rem'}}>
-              Piedāvā savu auto!
+              Publicēt savu sludinājumu!
             </h2>
             <Link href="/ievietot?kategorija=auto" style={{
               background: 'white', color: '#d97706',
