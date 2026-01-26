@@ -34,14 +34,14 @@ export default function IevietotSludinajumu() {
     const formData = new FormData(e.target);
     const imageUrls = [];
 
-    // 🔥 UPLOAD UZ TAVU 'sludinajumi' BUCKET
+    // 🔥 UPLOAD UZ 'sludinajumi' BUCKET
     if (images.length > 0) {
       for (const file of images) {
         const fileExt = file.name.split(".").pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substr(2,9)}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
-          .from("sludinajumi")  // ← MAINĪTS NO "public" UZ "sludinajumi"!
+          .from("sludinajumi")
           .upload(fileName, file, { upsert: true });
 
         if (uploadError) {
@@ -51,21 +51,21 @@ export default function IevietotSludinajumu() {
         }
 
         const { data: { publicUrl } } = supabase.storage
-          .from("sludinajumi")  // ← MAINĪTS NO "public" UZ "sludinajumi"!
+          .from("sludinajumi")
           .getPublicUrl(fileName);
         
         imageUrls.push(publicUrl);
       }
     }
 
-    // 🔥 ANGĻU KOLONNAS DB!
+    // 🔥 TAVAI SHĒMAI - image_public_urls (JSONB)
     const data = {
       title: formData.get("virsraksts"),
       description: formData.get("apraksts"),
       price: parseInt(formData.get("cena")) || 0,
       category: formData.get("category"),
       phone: formData.get("kontakts"),
-      image_urls: imageUrls.length > 0 ? imageUrls : null,
+      image_public_urls: imageUrls.length > 0 ? imageUrls : null,  // ✅ TAVA KOLONNA!
       status: "published",
       location: "Rīga"
     };
