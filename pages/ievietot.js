@@ -34,14 +34,14 @@ export default function IevietotSludinajumu() {
     const formData = new FormData(e.target);
     const imageUrls = [];
 
-    // 🔥 UPLOAD UZ TAVU 'public' BUCKET
+    // 🔥 UPLOAD UZ TAVU 'sludinajumi' BUCKET
     if (images.length > 0) {
       for (const file of images) {
         const fileExt = file.name.split(".").pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substr(2,9)}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
-          .from("public")  // ← TAVS BUCKET!
+          .from("sludinajumi")  // ← MAINĪTS NO "public" UZ "sludinajumi"!
           .upload(fileName, file, { upsert: true });
 
         if (uploadError) {
@@ -51,7 +51,7 @@ export default function IevietotSludinajumu() {
         }
 
         const { data: { publicUrl } } = supabase.storage
-          .from("public")
+          .from("sludinajumi")  // ← MAINĪTS NO "public" UZ "sludinajumi"!
           .getPublicUrl(fileName);
         
         imageUrls.push(publicUrl);
