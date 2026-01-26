@@ -6,7 +6,7 @@ import Link from 'next/link'
 export default function AutoPage() {
   const [sludinajumi, setSludinajumi] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     fetchData()
@@ -15,7 +15,6 @@ export default function AutoPage() {
   async function fetchData() {
     try {
       setLoading(true)
-      setError(null)
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
       const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -28,145 +27,214 @@ export default function AutoPage() {
 
       if (!response.ok) throw new Error('Fetch kļūda')
       const data = await response.json()
-      console.log('🚗 AUTO ieraksti:', data)
       
-      const filtered = data.filter(s => 
+      let filtered = data.filter(s => 
         s.category?.toLowerCase().includes('auto') && 
         s.status === 'published'
       )
+      
+      // Meklēšana
+      if (search) {
+        filtered = filtered.filter(s => 
+          s.title?.toLowerCase().includes(search.toLowerCase()) ||
+          s.description?.toLowerCase().includes(search.toLowerCase())
+        )
+      }
+      
       setSludinajumi(filtered)
     } catch (err) {
       console.error('Error:', err)
-      setError(err.message)
     } finally {
       setLoading(false)
     }
   }
 
   if (loading) return (
-    <main className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-amber-50 flex items-center justify-center p-8">
-      <div className="animate-pulse space-y-4 text-center">
-        <div className="w-32 h-32 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-3xl mx-auto shadow-2xl"></div>
-        <p className="text-2xl font-bold text-gray-600">Ielādē auto...</p>
-      </div>
-    </main>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center'
+    }}>
+      <div style={{fontSize: '4rem', color: 'white'}}>🚗 Ielādē...</div>
+    </div>
   )
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-amber-50 py-20 px-6 lg:px-12">
-      <div className="max-w-7xl mx-auto">
-        {/* LIELS HERO BLOKS */}
-        <div className="text-center mb-28">
-          <div className="inline-flex items-center gap-6 bg-white/80 backdrop-blur-xl px-16 py-8 rounded-[3rem] shadow-2xl border border-white/50 mb-12 mx-auto max-w-4xl">
-            <span className="text-7xl">🚗</span>
-            <div>
-              <h1 className="text-6xl lg:text-7xl font-black bg-gradient-to-r from-orange-900 via-amber-900 to-yellow-900 bg-clip-text text-transparent mb-4 leading-tight">
-                Auto sludinājumi
-              </h1>
-              <p className="text-3xl font-bold text-slate-600">
-                {sludinajumi.length} auto Rīgā
-              </p>
-            </div>
-          </div>
-          <Link href="/ievietot" className="group inline-flex items-center gap-4 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-black text-xl py-6 px-12 rounded-[2.5rem] shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all duration-300 border border-orange-300/50">
-            <span className="text-3xl group-hover:rotate-12 transition-transform duration-300">+</span>
-            Pievienot auto
-          </Link>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)',
+      padding: '2rem 1rem',
+      color: 'white'
+    }}>
+      <div style={{maxWidth: '1400px', margin: '0 auto'}}>
+        
+        {/* Header */}
+        <div style={{
+          textAlign: 'center',
+          marginBottom: '4rem',
+          position: 'relative'
+        }}>
+          <Link href="/kategorijas" style={{
+            position: 'absolute', left: '0', top: '0',
+            background: 'rgba(255,255,255,0.2)', color: 'white',
+            padding: '0.75rem 1.5rem', borderRadius: '50px',
+            fontWeight: '600', textDecoration: 'none'
+          }}>← Atpakaļ kategorijās</Link>
+          
+          <div style={{fontSize: '6rem', marginBottom: '1rem'}}>🚗</div>
+          <h1 style={{
+            fontSize: '4rem', fontWeight: 'bold',
+            textShadow: '0 4px 12px rgba(0,0,0,0.3)'
+          }}>Auto sludinājumi</h1>
+          <p style={{fontSize: '1.5rem', opacity: 0.9}}>
+            Auto • Moto • Pārdod • {sludinajumi.length} sludinājumi Rīgā
+          </p>
         </div>
 
-        {/* KARTĪTES GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-24">
+        {/* Filtrs */}
+        <div style={{
+          background: 'rgba(255,255,255,0.15)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '2rem',
+          padding: '1.5rem 2rem',
+          marginBottom: '3rem',
+          display: 'flex', flexWrap: 'wrap',
+          gap: '1rem', alignItems: 'center'
+        }}>
+          <input 
+            placeholder="Meklēt auto (BMW, Audi...)" 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              flex: 1, minWidth: '300px',
+              padding: '1rem 1.5rem', borderRadius: '50px',
+              border: 'none', background: 'rgba(255,255,255,0.9)',
+              fontSize: '1.1rem', color: '#000'
+            }} 
+          />
+          <select style={{padding: '1rem 1.5rem', borderRadius: '50px', border: 'none'}}>
+            <option>Jaunākie</option>
+            <option>Cena augoša</option>
+            <option>Cena dilstoša</option>
+          </select>
+          <Link href="/ievietot?kategorija=auto" style={{
+            background: 'white', color: '#d97706',
+            padding: '1rem 2.5rem', borderRadius: '50px',
+            fontWeight: 'bold', textDecoration: 'none', whiteSpace: 'nowrap'
+          }}>➕ Piedāvāt auto</Link>
+        </div>
+
+        {/* Auto sludinājumi */}
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(370px, 1fr))', gap: '2rem'}}>
           {sludinajumi.map((item) => {
-            let firstImage = 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=500&fit=crop'
-            try {
-              if (item.image_urls) {
-                const images = JSON.parse(item.image_urls)
-                if (images && images[0]) firstImage = images[0]
-              }
-            } catch(e) {
-              console.log('Image parse error:', item.image_urls)
-            }
+            const firstImage = item.image_urls 
+              ? JSON.parse(item.image_urls)[0] || 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400'
+              : 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400'
 
             return (
-              <Link 
-                key={item.id}
-                href={`/sludinajums/${item.id}`}
-                className="group bg-white rounded-[2.5rem] p-8 sm:p-10 shadow-2xl hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border border-slate-100/50 hover:border-orange-200 hover:-translate-y-4 transition-all duration-500 overflow-hidden hover:bg-slate-50/50 backdrop-blur-sm"
-              >
-                {/* BILDE */}
-                <div className="w-full h-64 sm:h-72 rounded-2xl overflow-hidden bg-gradient-to-br from-orange-50 to-yellow-50 mb-8 shadow-xl group-hover:shadow-2xl transition-all duration-700 border border-orange-100">
-                  <img 
-                    src={firstImage}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 hover:brightness-105"
-                    loading="lazy"
-                  />
+              <Link key={item.id} href={`/sludinajums/${item.id}`} style={{
+                background: 'rgba(255,255,255,0.95)',
+                borderRadius: '2rem', overflow: 'hidden',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+                transition: 'all 0.4s', textDecoration: 'none',
+                color: 'initial', display: 'block'
+              }} className="group">
+                <div style={{
+                  height: '210px', 
+                  backgroundImage: `url(${firstImage})`,
+                  backgroundSize: 'cover', backgroundPosition: 'center',
+                  position: 'relative'
+                }}>
+                  <div style={{
+                    position: 'absolute', top: '1rem', right: '1rem',
+                    background: '#f59e0b', color: 'white',
+                    padding: '0.5rem 1rem', borderRadius: '50px',
+                    fontWeight: 'bold', fontSize: '0.875rem'
+                  }}>Pārdod</div>
                 </div>
-
-                {/* NOSAUKUMS */}
-                <h3 className="font-black text-xl sm:text-2xl lg:text-3xl mb-6 line-clamp-2 text-slate-900 group-hover:text-orange-900 transition-all duration-300 leading-tight">
-                  {item.title}
-                </h3>
-
-                {/* CENA – LIELA */}
-                <div className="text-4xl sm:text-5xl lg:text-6xl font-black text-emerald-600 mb-6 sm:mb-8 leading-none drop-shadow-lg">
-                  {item.price}€
-                </div>
-
-                {/* VIETA */}
-                <p className="text-lg sm:text-xl text-slate-600 font-semibold mb-8 sm:mb-10">
-                  {item.location || 'Rīga'}
-                </p>
-
-                {/* POGAS */}
-                <div className="flex gap-3 sm:gap-4">
-                  <Link 
-                    href={`/sludinajums/${item.id}`}
-                    className="flex-1 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-2xl text-base sm:text-lg text-center shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:scale-[1.02] whitespace-nowrap"
-                  >
-                    Skatīt
-                  </Link>
-                  <Link 
-                    href={`tel:${item.phone || '+37120000000'}`}
-                    className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-2xl text-base sm:text-lg text-center shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:scale-[1.02] whitespace-nowrap"
-                  >
-                    Zvanīt
-                  </Link>
+                <div style={{padding: '2.5rem'}}>
+                  <h3 style={{
+                    fontSize: '1.4rem', fontWeight: 'bold',
+                    marginBottom: '1rem', lineHeight: '1.3', color: '#1f2937'
+                  }}>
+                    {item.title}
+                  </h3>
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between',
+                    alignItems: 'center', marginBottom: '1rem'
+                  }}>
+                    <p style={{
+                      fontSize: '1.75rem', fontWeight: 'bold',
+                      color: '#059669', margin: 0
+                    }}>
+                      {item.price}€
+                    </p>
+                    <span style={{
+                      background: 'rgba(255,255,255,0.5)',
+                      padding: '0.5rem 1rem', borderRadius: '1rem',
+                      fontSize: '0.9rem', color: '#1f2937'
+                    }}>
+                      {item.location || 'Rīga'}
+                    </span>
+                  </div>
+                  <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap'}}>
+                    <span style={{
+                      background: 'rgba(245,158,11,0.3)',
+                      color: '#b45309', padding: '0.375rem 0.875rem',
+                      borderRadius: '1rem', fontSize: '0.85rem',
+                      fontWeight: '600'
+                    }}>
+                      Auto
+                    </span>
+                  </div>
                 </div>
               </Link>
             )
           })}
         </div>
 
-        {/* TUKŠS STĀVOKLIS */}
-        {sludinajumi.length === 0 && !error && (
-          <div className="text-center py-48">
-            <div className="w-48 h-48 mx-auto mb-16 p-16 bg-gradient-to-br from-orange-100 to-yellow-100 rounded-[3rem] shadow-2xl flex items-center justify-center border-4 border-orange-200">
-              <span className="text-8xl">🚗</span>
-            </div>
-            <h2 className="text-5xl sm:text-6xl font-black text-slate-800 mb-8">Nav auto sludinājumu</h2>
-            <p className="text-2xl sm:text-3xl text-slate-600 mb-16 max-w-2xl mx-auto">
-              Būsi pirmais Rīgas auto tirgū!
-            </p>
-            <Link href="/ievietot" className="inline-flex items-center gap-4 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-black text-xl sm:text-2xl py-6 sm:py-8 px-12 sm:px-20 rounded-[3rem] shadow-3xl hover:shadow-4xl hover:scale-105 transition-all duration-500">
-              ➕ Pievienot sludinājumu
+        {/* CTA */}
+        {sludinajumi.length === 0 && (
+          <div style={{
+            textAlign: 'center', marginTop: '4rem',
+            padding: '3rem 2rem', background: 'rgba(255,255,255,0.1)',
+            borderRadius: '2rem', backdropFilter: 'blur(20px)'
+          }}>
+            <div style={{fontSize: '8rem', marginBottom: '1rem'}}>🚗</div>
+            <h2 style={{fontSize: '2.5rem', marginBottom: '1rem'}}>
+              Nav auto sludinājumu
+            </h2>
+            <Link href="/ievietot?kategorija=auto" style={{
+              background: 'white', color: '#d97706',
+              padding: '1.5rem 4rem', borderRadius: '50px',
+              fontSize: '1.5rem', fontWeight: 'bold',
+              textDecoration: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+            }}>
+              ➕ Publicēt pirmo auto – BEZ MAKSAS!
             </Link>
           </div>
         )}
 
-        {error && (
-          <div className="max-w-2xl mx-auto text-center py-24">
-            <div className="text-6xl mb-8 text-rose-500">⚠️</div>
-            <p className="text-2xl font-bold text-slate-800 mb-12">{error}</p>
-            <button 
-              onClick={fetchData} 
-              className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold py-5 px-12 rounded-2xl text-xl shadow-2xl hover:shadow-3xl transition-all duration-300"
-            >
-              Ielādēt vēlreiz
-            </button>
+        {sludinajumi.length > 0 && (
+          <div style={{
+            textAlign: 'center', marginTop: '4rem',
+            padding: '3rem 2rem', background: 'rgba(255,255,255,0.1)',
+            borderRadius: '2rem', backdropFilter: 'blur(20px)'
+          }}>
+            <h2 style={{fontSize: '2.5rem', marginBottom: '1rem'}}>
+              Piedāvā savu auto!
+            </h2>
+            <Link href="/ievietot?kategorija=auto" style={{
+              background: 'white', color: '#d97706',
+              padding: '1.5rem 4rem', borderRadius: '50px',
+              fontSize: '1.5rem', fontWeight: 'bold',
+              textDecoration: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+            }}>
+              ➕ Publicēt tagad – BEZ MAKSAS!
+            </Link>
           </div>
         )}
       </div>
-    </main>
+    </div>
   )
 }
