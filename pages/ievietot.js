@@ -65,9 +65,9 @@ export default function IevietotSludinajumu() {
       price: parseInt(formData.get("cena")) || 0,
       category: formData.get("category"),
       phone: formData.get("kontakts"),
-      image_public_urls: imageUrls.length > 0 ? imageUrls : null,  // ✅ TAVA KOLONNA!
+      city: formData.get("city") || "Rīga",  // ✅ MAINĪTS NO 'location' UZ 'city'
+      image_public_urls: imageUrls.length > 0 ? imageUrls : null,
       status: "published",
-      location: "Rīga"
     };
 
     try {
@@ -145,8 +145,8 @@ export default function IevietotSludinajumu() {
                 />
               </div>
 
-              {/* CENA + TELEFONS */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* CENA + TELEFONS + PILSĒTA */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-lg font-semibold mb-3 text-gray-800" htmlFor="cena">Cena (€)</label>
                   <input 
@@ -164,6 +164,16 @@ export default function IevietotSludinajumu() {
                     className="w-full border border-gray-300 rounded-2xl px-6 py-4 text-lg focus:ring-4 focus:ring-orange-200 focus:border-orange-500 shadow-sm transition-all" 
                     placeholder="+371 20xxxxx" 
                     required 
+                  />
+                </div>
+                <div>
+                  <label className="block text-lg font-semibold mb-3 text-gray-800" htmlFor="city">Pilsēta</label>
+                  <input 
+                    id="city" name="city" 
+                    type="text" 
+                    className="w-full border border-gray-300 rounded-2xl px-6 py-4 text-lg focus:ring-4 focus:ring-orange-200 focus:border-orange-500 shadow-sm transition-all" 
+                    placeholder="Rīga" 
+                    defaultValue="Rīga"
                   />
                 </div>
               </div>
