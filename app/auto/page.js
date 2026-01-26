@@ -1,131 +1,241 @@
-// app/auto/page.js
 'use client'
 
-import { createClient } from '@supabase/supabase-js'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function AutoPage() {
-  const [listings, setListings] = useState([])
+  const [sludinajumi, setSludinajumi] = useState([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
-    fetchListings()
+    fetchData()
   }, [])
 
-  const fetchListings = async () => {
+  async function fetchData() {
     try {
-      const { data, error } = await supabase
-        .from('sludinajumi')
-        .select('*')
-        .eq('category', 'auto')
-        .eq('status', 'published')
-        .order('created_at', { ascending: false })
+      setLoading(true)
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-      if (error) throw error
-      setListings(data || [])
-    } catch (error) {
-      alert('Kļūda: ' + error.message)
+      const response = await fetch(`${supabaseUrl}/rest/v1/sludinajumi?select=*`, {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`
+        }
+      })
+
+      if (!response.ok) throw new Error('Fetch kļūda')
+      const data = await response.json()
+      
+      let filtered = data.filter(s => 
+        s.category?.toLowerCase().includes('auto') && 
+        s.status === 'published'
+      )
+      
+      // Meklēšana
+      if (search) {
+        filtered = filtered.filter(s => 
+          s.title?.toLowerCase().includes(search.toLowerCase()) ||
+          s.description?.toLowerCase().includes(search.toLowerCase())
+        )
+      }
+      
+      setSludinajumi(filtered)
+    } catch (err) {
+      console.error('Error:', err)
     } finally {
       setLoading(false)
     }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 flex items-center justify-center">
-        <div className="text-4xl">🚗 Loading...</div>
-      </div>
-    )
-  }
+  if (loading) return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center'
+    }}>
+      <div style={{fontSize: '4rem', color: 'white'}}>🚗 Ielādē...</div>
+    </div>
+  )
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-amber-100 py-10 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* HEADER */}
-        <div className="text-center mb-16">
-          <Link href="/" className="inline-flex items-center gap-2 mb-8 px-6 py-3 bg-white/80 backdrop-blur-xl hover:bg-white border border-orange-200 rounded-2xl shadow-xl text-lg font-bold text-orange-900">
-            ← Atpakaļ
-          </Link>
-          <div className="text-6xl mb-4">🚗</div>
-          <h1 className="text-5xl lg:text-6xl font-black bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text text-transparent mb-4">
-            Auto un moto
-          </h1>
-          <p className="text-2xl text-orange-800 font-semibold">{listings.length} sludinājumi</p>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)',
+      padding: '2rem 1rem',
+      color: 'white'
+    }}>
+      <div style={{maxWidth: '1400px', margin: '0 auto'}}>
+        
+        {/* Header */}
+        <div style={{
+          textAlign: 'center',
+          marginBottom: '4rem',
+          position: 'relative'
+        }}>
+          <Link href="/kategorijas" style={{
+            position: 'absolute', left: '0', top: '0',
+            background: 'rgba(255,255,255,0.2)', color: 'white',
+            padding: '0.75rem 1.5rem', borderRadius: '50px',
+            fontWeight: '600', textDecoration: 'none'
+          }}>← Atpakaļ kategorijās</Link>
+          
+          <div style={{fontSize: '6rem', marginBottom: '1rem'}}>🚗</div>
+          <h1 style={{
+            fontSize: '4rem', fontWeight: 'bold',
+            textShadow: '0 4px 12px rgba(0,0,0,0.3)'
+          }}>Auto sludinājumi</h1>
+          <p style={{fontSize: '1.5rem', opacity: 0.9}}>
+            Auto • Moto • Pārdod • {sludinajumi.length} sludinājumi Rīgā
+          </p>
         </div>
 
-        {/* GRID */}
-        {listings.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="text-8xl mb-8">🚗</div>
-            <h2 className="text-4xl font-bold text-gray-600 mb-4">Vēl nav sludinājumu</h2>
-            <Link 
-              href="/ievietot" 
-              className="bg-gradient-to-r from-orange-600 to-yellow-600 text-white px-8 py-4 rounded-2xl text-xl font-bold hover:scale-105 transition-all"
-            >
-              ➕ Pirmais sludinājums
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {listings.map((listing) => (
-              <Link 
-                key={listing.id} 
-                href={`/sludinajums/${listing.id}`}
-                className="group bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all border border-orange-100 hover:border-orange-300"
-              >
-                {/* ATTĒLS */}
-                <div className="w-full h-64 rounded-2xl overflow-hidden mb-4 bg-gradient-to-br from-gray-100 to-gray-200 group-hover:scale-105 transition-transform">
-                  {listing.image_public_urls && listing.image_public_urls.length > 0 ? (
-                    <img 
-                      src={listing.image_public_urls[0]} 
-                      alt={listing.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.style.display = 'none'
-                        e.target.nextSibling.style.display = 'flex'
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl">
-                      📷
-                    </div>
-                  )}
-                </div>
+        {/* Filtrs */}
+        <div style={{
+          background: 'rgba(255,255,255,0.15)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '2rem',
+          padding: '1.5rem 2rem',
+          marginBottom: '3rem',
+          display: 'flex', flexWrap: 'wrap',
+          gap: '1rem', alignItems: 'center'
+        }}>
+          <input 
+            placeholder="Meklēt auto (BMW, Audi...)" 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              flex: 1, minWidth: '300px',
+              padding: '1rem 1.5rem', borderRadius: '50px',
+              border: 'none', background: 'rgba(255,255,255,0.9)',
+              fontSize: '1.1rem', color: '#000'
+            }} 
+          />
+          <select style={{padding: '1rem 1.5rem', borderRadius: '50px', border: 'none'}}>
+            <option>Jaunākie</option>
+            <option>Cena augoša</option>
+            <option>Cena dilstoša</option>
+          </select>
+          <Link href="/ievietot?kategorija=auto" style={{
+            background: 'white', color: '#d97706',
+            padding: '1rem 2.5rem', borderRadius: '50px',
+            fontWeight: 'bold', textDecoration: 'none', whiteSpace: 'nowrap'
+          }}>➕ Ievietot sludinājumu </Link>
+        </div>
 
-                {/* SATURS */}
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors">
-                    {listing.title}
+        {/* Auto sludinājumi */}
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(370px, 1fr))', gap: '2rem'}}>
+          {sludinajumi.map((item) => {
+            // 🔥 GALVENĀS IZMAIŅAS ŠEIT:
+            const firstImage = item.image_public_urls 
+              ? JSON.parse(item.image_public_urls)[0] || 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400'
+              : 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400'
+
+            return (
+              <Link key={item.id} href={`/sludinajums/${item.id}`} style={{
+                background: 'rgba(255,255,255,0.95)',
+                borderRadius: '2rem', overflow: 'hidden',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+                transition: 'all 0.4s', textDecoration: 'none',
+                color: 'initial', display: 'block'
+              }} className="group">
+                <div style={{
+                  height: '210px', 
+                  backgroundImage: `url(${firstImage})`,
+                  backgroundSize: 'cover', backgroundPosition: 'center',
+                  position: 'relative'
+                }}>
+                  <div style={{
+                    position: 'absolute', top: '1rem', right: '1rem',
+                    background: '#f59e0b', color: 'white',
+                    padding: '0.5rem 1rem', borderRadius: '50px',
+                    fontWeight: 'bold', fontSize: '0.875rem'
+                  }}>Pārdod</div>
+                </div>
+                <div style={{padding: '2.5rem'}}>
+                  <h3 style={{
+                    fontSize: '1.4rem', fontWeight: 'bold',
+                    marginBottom: '1rem', lineHeight: '1.3', color: '#1f2937'
+                  }}>
+                    {item.title}
                   </h3>
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>{listing.location}</span>
-                    <span className="font-bold text-orange-600 text-lg">
-                      {listing.price ? `${listing.price.toLocaleString()}€` : 'Dāvanā'}
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between',
+                    alignItems: 'center', marginBottom: '1rem'
+                  }}>
+                    <p style={{
+                      fontSize: '1.75rem', fontWeight: 'bold',
+                      color: '#059669', margin: 0
+                    }}>
+                      {item.price ? `${item.price.toLocaleString()}€` : 'Dāvanā'}
+                    </p>
+                    <span style={{
+                      background: 'rgba(255,255,255,0.5)',
+                      padding: '0.5rem 1rem', borderRadius: '1rem',
+                      fontSize: '0.9rem', color: '#1f2937'
+                    }}>
+                      {item.location || 'Rīga'}
                     </span>
                   </div>
-
-                  <div className="flex items-center gap-2 text-sm text-orange-700 mt-2">
-                    📞 {listing.phone}
+                  <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap'}}>
+                    <span style={{
+                      background: 'rgba(245,158,11,0.3)',
+                      color: '#b45309', padding: '0.375rem 0.875rem',
+                      borderRadius: '1rem', fontSize: '0.85rem',
+                      fontWeight: '600'
+                    }}>
+                      Auto
+                    </span>
                   </div>
                 </div>
-
-                <div className="mt-4 pt-4 border-t border-orange-100 flex justify-between items-center">
-                  <span className="text-xs text-gray-500">Publicēts tagad</span>
-                  <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-semibold">
-                    {listing.status}
-                  </span>
-                </div>
               </Link>
-            ))}
+            )
+          })}
+        </div>
+
+        {/* CTA */}
+        {sludinajumi.length === 0 && (
+          <div style={{
+            textAlign: 'center', marginTop: '4rem',
+            padding: '3rem 2rem', background: 'rgba(255,255,255,0.1)',
+            borderRadius: '2rem', backdropFilter: 'blur(20px)'
+          }}>
+            <div style={{fontSize: '8rem', marginBottom: '1rem'}}>🚗</div>
+            <h2 style={{fontSize: '2.5rem', marginBottom: '1rem'}}>
+              Nav auto sludinājumu
+            </h2>
+            <Link href="/ievietot?kategorija=auto" style={{
+              background: 'white', color: '#d97706',
+              padding: '1.5rem 4rem', borderRadius: '50px',
+              fontSize: '1.5rem', fontWeight: 'bold',
+              textDecoration: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+            }}>
+              ➕ Publicē savu pirmo sludinājumu– BEZ MAKSAS!
+            </Link>
+          </div>
+        )}
+
+        {sludinajumi.length > 0 && (
+          <div style={{
+            textAlign: 'center', marginTop: '4rem',
+            padding: '3rem 2rem', background: 'rgba(255,255,255,0.1)',
+            borderRadius: '2rem', backdropFilter: 'blur(20px)'
+          }}>
+            <h2 style={{fontSize: '2.5rem', marginBottom: '1rem'}}>
+              Publicēt savu sludinājumu!
+            </h2>
+            <Link href="/ievietot?kategorija=auto" style={{
+              background: 'white', color: '#d97706',
+              padding: '1.5rem 4rem', borderRadius: '50px',
+              fontSize: '1.5rem', fontWeight: 'bold',
+              textDecoration: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+            }}>
+              ➕ Publicēt tagad – BEZ MAKSAS!
+            </Link>
           </div>
         )}
       </div>
-    </main>
+    </div>
   )
 }
