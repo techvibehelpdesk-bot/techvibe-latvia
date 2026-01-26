@@ -1,4 +1,5 @@
-// pages/ievietot.js - SS.COM PRO ar BILDĒM PERFECT /auto!
+'use client'
+
 import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
@@ -33,7 +34,7 @@ export default function IevietotSludinajumu() {
     const formData = new FormData(e.target);
     const imageUrls = [];
 
-    // ✅ UPLOAD + PAREIZS PUBLIC URL (vairākas bildes!)
+    // ✅ UPLOAD BILDES
     if (images.length > 0) {
       for (const file of images) {
         const fileExt = file.name.split(".").pop();
@@ -49,7 +50,7 @@ export default function IevietotSludinajumu() {
           return;
         }
 
-        // ✅ ✓ URL ar public/ – /auto rādīs!
+        // ✅ PUBLIC URL
         const { data: { publicUrl } } = supabase.storage
           .from("sludinajumi")
           .getPublicUrl(fileName);
@@ -58,15 +59,16 @@ export default function IevietotSludinajumu() {
       }
     }
 
-    // ✅ DATA – nosaukums, images_url singular!
+    // ✅ ANGĻU KOLONNAS DB!
     const data = {
-      nosaukums: formData.get("virsraksts"),
-      apraksts: formData.get("apraksts"),
-      cena: parseInt(formData.get("cena")) || 0,
-      category: formData.get("category"),
-      kontakts: formData.get("kontakts"),
-      images_url: imageUrls.length > 0 ? imageUrls : null,
-      status: "publicēts"
+      title: formData.get("virsraksts"),           // nosaukums → title
+      description: formData.get("apraksts"),        // apraksts → description  
+      price: parseInt(formData.get("cena")) || 0,   // cena → price
+      category: formData.get("category"),           // saglabā
+      phone: formData.get("kontakts"),              // kontakts → phone
+      image_urls: imageUrls.length > 0 ? imageUrls : null,  // image_urls (masīvs)
+      status: "published",                          // publicēts → published
+      location: "Rīga"                              // pievienots noklusējums
     };
 
     try {
@@ -88,25 +90,25 @@ export default function IevietotSludinajumu() {
         <title>Ievietot sludinājumu | TechVibe</title>
       </Head>
 
-      <main className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-10">
+      <main className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-100 py-10">
         <div className="max-w-4xl mx-auto px-4">
           <div className="mb-6">
-            <Link href="/" className="inline-flex items-center px-6 py-3 bg-white hover:bg-gray-50 border-2 border-gray-200 rounded-xl shadow-sm text-lg font-semibold text-gray-800 hover:text-purple-600 hover:border-purple-400 transition-all">
+            <Link href="/" className="inline-flex items-center px-6 py-3 bg-white hover:bg-gray-50 border-2 border-gray-200 rounded-xl shadow-sm text-lg font-semibold text-gray-800 hover:text-orange-600 hover:border-orange-400 transition-all">
               ← Atpakaļ
             </Link>
           </div>
 
           <div className="bg-white shadow-xl rounded-2xl p-8 mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-8">
-              Ievietot jaunu sludinājumu
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text text-transparent mb-8">
+              Ievietot jaunu auto sludinājumu
             </h1>
 
             {/* KATEGORIJAS */}
-            <div className="mb-8 p-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border-2 border-dashed border-indigo-200">
+            <div className="mb-8 p-6 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl border-2 border-dashed border-orange-200">
               <label className="block text-lg font-semibold mb-4 text-gray-800">Izvēlies kategoriju</label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {categories.map((cat) => (
-                  <label key={cat.id} className="flex items-center p-4 border-2 border-gray-200 hover:border-purple-400 hover:bg-purple-50 rounded-xl cursor-pointer transition-all hover:shadow-md">
+                  <label key={cat.id} className="flex items-center p-4 border-2 border-gray-200 hover:border-orange-400 hover:bg-orange-50 rounded-xl cursor-pointer transition-all hover:shadow-md">
                     <span className="text-2xl mr-3">{cat.icon}</span>
                     <span className="font-medium">{cat.name}</span>
                     <input type="radio" name="category" value={cat.value} className="ml-auto w-5 h-5" required />
@@ -118,38 +120,38 @@ export default function IevietotSludinajumu() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold mb-2 text-gray-700" htmlFor="virsraksts">Virsraksts</label>
-                <input id="virsraksts" name="virsraksts" type="text" className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500" placeholder="BMW X5 2020" required />
+                <input id="virsraksts" name="virsraksts" type="text" className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500" placeholder="BMW X5 2020" required />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold mb-2 text-gray-700" htmlFor="apraksts">Apraksts</label>
-                <textarea id="apraksts" name="apraksts" className="w-full border border-gray-300 rounded-xl px-4 py-3 h-32 focus:ring-2 focus:ring-purple-500 resize-vertical" placeholder="Detalizēts apraksts..." required />
+                <textarea id="apraksts" name="apraksts" className="w-full border border-gray-300 rounded-xl px-4 py-3 h-32 focus:ring-2 focus:ring-orange-500 resize-vertical" placeholder="Detalizēts apraksts..." required />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold mb-2 text-gray-700" htmlFor="cena">Cena (€)</label>
-                  <input id="cena" name="cena" type="number" className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500" min="0" step="1" />
+                  <input id="cena" name="cena" type="number" className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500" min="0" step="1" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-2 text-gray-700" htmlFor="kontakts">Tālrunis</label>
-                  <input id="kontakts" name="kontakts" type="text" className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500" placeholder="+371 20xxxxx" required />
+                  <input id="kontakts" name="kontakts" type="text" className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500" placeholder="+371 20xxxxx" required />
                 </div>
               </div>
 
               {/* BILDES */}
               <div>
                 <label className="block text-sm font-semibold mb-2 text-gray-700">📸 Bildes (līdz 3)</label>
-                <input type="file" multiple accept="image/*" onChange={handleImageChange} className="w-full border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-400 hover:bg-purple-50 transition-all" />
+                <input type="file" multiple accept="image/*" onChange={handleImageChange} className="w-full border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-orange-400 hover:bg-orange-50 transition-all" />
                 {images.length > 0 && <p className="text-sm text-green-600 mt-2">✅ {images.length} bilde(s)</p>}
               </div>
 
-              <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 text-white font-bold py-4 px-8 rounded-xl text-lg shadow-lg hover:shadow-xl transition-all">
+              <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700 disabled:opacity-50 text-white font-bold py-4 px-8 rounded-xl text-lg shadow-lg hover:shadow-xl transition-all">
                 {loading ? "🚀 Nosūta..." : "🚀 Publicēt + bildes"}
               </button>
 
               <div className="pt-6 border-t border-gray-200">
-                <Link href="/" className="inline-flex items-center px-6 py-3 bg-white hover:bg-gray-50 border-2 border-gray-200 rounded-xl shadow-sm text-lg font-semibold text-gray-700 hover:text-purple-600 hover:border-purple-400 transition-all">
+                <Link href="/" className="inline-flex items-center px-6 py-3 bg-white hover:bg-gray-50 border-2 border-gray-200 rounded-xl shadow-sm text-lg font-semibold text-gray-700 hover:text-orange-600 hover:border-orange-400 transition-all">
                   ← Atpakaļ
                 </Link>
               </div>
