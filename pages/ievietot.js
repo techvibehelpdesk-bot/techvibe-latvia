@@ -12,7 +12,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 // 🔥 PILNS 15 KATEGORIJU SARAKSTS NO SCREENSHOT
 const categories = [
   { id: 1, name: "📱 Telefoni un aksesuāri", value: "telefoni" },
-  { id: 2, name: "🚗 Auto un moto", value: "auto" },
+  { id: 2, name: "🚗 Auto, auto detaļas un aksesuāri ", value: "auto" },
   { id: 3, name: "💻 Datori un programmatūra", value: "datori" },
   { id: 4, name: "🛋️ Mēbeles un interjers", value: "mebeles" },
   { id: 5, name: "⚽ Sporta preces", value: "sports" },
