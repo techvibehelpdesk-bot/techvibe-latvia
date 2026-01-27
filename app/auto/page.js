@@ -33,7 +33,6 @@ export default function AutoPage() {
         s.status === 'published'
       )
       
-      // Meklēšana
       if (search) {
         filtered = filtered.filter(s => 
           s.title?.toLowerCase().includes(search.toLowerCase()) ||
@@ -121,16 +120,15 @@ export default function AutoPage() {
             background: 'white', color: '#d97706',
             padding: '1rem 2.5rem', borderRadius: '50px',
             fontWeight: 'bold', textDecoration: 'none', whiteSpace: 'nowrap'
-          }}>➕ Ievietot sludinājumu </Link>
+          }}>➕ Ievietot sludinājumu</Link>
         </div>
 
-        {/* Auto sludinājumi */}
+        {/* Sludinājumi */}
         <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(370px, 1fr))', gap: '2rem'}}>
           {sludinajumi.map((item) => {
-            // 🔥 GALVENĀS IZMAIŅAS ŠEIT:
-            const firstImage = item.image_public_urls 
-              ? JSON.parse(item.image_public_urls)[0] || 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400'
-              : 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400'
+            // 🔥 LABOTĀS RINDAS - BEZ JSON.parse!
+            const firstImage = item.image_public_urls?.[0] || 
+              'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400'
 
             return (
               <Link key={item.id} href={`/sludinajums/${item.id}`} style={{
@@ -139,7 +137,7 @@ export default function AutoPage() {
                 boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
                 transition: 'all 0.4s', textDecoration: 'none',
                 color: 'initial', display: 'block'
-              }} className="group">
+              }}>
                 <div style={{
                   height: '210px', 
                   backgroundImage: `url(${firstImage})`,
@@ -211,7 +209,7 @@ export default function AutoPage() {
               fontSize: '1.5rem', fontWeight: 'bold',
               textDecoration: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
             }}>
-              ➕ Publicē savu pirmo sludinājumu– BEZ MAKSAS!
+              ➕ Publicē savu pirmo sludinājumu – BEZ MAKSAS!
             </Link>
           </div>
         )}
