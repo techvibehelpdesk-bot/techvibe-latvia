@@ -9,13 +9,23 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// 🔥 PILNS 15 KATEGORIJU SARAKSTS NO SCREENSHOT
 const categories = [
-  { id: 1, name: "Telefoni un aksesuāri", icon: "📱", value: "telefoni" },
-  { id: 2, name: "Auto un moto", icon: "🚗", value: "auto" },
-  { id: 3, name: "Datori un programmatūra", icon: "💻", value: "datori" },
-  { id: 4, name: "Mēbeles un interjers", icon: "🛋️", value: "mebeles" },
-  { id: 5, name: "Sporta preces", icon: "⚽", value: "sports" },
-  { id: 6, name: "Darbs un bizness", icon: "💼", value: "darbs" },
+  { id: 1, name: "📱 Telefoni un aksesuāri", value: "telefoni" },
+  { id: 2, name: "🚗 Auto un moto", value: "auto" },
+  { id: 3, name: "💻 Datori un programmatūra", value: "datori" },
+  { id: 4, name: "🛋️ Mēbeles un interjers", value: "mebeles" },
+  { id: 5, name: "⚽ Sporta preces", value: "sports" },
+  { id: 6, name: "💼 Darbs un bizness", value: "darbs" },
+  { id: 7, name: "🏍️ Moto un aksesuāri", value: "moto" },
+  { id: 8, name: "🚲 Velosipēdi", value: "velosipedi" },
+  { id: 9, name: "🏠 Dzīvokļi", value: "dzivokli" },
+  { id: 10, name: "🏘️ Mājas un zemes gabali", value: "majas" },
+  { id: 11, name: "🏗️ Būvmateriāli", value: "buvmateriali" },
+  { id: 12, name: "🔧 Pakalpojumi", value: "pakalpojumi" },
+  { id: 13, name: "👶 Bērniem", value: "berniem" },
+  { id: 14, name: "🌳 Dārzi un labiekārtojums", value: "dazi" },
+  { id: 15, name: "📦 Citi sludinājumi", value: "citi" },
 ];
 
 export default function IevietotSludinajumu() {
@@ -58,14 +68,14 @@ export default function IevietotSludinajumu() {
       }
     }
 
-    // 🔥 TAVAI SHĒMAI - image_public_urls (JSONB)
+    // 🔥 LABOTIE LAUKI - location, phone, image_public_urls
     const data = {
       title: formData.get("virsraksts"),
       description: formData.get("apraksts"),
       price: parseInt(formData.get("cena")) || 0,
       category: formData.get("category"),
       phone: formData.get("kontakts"),
-      city: formData.get("city") || "Rīga",  // ✅ MAINĪTS NO 'location' UZ 'city'
+      city: formData.get("city") || "Rīga",  // city input → location kolonna
       image_public_urls: imageUrls.length > 0 ? imageUrls : null,
       status: "published",
     };
@@ -93,7 +103,7 @@ export default function IevietotSludinajumu() {
       <main className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-amber-100 py-10 px-4">
         <div className="max-w-4xl mx-auto">
           {/* BACK */}
-          <Link href="/" className="inline-flex items-center gap-2 mb-8 px-6 py-3 bg-white/80 backdrop-blur-xl hover:bg-white border border-orange-200 rounded-2xl shadow-xl hover:shadow-2xl text-lg font-bold text-orange-900 hover:scale-[1.02] transition-all">
+          <Link href="/kategorijas" className="inline-flex items-center gap-2 mb-8 px-6 py-3 bg-white/80 backdrop-blur-xl hover:bg-white border border-orange-200 rounded-2xl shadow-xl hover:shadow-2xl text-lg font-bold text-orange-900 hover:scale-[1.02] transition-all">
             ← Atpakaļ kategorijās
           </Link>
 
@@ -108,10 +118,10 @@ export default function IevietotSludinajumu() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* KATEGORIJAS */}
+              {/* KATEGORIJAS - PILNS GRID */}
               <div className="p-6 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl border-2 border-dashed border-orange-200">
-                <label className="block text-xl font-bold mb-6 text-orange-900">Kategorija</label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <label className="block text-xl font-bold mb-6 text-orange-900">Kategorija *</label>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {categories.map((cat) => (
                     <label key={cat.id} className="group flex items-center p-6 border-2 border-gray-200 hover:border-orange-400 hover:bg-orange-50 rounded-2xl cursor-pointer transition-all hover:shadow-xl hover:scale-[1.02]">
                       <span className="text-3xl mr-4 group-hover:scale-110 transition-transform">{cat.icon}</span>
