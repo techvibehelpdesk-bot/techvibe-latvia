@@ -17,7 +17,12 @@ export default async function SludinajumaLapa({ params }) {
     .single();
 
   if (error || !sludinajums) {
-    return <div className="min-h-screen flex items-center justify-center text-xl text-gray-500 p-12">Sludinājums nav atrasts</div>;
+    console.error('Sludinājums error:', error);
+    return (
+      <div className="min-h-screen flex items-center justify-center text-xl text-gray-500 p-12">
+        Sludinājums nav atrasts
+      </div>
+    );
   }
 
   // VISAS bildes no thumbnail + images relation
@@ -26,15 +31,35 @@ export default async function SludinajumaLapa({ params }) {
     ...sludinajums.images?.map(img => img.path) || []
   ].filter(Boolean);
 
-  // Signed URLs visām bildēm
+  console.log('All image paths:', allImagePaths);
+
+  // Signed URLs visām bildēm AR ERROR HANDLING
   const signedImageUrls = await Promise.all(
     allImagePaths.map(async (path) => {
-      const { data } = await supabase.storage
+      if (!path) return null;
+      
+      const { data, error } = await supabase.storage
         .from('sludinajumi')
         .createSignedUrl(path, 3600);
-      return data?.signedUrl;
+      
+      if (error) {
+        console.error('Signed URL error for path', path, ':', error);
+        return null;
+      }
+      
+      if (!data?.signedUrl) {
+        console.error('No signedUrl for path', path, ':', data);
+        return null;
+      }
+      
+      console.log('Signed URL success for:', path);
+      return data.signedUrl;
     })
-  ).then(urls => urls.filter(Boolean));
+  ).then(urls => {
+    const validUrls = urls.filter(Boolean);
+    console.log('Valid signed URLs count:', validUrls.length);
+    return validUrls;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/50 py-8 px-4 sm:px-6 lg:px-8">
@@ -51,7 +76,7 @@ export default async function SludinajumaLapa({ params }) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-20">
-          {/* VISU attēlu screenshot grid */}
+          {/* VISU attēlu grid */}
           <div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">
               {signedImageUrls.map((img, i) => (
@@ -92,7 +117,7 @@ export default async function SludinajumaLapa({ params }) {
             </p>
           </div>
 
-          {/* Info cards - minimālistiski */}
+          {/* Info cards */}
           <div className="space-y-6 lg:sticky lg:top-8 lg:self-start">
             <div className="group bg-white/90 backdrop-blur-xl p-8 lg:p-10 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 border border-white/70 hover:border-emerald-200/70">
               <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500/20 to-green-500/20 text-emerald-700 text-sm font-bold rounded-2xl mb-6 border border-emerald-200/50">
@@ -126,7 +151,7 @@ export default async function SludinajumaLapa({ params }) {
           </div>
         </div>
 
-        {/* Apraksts - super clean */}
+        {/* Apraksts */}
         <div className="max-w-4xl mx-auto">
           <div className="bg-white/70 backdrop-blur-2xl p-12 lg:p-16 rounded-4xl shadow-3xl border border-white/60">
             <h3 className="text-4xl lg:text-5xl font-black mb-12 flex items-center gap-4 bg-gradient-to-r from-gray-900 via-slate-800 to-black bg-clip-text text-transparent drop-shadow-2xl">
