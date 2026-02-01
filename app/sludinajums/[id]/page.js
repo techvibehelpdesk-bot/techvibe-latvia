@@ -7,6 +7,7 @@ export default function SludinajumaLapa({ params, searchParams }) {
   const [images, setImages] = useState([]);
   const [currentImage, setCurrentImage] = useState(0);
 
+  // DATU IELĀDE
   useEffect(() => {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -22,14 +23,20 @@ export default function SludinajumaLapa({ params, searchParams }) {
         setSludinajums(data);
         const imgs = Array.isArray(data?.image_public_urls) ? data.image_public_urls : [];
         setImages(imgs);
+        // Reset uz pirmo attēlu
+        setCurrentImage(0);
       });
+  }, [params.id]);
 
-    // AUTO SLIDE katras 4s
+  // AUTO SLIDE katras 4s - tikai kad images gatavs
+  useEffect(() => {
+    if (images.length <= 1) return; // Nav ko slīdēt
+
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % images.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, [params.id]);
+  }, [images.length]);
 
   if (!sludinajums) return <div style={{padding: '100px', textAlign: 'center'}}>Loading...</div>;
 
@@ -49,7 +56,7 @@ export default function SludinajumaLapa({ params, searchParams }) {
           </div>
         </div>
 
-        {/* 3 KOLONNAS CHECKBOXES - NO SCREENSHOT */}
+        {/* 3 KOLONNAS CHECKBOXES */}
         <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginBottom: '40px'}}>
           
           {/* Dzinējs */}
@@ -113,7 +120,7 @@ export default function SludinajumaLapa({ params, searchParams }) {
                 key={i}
                 src={img} 
                 style={{width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: '10px', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'}} 
-                alt={`Foto ${i+1}`}
+                alt={`Foto ${i+2}`}
                 onClick={() => setCurrentImage(i+1)}
               />
             ))}
