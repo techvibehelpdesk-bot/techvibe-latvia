@@ -18,88 +18,78 @@ export default async function SludinajumaLapa({ params }) {
   const images = Array.isArray(sludinajums?.image_public_urls) ? sludinajums.image_public_urls : [];
 
   return (
-    <>
-      {/* DIAGNOZE */}
-      <div style={{position: 'fixed', top: 0, left: 0, zIndex: 99999, background: '#dc2626', color: 'white', padding: '16px', fontWeight: 'bold'}}>
-        ✅ V4.0 • Images: {images.length}
-      </div>
+    <div style={{minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)', color: '#1e293b', fontFamily: 'system-ui'}}>
+      
+      {/* HERO - VIDĒJS attēls kā ss.lv */}
+      <section style={{maxWidth: '1200px', margin: '0 auto', padding: '40px 24px'}}>
+        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'start'}}>
+          
+          {/* Galvenais attēls */}
+          <div>
+            <img 
+              src={images[0] || 'https://via.placeholder.com/800x600/f0f9ff/64748b?text=AUDI'} 
+              style={{width: '100%', height: '500px', objectFit: 'cover', borderRadius: '16px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)'}}
+              alt="Galvenais"
+            />
+          </div>
 
-      <div style={{minHeight: '100vh', paddingTop: '80px', background: 'linear-gradient(135deg, #0f0f23 0%, #1a0033 50%, #000 100%)', color: 'white'}}>
+          {/* Cena + pamatinfo */}
+          <div style={{background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)'}}>
+            <div style={{fontSize: '3.5rem', fontWeight: 900, color: '#059669', marginBottom: '16px', textAlign: 'center'}}>
+              {sludinajums?.price || 'Cena'} €
+            </div>
+            <div style={{fontSize: '1.2rem', marginBottom: '24px', opacity: 0.8, textAlign: 'center'}}>
+              ID: {params.id} • {images.length} foto
+            </div>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '32px'}}>
+              <div style={{textAlign: 'center'}}>
+                <div style={{fontSize: '2.5rem', fontWeight: 700, color: '#3b82f6'}}>{sludinajums?.power || '?'}</div>
+                <div style={{fontSize: '0.9rem', color: '#64748b'}}>ZS</div>
+              </div>
+              <div style={{textAlign: 'center'}}>
+                <div style={{fontSize: '2.5rem', fontWeight: 700, color: '#10b981'}}>{sludinajums?.fuel || '?'}</div>
+                <div style={{fontSize: '0.9rem', color: '#64748b'}}>l/100km</div>
+              </div>
+              <div style={{textAlign: 'center'}}>
+                <div style={{fontSize: '2.5rem', fontWeight: 700, color: '#f59e0b'}}>{sludinajums?.year || '?'}</div>
+                <div style={{fontSize: '0.9rem', color: '#64748b'}}>Gads</div>
+              </div>
+            </div>
+            <button style={{width: '100%', background: 'linear-gradient(45deg, #059669, #10b981)', color: 'white', padding: '20px', fontSize: '1.3rem', fontWeight: 700, borderRadius: '12px', border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(5,150,105,0.3)'}}>
+              📞 Sazināties +371 29 *** ***
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div style={{maxWidth: '1200px', margin: '0 auto 60px', padding: '0 24px'}}>
         
-        {/* HERO */}
-        <section style={{position: 'relative', height: '100vh'}}>
-          <img 
-            src={images[0] || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=2000'} 
-            style={{width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.4)'}}
-            alt="Auto"
-          />
-          <div style={{position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '0 40px', background: 'rgba(0,0,0,0.7)'}}>
-            <h1 style={{fontSize: 'clamp(3rem, 10vw, 7rem)', fontWeight: 900, marginBottom: '32px', background: 'linear-gradient(45deg, #ff4757, #ffa502)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
-              {sludinajums?.title}
-            </h1>
-            <div style={{fontSize: 'clamp(1.5rem, 5vw, 3rem)', marginBottom: '40px'}}>
-              <span style={{color: '#10b981', fontWeight: 800, fontSize: '1.3em'}}>{sludinajums?.price}€</span>
-            </div>
-            <div style={{fontSize: '1.8rem', opacity: 0.9}}>
-              {sludinajums?.year} • {sludinajums?.power}ZS • {images.length} foto
-            </div>
+        {/* Galerija BLOKI kā ss.lv */}
+        <section style={{background: 'white', borderRadius: '16px', padding: '40px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)', marginBottom: '40px'}}>
+          <h2 style={{fontSize: '2.5rem', fontWeight: 700, marginBottom: '32px', color: '#1e293b'}}>🖼️ Foto galerija</h2>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px'}}>
+            {images.slice(1).map((img, i) => (
+              <div key={i} style={{background: '#f1f5f9', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', cursor: 'pointer'}}>
+                <img 
+                  src={img} 
+                  style={{width: '100%', aspectRatio: '4/3', objectFit: 'cover'}} 
+                  alt={`Foto ${i+1}`}
+                />
+                <div style={{padding: '16px', textAlign: 'center'}}>
+                  <div style={{fontWeight: 600, color: '#475569'}}>Foto {i+2}</div>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
-        {/* GALVENĀ SATURA LAUKS */}
-        <div style={{maxWidth: '1400px', margin: '0 auto', padding: '80px 24px'}}>
-          
-          <div style={{display: 'grid', gridTemplateColumns: '1fr', gap: '60px'}}>
-            
-            {/* Galerija */}
-            <section>
-              <h2 style={{fontSize: '3.5rem', fontWeight: 900, marginBottom: '48px', textAlign: 'center', opacity: 0.95}}>
-                🖼️ Galerija
-              </h2>
-              <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px'}}>
-                {images.slice(1, 13).map((img, i) => (
-                  <img 
-                    key={i}
-                    src={img} 
-                    style={{width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: '24px', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', cursor: 'pointer'}}
-                    alt={`Foto ${i+1}`}
-                  />
-                ))}
-              </div>
-            </section>
-
-            {/* Specs + CTA */}
-            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', '@media(max-width: 768px)': {gridTemplateColumns: '1fr'}}}>
-              
-              {/* Specs */}
-              <div style={{background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(20px)', padding: '48px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.2)'}}>
-                <h3 style={{fontSize: '2.5rem', marginBottom: '32px', textAlign: 'center'}}>⚙️ Specs</h3>
-                <div style={{display: 'grid', gap: '24px', textAlign: 'center'}}>
-                  <div><div style={{fontSize: '4rem', fontWeight: 900, color: '#f59e0b'}}>{sludinajums?.power}</div><div style={{fontSize: '1rem', opacity: 0.8}}>ZS</div></div>
-                  <div><div style={{fontSize: '4rem', fontWeight: 900, color: '#06b6d4'}}>{sludinajums?.fuel}</div><div style={{fontSize: '1rem', opacity: 0.8}}>l/100km</div></div>
-                  <div><div style={{fontSize: '4rem', fontWeight: 900, color: '#10b981'}}>{sludinajums?.year}</div><div style={{fontSize: '1rem', opacity: 0.8}}>Gads</div></div>
-                </div>
-              </div>
-
-              {/* CTA */}
-              <div style={{background: 'rgba(16,185,129,0.2)', backdropFilter: 'blur(20px)', padding: '48px', borderRadius: '24px', border: '2px solid rgba(16,185,129,0.4)', textAlign: 'center'}}>
-                <h3 style={{fontSize: '2rem', marginBottom: '24px'}}>📞 Sazinies</h3>
-                <div style={{fontSize: '3rem', fontWeight: 900, marginBottom: '32px'}}>+371 29 *** ***</div>
-                <button style={{width: '100%', background: 'linear-gradient(45deg, #10b981, #34d399)', color: 'white', padding: '24px', fontSize: '1.5rem', fontWeight: 900, borderRadius: '16px', border: 'none', cursor: 'pointer', boxShadow: '0 12px 40px rgba(16,185,129,0.4)'}}>
-                  🚀 Zvanīt tagad
-                </button>
-              </div>
-            </div>
-
-            {/* Apraksts */}
-            <section style={{background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)', padding: '64px', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.1)'}}>
-              <h2 style={{fontSize: '3.5rem', marginBottom: '40px', textAlign: 'center'}}>📝 Apraksts</h2>
-              <div style={{fontSize: '1.3rem', lineHeight: 1.8, whiteSpace: 'pre-wrap'}}>
-                {sludinajums?.description || 'Detalizēts apraksts...'}
-              </div>
-            </section>
+        {/* Apraksts */}
+        <section style={{background: 'white', borderRadius: '16px', padding: '40px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)'}}>
+          <h2 style={{fontSize: '2.5rem', fontWeight: 700, marginBottom: '24px', color: '#1e293b'}}>📝 Pilns apraksts</h2>
+          <div style={{fontSize: '1.2rem', lineHeight: 1.7, color: '#475569', whiteSpace: 'pre-wrap'}}>
+            {sludinajums?.description || 'Apraksts šeit...'}
           </div>
-        </div>
+        </section>
       </div>
     </>
   );
