@@ -41,19 +41,18 @@ export default function SludinajumaLapa({ params, searchParams }) {
   if (!sludinajums) return <div style={{padding: '100px', textAlign: 'center'}}>Loading...</div>;
 
   return (
-    <div style={{background: '#f9fafb', padding: '24px 0', minHeight: '100vh'}}>
-      <div style={{maxWidth: '1200px', margin: '0 auto'}}>
-        
-        {/* SLIDING HERO */}
-        <div style={{position: 'relative', height: '350px', marginBottom: '32px', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', background: 'white'}}>
-          <img 
-            src={images[currentImage]} 
-            style={{width: '100%', height: '100%', objectFit: 'cover', transition: 'opacity 0.8s ease-in-out'}} 
-            alt="Hero"
-          />
-          <div style={{position: 'absolute', bottom: '20px', left: '20px', right: '20px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '16px', borderRadius: '12px'}}>
-            Foto {currentImage + 1} / {images.length}
-          </div>
+    {/* SLIDING HERO - MAZĀKS UN CONTAIN */}
+<div style={{position: 'relative', height: '280px', marginBottom: '32px', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', background: '#f0f0f0'}}>
+  <img 
+    src={images[currentImage]} 
+    style={{width: '100%', height: '100%', objectFit: 'contain', maxWidth: '100%', maxHeight: '100%', transition: 'opacity 0.8s ease-in-out'}} 
+    alt="Hero"
+  />
+  <div style={{position: 'absolute', bottom: '16px', left: '16px', right: '16px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '12px', borderRadius: '10px', fontSize: '0.9rem'}}>
+    Foto {currentImage + 1} / {images.length}
+  </div>
+</div>
+
         </div>
 
         {/* 3 KOLONNAS CHECKBOXES */}
