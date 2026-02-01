@@ -1,116 +1,138 @@
+'use client'; // CLIENT KOMPONENTE galerijai
+import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export default function SludinajumaLapa({ params, searchParams }) {
+  const [sludinajums, setSludinajums] = useState(null);
+  const [images, setImages] = useState([]);
+  const [currentImage, setCurrentImage] = useState(0);
 
-export default async function SludinajumaLapa({ params }) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  useEffect(() => {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    );
 
-  const { data: sludinajums } = await supabase
-    .from('sludinajumi')
-    .select('*')
-    .eq('id', params.id)
-    .single();
+    supabase
+      .from('sludinajumi')
+      .select('*')
+      .eq('id', params.id)
+      .single()
+      .then(({ data }) => {
+        setSludinajums(data);
+        const imgs = Array.isArray(data?.image_public_urls) ? data.image_public_urls : [];
+        setImages(imgs);
+      });
 
-  const images = Array.isArray(sludinajums?.image_public_urls) ? sludinajums.image_public_urls : [];
+    // AUTO SLIDE katras 4s
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [params.id]);
+
+  if (!sludinajums) return <div style={{padding: '100px', textAlign: 'center'}}>Loading...</div>;
 
   return (
-    <div style={{background: '#f9fafb', padding: '20px 0', minHeight: '100vh'}}>
-      <div style={{maxWidth: '1100px', margin: '0 auto'}}>
+    <div style={{background: '#f9fafb', padding: '24px 0', minHeight: '100vh'}}>
+      <div style={{maxWidth: '1200px', margin: '0 auto'}}>
         
-        {/* MĀZĀKS HERO ATTĒLS */}
-        <div style={{background: 'white', borderRadius: '12px', marginBottom: '24px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.08)'}}>
+        {/* SLIDING HERO */}
+        <div style={{position: 'relative', height: '350px', marginBottom: '32px', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', background: 'white'}}>
           <img 
-            src={images[0]} 
-            style={{width: '100%', height: '320px', objectFit: 'cover'}} 
-            alt="Galvenais"
+            src={images[currentImage]} 
+            style={{width: '100%', height: '100%', objectFit: 'cover', transition: 'opacity 0.8s ease-in-out'}} 
+            alt="Hero"
           />
+          <div style={{position: 'absolute', bottom: '20px', left: '20px', right: '20px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '16px', borderRadius: '12px'}}>
+            Foto {currentImage + 1} / {images.length}
+          </div>
         </div>
 
-        {/* 3 KOLONNAS + CHECKBOXES kā screenshot */}
-        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginBottom: '32px'}}>
+        {/* 3 KOLONNAS CHECKBOXES - NO SCREENSHOT */}
+        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginBottom: '40px'}}>
           
-          {/* 1. kolonna */}
-          <div style={{background: 'white', padding: '24px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)'}}>
-            <h3 style={{fontSize: '1.1rem', fontWeight: 700, marginBottom: '16px', color: '#374151'}}>Dzinējs</h3>
-            <div style={{fontSize: '1.8rem', fontWeight: 700, color: '#1f2937'}}>2.0 dzinējs</div>
-            <label style={{display: 'block', margin: '12px 0', fontSize: '0.9rem'}}>
-              <input type="checkbox" style={{marginRight: '8px'}} checked readOnly /> 
-              Quattro
+          {/* Dzinējs */}
+          <div style={{background: 'white', padding: '28px', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)'}}>
+            <h3 style={{fontSize: '1.1rem', fontWeight: 700, marginBottom: '16px'}}>Dzinējs</h3>
+            <div style={{fontSize: '1.6rem', fontWeight: 700, marginBottom: '12px'}}>2.5 Dzinējs</div>
+            <label style={{display: 'block', margin: '8px 0', fontSize: '0.9rem'}}>
+              <input type="checkbox" style={{marginRight: '10px'}} defaultChecked readOnly /> Audi Quattro
             </label>
-            <label style={{display: 'block', margin: '4px 0', fontSize: '0.9rem'}}>
-              <input type="checkbox" style={{marginRight: '8px'}} checked readOnly /> 
-              245 ZS
+            <label style={{display: 'block', margin: '8px 0', fontSize: '0.9rem'}}>
+              <input type="checkbox" style={{marginRight: '10px'}} defaultChecked readOnly /> 256 ZS
             </label>
           </div>
 
-          {/* 2. kolonna */}
-          <div style={{background: 'white', padding: '24px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)'}}>
-            <h3 style={{fontSize: '1.1rem', fontWeight: 700, marginBottom: '16px', color: '#374151'}}>Aprīkojums</h3>
+          {/* Aprīkojums */}
+          <div style={{background: 'white', padding: '28px', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)'}}>
+            <h3 style={{fontSize: '1.1rem', fontWeight: 700, marginBottom: '16px'}}>Aprīkojums</h3>
             <label style={{display: 'block', margin: '8px 0', fontSize: '0.9rem'}}>
-              <input type="checkbox" style={{marginRight: '8px'}} checked readOnly /> 
-              Klimata kontrole
+              <input type="checkbox" style={{marginRight: '10px'}} defaultChecked readOnly /> Klimata kontrole
             </label>
             <label style={{display: 'block', margin: '8px 0', fontSize: '0.9rem'}}>
-              <input type="checkbox" style={{marginRight: '8px'}} checked readOnly /> 
-              Parktronic
+              <input type="checkbox" style={{marginRight: '10px'}} defaultChecked readOnly /> Parktronic
             </label>
             <label style={{display: 'block', margin: '8px 0', fontSize: '0.9rem'}}>
-              <input type="checkbox" style={{marginRight: '8px'}} checked readOnly /> 
-              Keyless
+              <input type="checkbox" style={{marginRight: '10px'}} defaultChecked readOnly /> Keyless
             </label>
           </div>
 
-          {/* 3. kolonna */}
-          <div style={{background: 'white', padding: '24px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)'}}>
-            <h3 style={{fontSize: '1.1rem', fontWeight: 700, marginBottom: '16px', color: '#374151'}}>Audio / Multimediji</h3>
+          {/* Audio */}
+          <div style={{background: 'white', padding: '28px', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)'}}>
+            <h3 style={{fontSize: '1.1rem', fontWeight: 700, marginBottom: '16px'}}>Audio/Multimediji</h3>
             <label style={{display: 'block', margin: '8px 0', fontSize: '0.9rem'}}>
-              <input type="checkbox" style={{marginRight: '8px'}} checked readOnly /> 
-              Bose
+              <input type="checkbox" style={{marginRight: '10px'}} defaultChecked readOnly /> Bose skaņas sistēma
             </label>
             <label style={{display: 'block', margin: '8px 0', fontSize: '0.9rem'}}>
-              <input type="checkbox" style={{marginRight: '8px'}} checked readOnly /> 
-              Navigācija
+              <input type="checkbox" style={{marginRight: '10px'}} defaultChecked readOnly /> Navigācija
             </label>
             <label style={{display: 'block', margin: '8px 0', fontSize: '0.9rem'}}>
-              <input type="checkbox" style={{marginRight: '8px'}} readOnly /> 
-              Subwoofer
+              <input type="checkbox" style={{marginRight: '10px'}} readOnly /> Subwoofer
             </label>
           </div>
         </div>
 
-        {/* GALERIJA MĀZĀKI BLOKI */}
-        <div style={{background: 'white', borderRadius: '12px', padding: '32px', boxShadow: '0 8px 24px rgba(0,0,0,0.08)', marginBottom: '32px'}}>
-          <h2 style={{fontSize: '2rem', marginBottom: '24px', color: '#1e293b'}}>🖼️ Foto galerija</h2>
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '16px'}}>
+        {/* PAPILDU INFO GRID */}
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '40px'}}>
+          <div style={{background: 'white', padding: '24px', borderRadius: '12px'}}>
+            <strong>Marka:</strong> Audi<br/>
+            <strong>Modelis:</strong> Quatro
+          </div>
+          <div style={{background: 'white', padding: '24px', borderRadius: '12px'}}>
+            <strong>VIN kods:</strong> Bez VIN koda
+          </div>
+        </div>
+
+        {/* GALERIJA */}
+        <div style={{background: 'white', borderRadius: '12px', padding: '32px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', marginBottom: '32px'}}>
+          <h2 style={{fontSize: '1.8rem', marginBottom: '24px'}}>🖼️ Foto galerija</h2>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px'}}>
             {images.slice(1).map((img, i) => (
-              <div key={i} style={{borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'}}>
-                <img 
-                  src={img} 
-                  style={{width: '100%', height: '180px', objectFit: 'cover'}} 
-                  alt={`Foto ${i+1}`}
-                />
-              </div>
+              <img 
+                key={i}
+                src={img} 
+                style={{width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: '10px', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'}} 
+                alt={`Foto ${i+1}`}
+                onClick={() => setCurrentImage(i+1)}
+              />
             ))}
           </div>
         </div>
 
         {/* APRKSTS */}
-        <div style={{background: 'white', borderRadius: '12px', padding: '40px', boxShadow: '0 8px 24px rgba(0,0,0,0.08)'}}>
-          <h2 style={{fontSize: '2rem', marginBottom: '24px', color: '#1e293b'}}>📝 Pilns apraksts</h2>
-          <div style={{fontSize: '1.1rem', lineHeight: 1.6, color: '#4b5563'}}>
-            {sludinajums?.description || 'Detalizēts apraksts tiks pievienots.'}
+        <div style={{background: 'white', borderRadius: '12px', padding: '40px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)'}}>
+          <h2 style={{fontSize: '1.8rem', marginBottom: '24px'}}>📝 Pilns apraksts</h2>
+          <div style={{fontSize: '1.1rem', lineHeight: 1.6, color: '#4b5563', whiteSpace: 'pre-wrap'}}>
+            {sludinajums?.description}
           </div>
         </div>
 
-        {/* CENA BEIGĀS KĀ SS.LV */}
-        <div style={{background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', color: 'white', padding: '40px', borderRadius: '16px', textAlign: 'center', marginTop: '48px', boxShadow: '0 20px 40px rgba(5,150,105,0.3)'}}>
-          <div style={{fontSize: '4rem', fontWeight: 900, marginBottom: '16px'}}>{sludinajums?.price} €</div>
-          <button style={{background: 'white', color: '#059669', padding: '20px 48px', fontSize: '1.3rem', fontWeight: 800, borderRadius: '12px', border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,0.2)', textTransform: 'uppercase'}}>
-            📞 Zvanīt pārdevējam
+        {/* CENA BEIGĀS */}
+        <div style={{background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', padding: '48px', borderRadius: '20px', textAlign: 'center', marginTop: '48px', boxShadow: '0 20px 40px rgba(16,185,129,0.3)'}}>
+          <h1 style={{fontSize: '4.5rem', fontWeight: 900, marginBottom: '16px'}}>{sludinajums?.price} €</h1>
+          <button style={{background: 'rgba(255,255,255,0.95)', color: '#059669', padding: '24px 64px', fontSize: '1.5rem', fontWeight: 800, borderRadius: '16px', border: 'none', cursor: 'pointer', boxShadow: '0 12px 32px rgba(0,0,0,0.3)', textTransform: 'uppercase', letterSpacing: '1px'}}>
+            📞 Zvanīt +371 29 *** ***
           </button>
         </div>
       </div>
