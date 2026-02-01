@@ -6,6 +6,8 @@ export default function SludinajumaLapa({ params, searchParams }) {
   const [sludinajums, setSludinajums] = useState(null);
   const [images, setImages] = useState([]);
   const [currentImage, setCurrentImage] = useState(0);
+  const [fullscreenOpen, setFullscreenOpen] = useState(false);
+  const [fullscreenIndex, setFullscreenIndex] = useState(0);
 
   useEffect(() => {
     const supabase = createClient(
@@ -34,6 +36,46 @@ export default function SludinajumaLapa({ params, searchParams }) {
     return () => clearInterval(interval);
   }, [images.length]);
 
+  // FULLSCREEN GALERIJA
+  const openFullscreen = (imgSrc, index = 0) => {
+    setFullscreenIndex(index);
+    setFullscreenOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeFullscreen = () => {
+    setFullscreenOpen(false);
+    document.body.style.overflow = '';
+  };
+
+  const nextImageFullscreen = () => {
+    setFullscreenIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImageFullscreen = () => {
+    setFullscreenIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleHeroClick = (e, currentIdx) => {
+    setCurrentImage((currentIdx + 1) % images.length);
+  };
+
+  // KEYBOARD HANDLER
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!fullscreenOpen) return;
+      if (e.key === 'Escape') {
+        closeFullscreen();
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        nextImageFullscreen();
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        prevImageFullscreen();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [fullscreenOpen, images.length]);
+
   if (!sludinajums) return <div style={{padding: '100px', textAlign: 'center'}}>Loading...</div>;
 
   return (
@@ -42,20 +84,26 @@ export default function SludinajumaLapa({ params, searchParams }) {
         
         {/* KREISĀ - ATTĒLI */}
         <div>
-          {/* HERO SLIDER - Bez strīpas virsmā */}
-          <div style={{position: 'relative', height: '280px', marginBottom: '8px', borderRadius: '12px 12px 0 0', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', background: '#f0f0f0'}}>
+          {/* HERO SLIDER - AR FULLSCREEN */}
+          <div 
+            style={{position: 'relative', height: '280px', marginBottom: '8px', borderRadius: '12px 12px 0 0', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', background: '#f0f0f0', cursor: 'pointer'}}
+            onClick={(e) => handleHeroClick(e, currentImage)}
+            onDoubleClick={() => openFullscreen(images[currentImage], currentImage)}
+            title="Vienreiz klikšķis - maina foto | Dubultklikšķis - fullscreen"
+          >
             <img 
               src={images[currentImage]} 
               style={{width: '100%', height: '100%', objectFit: 'contain', maxWidth: '100%', maxHeight: '100%', transition: 'opacity 0.8s ease-in-out'}} 
               alt="Hero"
             />
           </div>
+          
           {/* NUMURS ZEM ATTĒLA */}
           <div style={{background: 'white', padding: '8px 16px', borderRadius: '0 0 12px 12px', textAlign: 'center', fontSize: '0.9rem', color: '#6b7280', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
             Foto {currentImage + 1} / {images.length}
           </div>
 
-          {/* GALERIJA MINI - KLIKŠĶIS STRĀDĀ */}
+          {/* GALERIJA MINI */}
           <div style={{background: 'white', borderRadius: '12px', padding: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', marginTop: '16px'}}>
             <h3 style={{fontSize: '1.2rem', marginBottom: '16px'}}>🖼️ Foto galerija</h3>
             <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px'}}>
@@ -73,7 +121,7 @@ export default function SludinajumaLapa({ params, searchParams }) {
           </div>
         </div>
 
-        {/* LABĀ - SATURS (nepārmainīts) */}
+        {/* LABĀ - SATURS */}
         <div>
           <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px'}}>
             <div style={{background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)'}}>
@@ -138,6 +186,55 @@ export default function SludinajumaLapa({ params, searchParams }) {
           </div>
         </div>
       </div>
+
+      {/* FULLSCREEN MODALIS */}
+      {fullscreenOpen && (
+        <div 
+          style={{
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', 
+            background: 'rgba(0,0,0,0.95)', zIndex: 9999, display: 'flex', 
+            alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out'
+          }}
+          onClick={closeFullscreen}
+        >
+          <div style={{position: 'relative', width: '90vw', height: '90vh', display: 'flex'}}>
+            {/* IEPRIEKŠĒJA BULTA */}
+            <button 
+              onClick={(e) => {e.stopPropagation(); prevImageFullscreen();}}
+              style={{
+                position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)',
+                background: 'rgba(255,255,255,0.3)', border: 'none', width: '60px', height: '60px',
+                borderRadius: '50%', fontSize: '24px', cursor: 'pointer', backdropFilter: 'blur(10px)'
+              }}
+            >‹</button>
+            
+            <img 
+              src={images[fullscreenIndex]} 
+              style={{maxWidth: '100%', maxHeight: '100%', objectFit: 'contain'}} 
+              alt="Fullscreen"
+            />
+            
+            {/* NĀKAMĀ BULTA */}
+            <button 
+              onClick={(e) => {e.stopPropagation(); nextImageFullscreen();}}
+              style={{
+                position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)',
+                background: 'rgba(255,255,255,0.3)', border: 'none', width: '60px', height: '60px',
+                borderRadius: '50%', fontSize: '24px', cursor: 'pointer', backdropFilter: 'blur(10px)'
+              }}
+            >›</button>
+            
+            {/* COUNTER */}
+            <div style={{
+              position: 'absolute', bottom: '30px', left: '50%', transform: 'translateX(-50%)',
+              background: 'rgba(0,0,0,0.7)', color: 'white', padding: '12px 24px', borderRadius: '30px',
+              fontSize: '1.2rem', fontWeight: 'bold', backdropFilter: 'blur(10px)'
+            }}>
+              {fullscreenIndex + 1} / {images.length}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
