@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import Image from 'next/image';
 
 export default async function SludinajumaLapa({ params }) {
   const supabase = createClient(
@@ -12,127 +13,122 @@ export default async function SludinajumaLapa({ params }) {
     .eq('id', params.id)
     .single();
 
-  const imagesRaw = sludinajums?.image_public_urls || [];
-  const images = Array.isArray(imagesRaw) ? imagesRaw.slice(0, 35) : [];
+  const mainImage = Array.isArray(sludinajums?.image_public_urls) 
+    ? sludinajums.image_public_urls[0] 
+    : '/placeholder-car.jpg';
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* SS.LV ORANDŽS HEADER */}
-      <header className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-6 shadow-2xl">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-3xl font-bold">
-              <a href="/" className="hover:underline">🚗 Auto Sludinājumi</a>
-            </h1>
-            <a 
-              href="/sludinajumi" 
-              className="bg-white text-orange-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 shadow-lg transition-all"
-            >
-              ← Atpakaļ uz sarakstu
-            </a>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Meklēšanas josla augšā KĀ screenshot */}
+      <div className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <div className="flex gap-4 items-center">
+            <Image src="/logo.png" alt="Logo" width={40} height={40} />
+            <div className="flex-1 max-w-md">
+              <input 
+                type="text" 
+                placeholder="Meklēt auto sludinājumus..." 
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div className="flex gap-2 text-sm text-gray-600">
+              <span>Sludinājumi</span>
+              <span>|</span>
+              <span>Konts</span>
+            </div>
           </div>
-          <p className="text-lg opacity-90">Vieglie auto / Audi / A3 / Detāļas</p>
         </div>
-      </header>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid lg:grid-cols-12 gap-12">
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
-          {/* GALERIJA KĀ SS.LV */}
-          <div className="lg:col-span-8 order-2 lg:order-1">
-            {/* Thumbnail rinda */}
-            <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
-              <div className="flex flex-wrap gap-[2px] mb-4">
-                {images.map((img, i) => (
-                  <div key={i} className="group relative">
-                    <img 
-                      src={img.replace(/800\./, '91.')}
-                      alt={`Foto ${i+1}`}
-                      className="w-[91px] h-[68px] object-cover rounded cursor-pointer hover:ring-2 ring-orange-400 transition-all group-hover:opacity-90"
-                    />
-                    <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-1 rounded-full">
-                      {i+1}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <p className="text-sm font-medium text-gray-700">
-                Foto: <span className="text-orange-600 font-bold">{images.length}</span>
-              </p>
-            </div>
-
-            {/* Apraksts */}
-            <div className="bg-white p-8 rounded-xl shadow-xl mb-8 prose prose-lg max-w-none">
-              <div className="whitespace-pre-wrap leading-relaxed">
-                {sludinajums?.description || 'Apraksts tiks pievienots.'}
+          {/* SINGLE CARD KĀ SCREENSHOT */}
+          <div className="md:col-span-2 lg:col-span-2 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-200">
+            
+            {/* GALVENĀ BILDE FULL WIDTH */}
+            <div className="relative h-80 bg-gray-200 overflow-hidden">
+              <Image 
+                src={mainImage} 
+                alt={sludinajums?.title}
+                fill 
+                className="object-cover hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute top-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
+                +{sludinajums?.image_public_urls?.length - 1 || 0} foto
               </div>
             </div>
 
-            {/* RAW DEBUG */}
-            <details className="bg-gray-900 text-white p-6 rounded-xl mb-8">
-              <summary className="text-xl font-bold cursor-pointer hover:text-orange-400">
-                🔍 RAW DB Debug
-              </summary>
-              <pre className="mt-4 text-xs max-h-96 overflow-auto font-mono">
-                {JSON.stringify(sludinajums, null, 2)}
-              </pre>
-            </details>
+            {/* CARD SATURS */}
+            <div className="p-8 space-y-4">
+              
+              {/* TITULS */}
+              <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+                {sludinajums?.title || 'Auto sludinājums'}
+              </h1>
+
+              {/* ZAĻĀ CENA LEJA KĀ SCREENSHOT */}
+              <div className="flex items-end gap-2">
+                <div className="text-4xl font-black text-emerald-600">
+                  {sludinajums?.price || '€'}
+                </div>
+                <span className="text-sm text-gray-500">€ / mēn</span>
+              </div>
+
+              {/* TAGI / KATEGORIJAS */}
+              <div className="flex flex-wrap gap-2">
+                <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                  Audi
+                </span>
+                <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                  A3
+                </span>
+                <span className="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
+                  2024
+                </span>
+              </div>
+
+              {/* SHORT INFO ROW */}
+              <div className="grid grid-cols-3 gap-4 text-sm text-gray-600 pt-4 border-t">
+                <div className="flex flex-col items-center">
+                  <span className="font-semibold text-gray-900">{sludinajums?.power || '150'}</span>
+                  <span>ZS</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="font-semibold text-gray-900">{sludinajums?.fuel || '5.6'}</span>
+                  <span>l/100km</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="font-semibold text-gray-900">Rīga</span>
+                  <span>Vieta</span>
+                </div>
+              </div>
+
+              {/* CTA KNOPES LEJA KĀ SCREENSHOT */}
+              <div className="flex gap-4 pt-6 border-t mt-6">
+                <button className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all text-lg">
+                  💬 Sazināties
+                </button>
+                <button className="flex-1 bg-white border-2 border-gray-300 py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all text-gray-800">
+                  💾 Saglabāt
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* SPECIFIKĀCIJAS + CENA KĀ SS.LV */}
-          <div className="lg:col-span-4 order-1 lg:order-2 space-y-6">
-            {/* LIELĀ CENA BLOCK */}
-            <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 text-white p-8 rounded-2xl shadow-2xl text-center">
-              <div className="text-5xl font-black mb-3 drop-shadow-lg">
-                {sludinajums?.price || '€'}
-              </div>
-              <p className="text-lg opacity-90 tracking-wide">💰 Cena</p>
+          {/* Citi sludinājumi sidebar kā screenshot (placeholder) */}
+          <div className="lg:col-span-1 space-y-4">
+            <div className="bg-white rounded-xl p-6 shadow-lg h-48 flex items-center justify-center border-2 border-dashed border-gray-300">
+              <p class="text-gray-500 text-sm">Citi sludinājumi</p>
             </div>
-
-            {/* PARAMETRI TABULA */}
-            <div className="bg-white rounded-2xl shadow-xl p-6">
-              <h3 className="text-2xl font-bold mb-6 text-gray-800 border-b-4 border-orange-500 pb-3">
-                📋 Galvenie parametri
-              </h3>
-              <table className="w-full text-sm space-y-3">
-                <tr className="border-b hover:bg-gray-50 py-2">
-                  <td className="font-semibold text-gray-700 w-28">Marka:</td>
-                  <td className="text-gray-900">{sludinajums?.make || 'N/A'}</td>
-                </tr>
-                <tr className="border-b hover:bg-gray-50 py-2">
-                  <td className="font-semibold text-gray-700">Modelis:</td>
-                  <td className="text-gray-900 font-medium">{sludinajums?.title}</td>
-                </tr>
-                <tr className="border-b hover:bg-gray-50 py-2">
-                  <td className="font-semibold text-gray-700">Jauda:</td>
-                  <td className="text-gray-900">{sludinajums?.power}</td>
-                </tr>
-                <tr className="border-b hover:bg-gray-50 py-2">
-                  <td className="font-semibold text-gray-700">Patēriņš:</td>
-                  <td className="text-gray-900">{sludinajums?.fuel}</td>
-                </tr>
-                <tr className="hover:bg-gray-50 py-2">
-                  <td className="font-semibold text-gray-700">Gads:</td>
-                  <td className="text-gray-900">{sludinajums?.year}</td>
-                </tr>
-              </table>
+            <div className="bg-white rounded-xl p-6 shadow-lg h-48 flex items-center justify-center border-2 border-dashed border-gray-300">
+              <p class="text-gray-500 text-sm">Reklāma</p>
             </div>
+          </div>
 
-            {/* KONTAKTI KĀ SS.LV */}
-            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-2xl shadow-2xl">
-              <h4 className="text-xl font-bold mb-4 flex items-center">
-                📞 Kontakti
-              </h4>
-              <div className="space-y-3">
-                <p className="text-2xl font-black">+371 29-***-***</p>
-                <p className="text-sm opacity-90">Rīga, Latvija</p>
-                <a 
-                  href="mailto:info@autotekvibe.lv" 
-                  className="block bg-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/30 transition-all text-center"
-                >
-                  ✉️ Sūtīt ziņu
-                </a>
-              </div>
+          <div className="lg:col-span-1 space-y-4">
+            <div className="bg-white rounded-xl p-6 shadow-lg h-64 flex items-center justify-center border-2 border-dashed border-gray-300">
+              <p className="text-gray-500 text-sm">Kontakti</p>
             </div>
           </div>
         </div>
