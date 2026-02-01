@@ -1,108 +1,75 @@
 import { createClient } from '@supabase/supabase-js';
 
 export default async function SludinajumaLapa({ params }) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
-
-  const { data: sludinajums } = await supabase
-    .from('sludinajumi')
-    .select('*')
-    .eq('id', params.id)
-    .single();
-
-  const imagesRaw = sludinajums?.image_public_urls || [];
-  const images = Array.isArray(imagesRaw) ? imagesRaw.slice(0, 35) : [];
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  const { data: sludinajums } = await supabase.from('sludinajumi').select('*').eq('id', params.id).single();
+  const images = Array.isArray(sludinajums?.image_public_urls) ? sludinajums.image_public_urls.slice(0, 35) : [];
 
   return (
-    <>
-      <style jsx global>{`
-        :root {
-          --ss-orange: #f97316;
-          --ss-yellow: #fbbf24;
-          --ss-bg: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-        }
-        .ss-header { background: var(--ss-bg); }
-        .ss-main { background: white; }
-        .thumbnail-grid { display: flex; flex-wrap: wrap; gap: 4px; }
-        .thumbnail { width: 91px; height: 68px; object-fit: cover; cursor: pointer; }
-        .specs-table td { padding: 4px 0; border-bottom: 1px solid #eee; }
-        .price-big { font-size: 2.5em; font-weight: bold; color: #059669; }
-      `}</style>
-
-      {/* SS.LV HEADER */}
-      <div className="ss-header py-4 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
+    <div className="min-h-screen">
+      {/* SS.LV ORANDŽS HEADER */}
+      <header className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 shadow-xl">
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <h1 className="text-2xl font-bold">
-            <a href="/" className="hover:underline">Auto Sludinājumi</a> / 
-            <span className="ml-2 text-yellow-300">{sludinajums?.title}</span>
+            <a href="/" className="hover:underline">Auto Sludinājumi</a> / {sludinajums?.title}
           </h1>
-          <div className="flex gap-4 text-sm">
-            <a href="/sludinajumi" className="hover:underline">← Atpakaļ</a>
-          </div>
+          <a href="/sludinajumi" className="bg-white text-orange-600 px-4 py-2 rounded font-semibold hover:bg-gray-100">
+            ← Atpakaļ
+          </a>
         </div>
-      </div>
+      </header>
 
-      <div className="ss-main max-w-7xl mx-auto px-4 py-8 bg-white">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-6 py-12 bg-gray-50">
+        <div className="grid lg:grid-cols-12 gap-8">
           
-          {/* LEFT: Thumbnail rinda + Cena KĀ SS.LV */}
-          <div className="lg:col-span-2">
-            {/* Thumbnail Gallery EXACT SS.LV */}
-            <div className="mb-6">
-              <div className="flex flex-wrap gap-1 mb-2">
-                {images.map((img, i) => (
-                  <img 
-                    key={i} 
-                    src={img.replace(/800\./, '91.')} 
-                    alt={`Foto ${i+1}`}
-                    className="thumbnail hover:opacity-80 transition-opacity cursor-pointer rounded"
-                    onClick={() => {}} // Karusele later
-                  />
-                ))}
-              </div>
-              <p className="text-sm text-gray-600">Foto: <strong>{images.length}</strong></p>
+          {/* Thumbnail galerija KĀ SS.LV */}
+          <div className="lg:col-span-8">
+            <div className="flex flex-wrap gap-1 mb-4 bg-white p-4 rounded-lg shadow-sm">
+              {images.map((img, i) => (
+                <img 
+                  key={i}
+                  src={img.replace(/800\./, '91.')}
+                  alt={`Foto ${i+1}`}
+                  className="w-[91px] h-[68px] object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+                />
+              ))}
             </div>
+            <p className="text-sm text-gray-600 mb-8">Foto: <strong>{images.length}</strong></p>
 
             {/* Apraksts */}
-            <div className="bg-gray-50 p-6 rounded-lg mb-8">
-              <div dangerouslySetInnerHTML={{ __html: sludinajums?.description || '' }} />
+            <div className="bg-white p-8 rounded-xl shadow-lg mb-8">
+              <div className="prose max-w-none whitespace-pre-wrap">{sludinajums?.description}</div>
             </div>
-
-            {/* RAW Debug */}
-            <details className="bg-gray-900 text-white p-4 rounded mb-8">
-              <summary className="cursor-pointer font-bold">RAW DB</summary>
-              <pre className="mt-2 text-xs overflow-auto max-h-64">{JSON.stringify(sludinajums, null, 2)}</pre>
-            </details>
           </div>
 
-          {/* RIGHT: Specs + Cena KĀ SS.LV */}
-          <div className="space-y-6">
-            {/* LIELĀ CENA KĀ SS.LV */}
-            <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white p-6 rounded-lg shadow-lg">
-              <div className="price-big mb-2">{sludinajums?.price}</div>
-              <p className="text-sm opacity-90">💰 Cena</p>
+          {/* Specs + Cena KĀ SS.LV */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* Lielā cena */}
+            <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white p-8 rounded-xl shadow-2xl text-center">
+              <div className="text-4xl font-black mb-2">{sludinajums?.price}</div>
+              <p className="opacity-90">💰 Cena</p>
             </div>
 
-            {/* Specs Tabulas KĀ SS.LV 4 kolonnas */}
-            <div className="space-y-4">
-              <table className="w-full specs-table">
-                <tr><td className="font-semibold w-24">Marka:</td><td>{sludinajums?.make}</td></tr>
-                <tr><td>Izgads:</td><td>{sludinajums?.year}</td></tr>
-                <tr><td>Motors:</td><td>{sludinajums?.engine}</td></tr>
-                <tr><td>Jauda:</td><td>{sludinajums?.power}</td></tr>
-                <tr><td>Piedz.:</td><td>{sludinajums?.drive || '2WD'}</td></tr>
-                <tr><td>Nobrauk.:</td><td>{sludinajums?.km}</td></tr>
+            {/* Specs tabula */}
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <h3 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">📋 Parametri</h3>
+              <table className="w-full text-sm">
+                <tr className="border-b py-2"><td className="font-medium w-24">Marka:</td><td>{sludinajums?.make}</td></tr>
+                <tr className="border-b py-2"><td>Izgads:</td><td>{sludinajums?.year}</td></tr>
+                <tr className="border-b py-2"><td>Motors:</td><td>{sludinajums?.engine}</td></tr>
+                <tr className="border-b py-2"><td>Jauda:</td><td>{sludinajums?.power}</td></tr>
+                <tr className="py-2"><td>Patēriņš:</td><td>{sludinajums?.fuel}</td></tr>
               </table>
+            </div>
 
-              {/* Kontakti KĀ SS.LV */}
-              <div className="bg-red-500/20 border border-red-500 p-4 rounded">
-                <h4 className="font-bold mb-2 text-red-800">📞 Kontakti</h4>
-                <p><strong>+371 29-***-***</strong></p>
-                <p className="text-sm mt-1">Rīga</p>
-                <a href="mailto:info@example.lv" className="text-blue-600 hover:underline block mt-2">✉️ E-pasts</a>
-              </div>
+            {/* Kontakti */}
+            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-xl shadow-lg">
+              <h4 className="font-bold mb-3">📞 Kontakti</h4>
+              <p className="text-lg mb-2"><strong>+371 29-***-***</strong></p>
+              <p className="text-sm mb-3">Rīga</p>
+              <a href="mailto:info@autotekvibe.lv" className="block bg-white text-red-600 px-4 py-2 rounded font-medium hover:bg-gray-100 text-center">
+                ✉️ Sazināties
+              </a>
             </div>
           </div>
         </div>
