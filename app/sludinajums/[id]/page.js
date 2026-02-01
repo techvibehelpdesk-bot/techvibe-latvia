@@ -1,134 +1,138 @@
+'use client'; // Client component galerijai hover
+
+import { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import Image from 'next/image';
 
-export default async function SludinajumaLapa({ params }) {
+async function getSludinajums(id) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
+  const { data } = await supabase.from('sludinajumi').select('*').eq('id', id).single();
+  return data;
+}
 
-  const { data: sludinajums } = await supabase
-    .from('sludinajumi')
-    .select('*')
-    .eq('id', params.id)
-    .single();
-
-  const mainImage = Array.isArray(sludinajums?.image_public_urls) 
-    ? sludinajums.image_public_urls[0] 
-    : '/placeholder-car.jpg';
+export default async function SludinajumaLapa({ params }) {
+  const sludinajums = await getSludinajums(params.id);
+  const images = Array.isArray(sludinajums?.image_public_urls) ? sludinajums.image_public_urls : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Meklēšanas josla augšā KĀ screenshot */}
-      <div className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex gap-4 items-center">
-            <Image src="/logo.png" alt="Logo" width={40} height={40} />
-            <div className="flex-1 max-w-md">
-              <input 
-                type="text" 
-                placeholder="Meklēt auto sludinājumus..." 
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div className="flex gap-2 text-sm text-gray-600">
-              <span>Sludinājumi</span>
-              <span>|</span>
-              <span>Konts</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          
-          {/* SINGLE CARD KĀ SCREENSHOT */}
-          <div className="md:col-span-2 lg:col-span-2 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-200">
-            
-            {/* GALVENĀ BILDE FULL WIDTH */}
-            <div className="relative h-80 bg-gray-200 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12">
+      <div className="max-w-7xl mx-auto px-6">
+        
+        {/* GALERIJAS GRID KVADRĀTI KĀ SCREENSHOT */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12">
+          {images.slice(0, 16).map((img, i) => (
+            <div 
+              key={i} 
+              className="group relative aspect-square bg-gray-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:rotate-1 cursor-pointer border-4 border-white hover:border-orange-400"
+            >
               <Image 
-                src={mainImage} 
-                alt={sludinajums?.title}
+                src={img} 
+                alt={`Foto ${i+1}`}
                 fill 
-                className="object-cover hover:scale-105 transition-transform duration-500"
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
               />
-              <div className="absolute top-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
-                +{sludinajums?.image_public_urls?.length - 1 || 0} foto
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold">
+                {i+1}
+              </span>
             </div>
+          ))}
+        </div>
 
-            {/* CARD SATURS */}
-            <div className="p-8 space-y-4">
-              
-              {/* TITULS */}
-              <h1 className="text-2xl font-bold text-gray-900 leading-tight">
-                {sludinajums?.title || 'Auto sludinājums'}
+        <div className="grid lg:grid-cols-3 gap-8">
+          
+          {/* GALVENĀ INFO + CENA */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* TITULS UN CENA */}
+            <div className="bg-white rounded-3xl shadow-xl p-8">
+              <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
+                {sludinajums?.title}
               </h1>
-
-              {/* ZAĻĀ CENA LEJA KĀ SCREENSHOT */}
-              <div className="flex items-end gap-2">
-                <div className="text-4xl font-black text-emerald-600">
-                  {sludinajums?.price || '€'}
+              <div className="flex items-baseline gap-4 mb-8">
+                <div className="text-5xl font-black bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent drop-shadow-lg">
+                  {sludinajums?.price}
                 </div>
-                <span className="text-sm text-gray-500">€ / mēn</span>
+                <span className="text-2xl text-gray-600 font-semibold">€</span>
               </div>
+            </div>
 
-              {/* TAGI / KATEGORIJAS */}
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                  Audi
-                </span>
-                <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                  A3
-                </span>
-                <span className="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
-                  2024
-                </span>
-              </div>
-
-              {/* SHORT INFO ROW */}
-              <div className="grid grid-cols-3 gap-4 text-sm text-gray-600 pt-4 border-t">
-                <div className="flex flex-col items-center">
-                  <span className="font-semibold text-gray-900">{sludinajums?.power || '150'}</span>
-                  <span>ZS</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="font-semibold text-gray-900">{sludinajums?.fuel || '5.6'}</span>
-                  <span>l/100km</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="font-semibold text-gray-900">Rīga</span>
-                  <span>Vieta</span>
-                </div>
-              </div>
-
-              {/* CTA KNOPES LEJA KĀ SCREENSHOT */}
-              <div className="flex gap-4 pt-6 border-t mt-6">
-                <button className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all text-lg">
-                  💬 Sazināties
-                </button>
-                <button className="flex-1 bg-white border-2 border-gray-300 py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all text-gray-800">
-                  💾 Saglabāt
-                </button>
+            {/* APRKSTS LEJĀ KĀ JAUTĀJI */}
+            <div className="bg-gradient-to-r from-gray-50 to-white rounded-3xl shadow-xl p-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-4 border-orange-500 pb-4">
+                📝 Pilns apraksts
+              </h2>
+              <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {sludinajums?.description || 'Apraksts tiks pievienots.'}
               </div>
             </div>
           </div>
 
-          {/* Citi sludinājumi sidebar kā screenshot (placeholder) */}
-          <div className="lg:col-span-1 space-y-4">
-            <div className="bg-white rounded-xl p-6 shadow-lg h-48 flex items-center justify-center border-2 border-dashed border-gray-300">
-              <p class="text-gray-500 text-sm">Citi sludinājumi</p>
-            </div>
-            <div className="bg-white rounded-xl p-6 shadow-lg h-48 flex items-center justify-center border-2 border-dashed border-gray-300">
-              <p class="text-gray-500 text-sm">Reklāma</p>
-            </div>
-          </div>
+          {/* SPECIFIKĀCIJAS TABULA KĀ SCREENSHOT 4 KOLONNAS */}
+          <div className="space-y-6">
+            
+            {/* ĪSA INFO TABULA */}
+            <div className="bg-white rounded-3xl shadow-xl p-8 sticky top-24">
+              <h3 className="text-2xl font-bold mb-8 text-gray-800 border-b pb-4">
+                📊 Tehniskie dati
+              </h3>
+              
+              {/* GALVENIE DATI 2 KOLONNĀS */}
+              <div className="grid grid-cols-2 gap-6 mb-8">
+                <div>
+                  <h4 className="font-semibold text-gray-700 mb-3">Pamatinformācija</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Marka:</span>
+                      <span className="font-semibold">{sludinajums?.make}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Izgads:</span>
+                      <span className="font-semibold">{sludinajums?.year}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Motors:</span>
+                      <span>{sludinajums?.engine}</span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-700 mb-3">Performace</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Jauda:</span>
+                      <span className="font-semibold">{sludinajums?.power}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Patēriņš:</span>
+                      <span>{sludinajums?.fuel}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-          <div className="lg:col-span-1 space-y-4">
-            <div className="bg-white rounded-xl p-6 shadow-lg h-64 flex items-center justify-center border-2 border-dashed border-gray-300">
-              <p className="text-gray-500 text-sm">Kontakti</p>
+              {/* KONTAKTI */}
+              <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white p-6 rounded-2xl mt-6">
+                <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  📞 Kontakti
+                </h4>
+                <div className="space-y-3">
+                  <p className="text-2xl font-black">+371 29 123 456</p>
+                  <p className="opacity-90">Rīga</p>
+                  <button className="w-full bg-white text-emerald-600 py-3 px-6 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                    Sazināties
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* OCTA KĀ SCREENSHOT */}
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-2xl text-center shadow-xl">
+              <p className="text-sm mb-2 opacity-90">Aprēķināt apdrošināšanu</p>
+              <div className="font-bold text-lg">OCTA.lv</div>
             </div>
           </div>
         </div>
