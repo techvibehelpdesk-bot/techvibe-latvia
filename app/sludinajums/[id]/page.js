@@ -23,14 +23,13 @@ export default function SludinajumaLapa({ params, searchParams }) {
         setSludinajums(data);
         const imgs = Array.isArray(data?.image_public_urls) ? data.image_public_urls : [];
         setImages(imgs);
-        // Reset uz pirmo attēlu
         setCurrentImage(0);
       });
   }, [params.id]);
 
-  // AUTO SLIDE katras 4s - tikai kad images gatavs
+  // AUTO SLIDE katras 4s
   useEffect(() => {
-    if (images.length <= 1) return; // Nav ko slīdēt
+    if (images.length <= 1) return;
 
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % images.length);
@@ -41,18 +40,19 @@ export default function SludinajumaLapa({ params, searchParams }) {
   if (!sludinajums) return <div style={{padding: '100px', textAlign: 'center'}}>Loading...</div>;
 
   return (
-    {/* SLIDING HERO - MAZĀKS UN CONTAIN */}
-<div style={{position: 'relative', height: '280px', marginBottom: '32px', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', background: '#f0f0f0'}}>
-  <img 
-    src={images[currentImage]} 
-    style={{width: '100%', height: '100%', objectFit: 'contain', maxWidth: '100%', maxHeight: '100%', transition: 'opacity 0.8s ease-in-out'}} 
-    alt="Hero"
-  />
-  <div style={{position: 'absolute', bottom: '16px', left: '16px', right: '16px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '12px', borderRadius: '10px', fontSize: '0.9rem'}}>
-    Foto {currentImage + 1} / {images.length}
-  </div>
-</div>
-
+    <div style={{background: '#f9fafb', padding: '24px 0', minHeight: '100vh'}}>
+      <div style={{maxWidth: '1200px', margin: '0 auto'}}>
+        
+        {/* SLIDING HERO - MAZĀKS UN CONTAIN */}
+        <div style={{position: 'relative', height: '280px', marginBottom: '32px', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', background: '#f0f0f0'}}>
+          <img 
+            src={images[currentImage]} 
+            style={{width: '100%', height: '100%', objectFit: 'contain', maxWidth: '100%', maxHeight: '100%', transition: 'opacity 0.8s ease-in-out'}} 
+            alt="Hero"
+          />
+          <div style={{position: 'absolute', bottom: '16px', left: '16px', right: '16px', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '12px', borderRadius: '10px', fontSize: '0.9rem'}}>
+            Foto {currentImage + 1} / {images.length}
+          </div>
         </div>
 
         {/* 3 KOLONNAS CHECKBOXES */}
