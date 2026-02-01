@@ -2,78 +2,129 @@
 import { useEffect, useState } from 'react';
 
 export default function SludinajumaLapa({ params }) {
-  const [data, setData] = useState(null);
+  const [sludinajums, setSludinajums] = useState(null);
   const [images, setImages] = useState([]);
-  const [debug, setDebug] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/debug-sludinajums?id=' + params.id)
-      .then(r => r.json())
-      .then(({ data, images, table, error }) => {
-        console.log('API RESPONSE:', { data, images, table, error });
-        setData(data);
-        setImages(images);
-        setDebug(`Tabula: ${table || 'nav'} | Error: ${error || 'nav'} | Images: ${images?.length || 0}`);
-      })
-      .catch(e => setDebug('API kļūda: ' + e.message));
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    
+    // 1. Fetch no sludinajumi tabulas
+    fetch(`${supabaseUrl}/rest/v1/sludinajumi?select=*&id=eq.${params.id}`, {
+      headers: {
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
+      }
+    })
+    .then(r => r.json())
+    .then(async data => {
+      console.log('TABULA DATA:', data);
+      if (data[0]) {
+        const row = data[0];
+        setSludinajums(row);
+        
+        // 2. Parse + Storage URL
+        let imgs = [];
+        if (row.images) {
+          try {
+            const parsed = JSON.parse(row.images);
+            imgs = Array.isArray(parsed) ? parsed.map(uuid => 
+              `${supabaseUrl}/storage/v1/object/public/sludinajumi/${uuid}`
+            ) : [];
+          } catch(e) {
+            console.log('JSON error:', e);
+          }
+        }
+        console.log('STORAGE IMAGES:', imgs);
+        setImages(imgs);
+      }
+      setLoading(false);
+    })
+    .catch(e => {
+      console.error(e);
+      setLoading(false);
+    });
   }, [params.id]);
 
-  if (!data) return (
-    <div className="min-h-screen flex items-center justify-center p-8">
-      <div className="bg-yellow-100 border-4 border-yellow-400 rounded-2xl p-8 text-center max-w-md">
-        <div className="text-4xl mb-4">🔍</div>
-        <div className="text-xl font-bold mb-2">Meklē sludinājumu...</div>
-        <div className="text-yellow-800">{debug}</div>
-      </div>
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-4xl animate-spin">⏳</div>
+    </div>
+  );
+
+  if (!sludinajums) return (
+    <div className="min-h-screen flex items-center justify-center text-red-600 text-2xl">
+      Sludinājums nav atrasts
     </div>
   );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50 py-12">
-      <div className="max-w-6xl mx-auto px-6">
-        {/* DEBUG TOP */}
-        <div className="bg-blue-100 border-2 border-blue-400 rounded-xl p-4 mb-8 text-sm font-mono">
-          {debug}
-        </div>
-
+      <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12">
-          {/* INFO */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-3xl p-8 shadow-2xl">
-              <h1 className="text-4xl font-black mb-6 text-gray-900">{data.title || data.text || 'Sludinājums'}</h1>
-              <div className="text-5xl font-black text-emerald-600 mb-8">{data.price || '—'}</div>
-              <div className="grid grid-cols-2 gap-4 text-lg">
-                <div className="p-4 bg-emerald-50 rounded-2xl font-semibold flex items-center gap-3">
-                  📍 {data.city || '—'}
+          
+          {/* KREISĀ INFO */}
+          <div>
+            <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-10 shadow-2xl sticky top-24">
+              <h1 className="text-5xl font-black mb-8 bg-gradient-to-r from-gray-900 to-emerald-700 bg-clip-text text-transparent">
+                {sludinajums.title}
+              </h1>
+              <div className="text-6xl font-black text-emerald-600 mb-12 mb-16">
+                {sludinajums.price} €
+              </div>
+              
+              <div className="space-y-6 mb-12">
+                <div className="flex items-center gap-4 p-6 bg-emerald-50 rounded-3xl shadow-lg">
+                  <div className="w-16 h-16 bg-emerald-500 rounded-3xl flex items-center justify-center text-3xl text-white font-bold shadow-2xl">📍</div>
+                  <span className="text-2xl font-bold">{sludinajums.city}</span>
                 </div>
-                <div className="p-4 bg-blue-50 rounded-2xl font-semibold flex items-center gap-3">
-                  🏷️ {data.category || '—'}
+                <div className="flex items-center gap-4 p-6 bg-blue-50 rounded-3xl shadow-lg">
+                  <div className="w-16 h-16 bg-blue-500 rounded-3xl flex items-center justify-center text-3xl text-white font-bold shadow-2xl">🏷️</div>
+                  <span className="text-2xl font-bold">{sludinajums.category}</span>
                 </div>
               </div>
+
+              <button className="w-full h-16 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white text-xl font-bold rounded-3xl shadow-2xl hover:shadow-3xl hover:scale-[1.02] transition-all duration-300 uppercase tracking-wide">
+                💬 Rakstīt pārdevējam
+              </button>
             </div>
           </div>
 
-          {/* BILDES */}
-          <div>
-            <div className="aspect-[4/3] bg-gray-200 rounded-3xl overflow-hidden shadow-2xl mb-6">
-              {images[0] ? <img src={images[0]} className="w-full h-full object-cover" /> : 
-                <div className="w-full h-full flex items-center justify-center text-4xl text-gray-500">📱 Nav bilžu</div>}
+          {/* LABĀ BILDES + APRKSTS */}
+          <div className="space-y-8">
+            
+            {/* HERO BILDE */}
+            <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-3xl bg-gradient-to-br from-gray-100 to-gray-200 group hover:scale-[1.02] transition-all duration-700 cursor-pointer">
+              {images[0] ? (
+                <img src={images[0]} alt="Galvenā" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-400 to-red-500 text-white text-4xl font-bold">
+                  📱 Nav bildes
+                </div>
+              )}
             </div>
+
+            {/* GALERIJA */}
             {images.length > 1 && (
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-3 lg:grid-cols-4 gap-4 p-4 -m-6 bg-white/50 rounded-3xl backdrop-blur-sm">
                 {images.slice(1).map((img, i) => (
-                  <div key={i} className="aspect-square rounded-2xl overflow-hidden shadow-lg">
-                    <img src={img} className="w-full h-full object-cover" />
+                  <div key={i} className="aspect-square rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-105 transition-all cursor-pointer group bg-gradient-to-br from-gray-100 to-gray-200">
+                    <img src={img} alt={`Bilde ${i}`} className="w-full h-full object-cover group-hover:scale-110" />
                   </div>
                 ))}
               </div>
             )}
-          </div>
-        </div>
 
-        <div className="mt-12 bg-white rounded-3xl p-10 shadow-2xl">
-          <h2 className="text-3xl font-black mb-8 text-gray-900">📝 Apraksts</h2>
-          <div className="text-xl whitespace-pre-wrap">{data.description || data.text || '—'}</div>
+            {/* APRKSTS */}
+            <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-12 shadow-2xl">
+              <h2 className="text-4xl font-black mb-12 bg-gradient-to-r from-slate-900 to-gray-700 bg-clip-text text-transparent border-b pb-6">
+                📝 Apraksts
+              </h2>
+              <div className="text-xl leading-relaxed whitespace-pre-wrap text-gray-800 prose prose-lg max-w-none">
+                {sludinajums.description || 'Apraksts tiks pievienots.'}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
