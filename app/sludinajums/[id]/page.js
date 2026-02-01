@@ -28,32 +28,38 @@ export async function generateStaticParams() {
     .select('id')
     .eq('status', 'published');
 
-  return data?.map(({ id }) => ({
-    id: id.toString(),
-  })) || [];
+  return data?.map(({ id }) => ({ id: id.toString() })) || [];
 }
 
 export default async function SludinajumaLapa({ params }) {
   const { data: sludinajums, error } = await getSludinajums(params.id);
 
+  console.log('DEBUG DB data:', sludinajums); // Console log lai redzi URL
+
   if (error || !sludinajums) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-xl text-gray-500 p-8">
-        <h1>❌ Sludinājums nav atrasts</h1>
-        <pre className="bg-red-50 p-6 rounded-xl mt-4 text-sm border-2 border-red-200 max-w-2xl">
+      <div className="min-h-screen flex flex-col items-center justify-center p-8">
+        <h1 className="text-4xl font-bold text-red-600 mb-4">❌ Sludinājums nav atrasts</h1>
+        <pre className="bg-red-50 p-8 rounded-2xl border-2 border-red-200 max-w-4xl text-sm overflow-auto">
           {JSON.stringify({ error: error?.message, id: params.id }, null, 2)}
         </pre>
       </div>
     );
   }
 
-  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const getImageUrl = (path) => path ? `${SUPABASE_URL}/storage/v1/object/public/sludinajumi/${path}` : null;
+  // IZMANTO DB pilnos URL no images_public_urls kolonnas!
+  let imageUrls = [];
+  if (sludinajums.thumbnail_url) imageUrls.push(sludinajums.thumbnail_url);
+  if (sludinajums.images_public_urls) {
+    try {
+      imageUrls = [...imageUrls, ...JSON.parse(sludinajums.images_public_urls)];
+    } catch (e) {
+      console.log('JSON parse error:', e);
+    }
+  }
   
-  const imageUrls = [
-    getImageUrl(sludinajums.thumbnail_url),
-    ...(sludinajums.images ? JSON.parse(sludinajums.images || '[]').map(getImageUrl) : [])
-  ].filter(Boolean).slice(0, 8);
+  imageUrls = imageUrls.filter(Boolean).slice(0, 8);
+  console.log('DEBUG Images:', imageUrls); // Console log
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50 py-12 px-4">
@@ -68,28 +74,30 @@ export default async function SludinajumaLapa({ params }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {imageUrls.map((img, i) => (
-            <div key={i} className="group relative rounded-3xl overflow-hidden bg-gradient-to-br from-white/70 to-slate-50 shadow-xl hover:shadow-3xl hover:-translate-y-3 transition-all duration-500 border border-slate-100/50 backdrop-blur-sm">
-              <div className="relative w-full h-80 sm:h-96">
-                <Image
-                  src={img}
-                  alt={sludinajums.title}
-                  fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                  priority={i < 4}
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all p-6 flex items-end">
-                <div className="text-white font-bold text-xl drop-shadow-lg">
-                  📱 Pilnekrāns | 💻 4K
+          {imageUrls.length > 0 ? (
+            imageUrls.map((img, i) => (
+              <div key={i} className="group relative rounded-3xl overflow-hidden bg-gradient-to-br from-white/70 to-slate-50 shadow-xl hover:shadow-3xl hover:-translate-y-3 transition-all duration-500 border border-slate-100/50 backdrop-blur-sm">
+                <div className="relative w-full h-80 sm:h-96">
+                  <Image
+                    src={img}
+                    alt={`${sludinajums.title} - attēls ${i + 1}`}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    priority={i < 4}
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all p-6 flex items-end">
+                  <div className="text-white font-bold text-xl drop-shadow-2xl">
+                    📱 Pilnekrāns | 💻 Augsta izšķirtspēja
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-          {imageUrls.length === 0 && (
-            <div className="col-span-full text-center py-32 text-gray-400 text-2xl">
-              🖼️ Nav pievienotu attēlu
+            ))
+          ) : (
+            <div className="col-span-full text-center py-32 text-gray-400 text-2xl flex flex-col items-center gap-4">
+              <span className="text-6xl">🖼️</span>
+              <p>Nav pievienotu attēlu</p>
             </div>
           )}
         </div>
@@ -116,7 +124,7 @@ export default async function SludinajumaLapa({ params }) {
             📄 Pilns apraksts
           </h3>
           <div className="prose prose-xl max-w-none text-gray-800 leading-relaxed whitespace-pre-wrap text-lg">
-            {sludinajums.description}
+            {sludinajums.description || 'Nav apraksta'}
           </div>
         </div>
       </div>
