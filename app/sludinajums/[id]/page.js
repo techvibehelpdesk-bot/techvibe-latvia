@@ -1,79 +1,88 @@
 export default function SludinajumaLapa({ params }) {
-  // HARDCODE Audi A3 + bildes – TESTĒ dizainu
+  // HARDCODE + dizains kā screenshot (sidebar kreisē, hero pa labi)
   const sludinajums = {
     title: "Audi A3",
     price: "3000 €",
     city: "Rīga",
-    category: "Auto",
+    category: "Auto", 
     description: "Pilns apraksts šeit...",
     images: [
-      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&fit=crop",
-      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&fit=crop",
-      "https://images.unsplash.com/photo-1558618047-3c8c76ffe6f4?w=800&fit=crop"
+      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800",
+      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800",
+      "https://images.unsplash.com/photo-1558618047-3c8c76ffe6f4?w=800"
     ]
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50 py-12">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50 py-12 px-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-12 gap-12 items-start">
           
-          {/* INFO SIDEBAR */}
-          <div className="lg:sticky lg:top-24 self-start">
-            <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-10 shadow-2xl">
-              <h1 className="text-4xl lg:text-5xl font-black mb-8 bg-gradient-to-r from-gray-900 to-emerald-700 bg-clip-text text-transparent">
+          {/* INFO SIDEBAR KREISĒ - 4 kolonnas */}
+          <div className="lg:col-span-4">
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl sticky top-24 lg:top-32">
+              <h1 className="text-3xl lg:text-4xl font-black mb-6 text-gray-900 leading-tight">
                 {sludinajums.title}
               </h1>
-              <div className="text-6xl font-black text-emerald-600 mb-12">
+              
+              {/* HERO CENA */}
+              <div className="text-5xl lg:text-6xl font-black bg-gradient-to-r from-emerald-500 to-emerald-700 text-transparent bg-clip-text bg-white drop-shadow-2xl mb-12 py-4">
                 {sludinajums.price}
               </div>
-              
-              <div className="space-y-6 mb-12">
-                <div className="flex items-center gap-4 p-6 bg-emerald-50/80 rounded-3xl backdrop-blur-sm shadow-xl">
-                  <span className="w-16 h-16 bg-emerald-500 rounded-3xl flex items-center justify-center text-2xl font-bold text-white shadow-2xl">📍</span>
-                  <span className="text-2xl font-bold">{sludinajums.city}</span>
+
+              {/* INFO IKONIŅAS */}
+              <div className="space-y-4 mb-12">
+                <div className="flex items-center gap-4 p-4 bg-emerald-50/50 rounded-2xl backdrop-blur-sm border border-emerald-200">
+                  <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-lg">📍</div>
+                  <div className="font-semibold text-xl">{sludinajums.city}</div>
                 </div>
-                <div className="flex items-center gap-4 p-6 bg-blue-50/80 rounded-3xl backdrop-blur-sm shadow-xl">
-                  <span className="w-16 h-16 bg-blue-500 rounded-3xl flex items-center justify-center text-2xl font-bold text-white shadow-2xl">🏷️</span>
-                  <span className="text-2xl font-bold">{sludinajums.category}</span>
+                <div className="flex items-center gap-4 p-4 bg-blue-50/50 rounded-2xl backdrop-blur-sm border border-blue-200">
+                  <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-lg">🏷️</div>
+                  <div className="font-semibold text-xl">{sludinajums.category}</div>
+                </div>
+                <div className="flex items-center gap-4 p-4 bg-purple-50/50 rounded-2xl backdrop-blur-sm border border-purple-200 text-sm">
+                  <div className="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-lg">⭐</div>
+                  <div className="font-semibold">Nav bojājumu</div>
                 </div>
               </div>
 
-              <button className="w-full h-16 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold text-xl rounded-3xl shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 text-lg tracking-wide">
-                💬 Rakstīt pārdevējam
+              <button className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-4 px-8 rounded-2xl text-xl shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3">
+                💬 Sazināties
               </button>
             </div>
           </div>
 
-          {/* BILDES + APRKSTS */}
-          <div className="space-y-8">
+          {/* LABĀ - BILDES 8 kolonnas */}
+          <div className="lg:col-span-8 space-y-8">
             
-            {/* HERO BILDE */}
-            <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-3xl bg-gradient-to-r from-gray-200 to-gray-300 hover:shadow-4xl transition-all duration-500">
+            {/* GALVENĀ BILDE HERO */}
+            <div className="aspect-[16/9] bg-gradient-to-r from-gray-200/50 to-gray-300/50 rounded-3xl overflow-hidden shadow-2xl ring-2 ring-white/50 hover:shadow-3xl hover:ring-emerald-200 transition-all duration-500">
               <img 
                 src={sludinajums.images[0]} 
-                alt="Audi A3" 
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" 
+                alt={sludinajums.title}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-700 cursor-pointer" 
               />
             </div>
 
-            {/* GALERIJA */}
-            {sludinajums.images.length > 1 && (
-              <div className="grid grid-cols-3 lg:grid-cols-4 gap-4 p-6 bg-white/70 rounded-3xl backdrop-blur-xl shadow-2xl">
-                {sludinajums.images.slice(1).map((img, i) => (
-                  <div key={i} className="aspect-square rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-105 transition-all cursor-pointer group bg-gradient-to-br from-gray-100 to-gray-200">
-                    <img src={img} alt={`Bilde ${i+1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* MINI BILDES GALERIJA */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-6 bg-white/60 rounded-3xl backdrop-blur-xl shadow-xl ring-1 ring-white/30">
+              {sludinajums.images.slice(1).map((img, i) => (
+                <div key={i} className="aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-all cursor-pointer group relative bg-gradient-to-br from-gray-100 to-gray-200">
+                  <img 
+                    src={img} 
+                    alt={`Bilde ${i+1}`}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-400" 
+                  />
+                </div>
+              ))}
+            </div>
 
-            {/* APRKSTS */}
-            <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-12 shadow-3xl">
-              <h2 className="text-4xl font-black mb-12 bg-gradient-to-r from-slate-900 to-gray-700 bg-clip-text text-transparent pb-6 border-b-4 border-emerald-200">
+            {/* APRKSTS AP AKŠĀ */}
+            <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-12 shadow-3xl ring-1 ring-white/40">
+              <h2 className="text-4xl font-black mb-12 bg-gradient-to-r from-slate-900 to-emerald-800 bg-clip-text text-transparent pb-8 border-b-4 border-gradient-to-r border-emerald-200">
                 📝 Pilns apraksts
               </h2>
-              <div className="prose prose-2xl text-gray-800 leading-relaxed whitespace-pre-wrap text-xl">
+              <div className="prose prose-2xl text-gray-800 leading-relaxed whitespace-pre-wrap text-xl tracking-wide">
                 {sludinajums.description}
               </div>
             </div>
