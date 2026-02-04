@@ -9,23 +9,22 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// 🔥 PILNS 15 KATEGORIJU SARAKSTS NO SCREENSHOT
+// 🔥 TAVS PRECĪZIE 14 KATEGORIJAS NO IEPRIEKŠEJĀS ZIŅAS
 const categories = [
-  { id: 1, name: "📱 Telefoni un aksesuāri", value: "telefoni" },
-  { id: 2, name: "🚗 Auto, auto detaļas un aksesuāri ", value: "auto" },
-  { id: 3, name: "💻 Datori un programmatūra", value: "datori" },
-  { id: 4, name: "🛋️ Mēbeles un interjers", value: "mebeles" },
-  { id: 5, name: "⚽ Sporta preces", value: "sports" },
-  { id: 6, name: "💼 Darbs un bizness", value: "darbs" },
-  { id: 7, name: "🏍️ Moto un aksesuāri", value: "moto" },
-  { id: 8, name: "🚲 Velosipēdi", value: "velosipedi" },
-  { id: 9, name: "🏠 Dzīvokļi", value: "dzivokli" },
-  { id: 10, name: "🏘️ Mājas un zemes gabali", value: "majas" },
-  { id: 11, name: "🏗️ Būvmateriāli", value: "buvmateriali" },
-  { id: 12, name: "🔧 Pakalpojumi", value: "pakalpojumi" },
-  { id: 13, name: "👶 Bērniem", value: "berniem" },
-  { id: 14, name: "🌳 Dārzi un labiekārtojums", value: "dazi" },
-  { id: 15, name: "📦 Citi sludinājumi", value: "citi" },
+  "Auto",
+  "Moto transports", 
+  "Velosipēdi",
+  "Dzīvokļi",
+  "Mājas, Vasarnīcas",
+  "Mēbeles",
+  "Būvmateriāli",
+  "Telefoni",
+  "Datori",
+  "Sadzīves tehnika",
+  "Darbs & Vakances",
+  "Blakusdarbs",
+  "Bērniem",
+  "Dažādi"
 ];
 
 export default function IevietotSludinajumu() {
@@ -118,15 +117,20 @@ export default function IevietotSludinajumu() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* KATEGORIJAS - PILNS GRID */}
+              {/* KATEGORIJAS - TAVS 14 KATEGORIJU GRID */}
               <div className="p-6 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl border-2 border-dashed border-orange-200">
                 <label className="block text-xl font-bold mb-6 text-orange-900">Kategorija *</label>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {categories.map((cat) => (
-                    <label key={cat.id} className="group flex items-center p-6 border-2 border-gray-200 hover:border-orange-400 hover:bg-orange-50 rounded-2xl cursor-pointer transition-all hover:shadow-xl hover:scale-[1.02]">
-                      <span className="text-3xl mr-4 group-hover:scale-110 transition-transform">{cat.icon}</span>
-                      <span className="font-semibold text-lg">{cat.name}</span>
-                      <input type="radio" name="category" value={cat.value} className="ml-auto w-6 h-6 accent-orange-500" required />
+                  {categories.map((cat, index) => (
+                    <label key={index} className="group flex items-center justify-between p-6 border-2 border-gray-200 hover:border-orange-400 hover:bg-orange-50 rounded-2xl cursor-pointer transition-all hover:shadow-xl hover:scale-[1.02]">
+                      <span className="font-semibold text-lg">{cat}</span>
+                      <input 
+                        type="radio" 
+                        name="category" 
+                        value={cat.toLowerCase().replace(/[^a-zāčēģīķļņūōṷ\s]/g, '').replace(/\s+/g, '-')} 
+                        className="w-6 h-6 accent-orange-500" 
+                        required 
+                      />
                     </label>
                   ))}
                 </div>
