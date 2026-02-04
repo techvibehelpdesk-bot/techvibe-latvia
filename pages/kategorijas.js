@@ -39,7 +39,7 @@ export default function Kategorijas() {
         <div style={{maxWidth: '1400px', margin: '0 auto'}}>
           <div style={{textAlign: 'center', marginBottom: '3rem'}}>
             <h1 style={{fontSize: '3.5rem', fontWeight: 'bold', color: '#111827'}}>🏷️ Visas kategorijas</h1>
-            <p style={{fontSize: '1.375rem', color: '#6b7280'}}>Kā ss.com – izvēlies sadaļu Rīgas sludinājumiem</p>
+            <p style={{fontSize: '1.375rem', color: '#6b7280'}}>Izvēlies sadaļu savam sludinājumam</p>
           </div>
           
           <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem'}}>
