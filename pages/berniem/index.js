@@ -64,15 +64,15 @@ export default function BerniemPage() {
       <nav className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex space-x-8">
-            <Link href="/kategorijas" className="text-lg font-medium text-gray-700 hover:text-black">Best Sellers</Link>
-            <Link href="/veikals" className="text-lg font-medium text-gray-700 hover:text-black">Shop</Link>
-            <Link href="/blogs" className="text-lg font-medium text-gray-700 hover:text-black">Blog</Link>
-            <Link href="/faq" className="text-lg font-medium text-gray-700 hover:text-black">FAQ</Link>
+            <Link href="/kategorijas" className="text-lg font-medium text-gray-700 hover:text-black">Izceltie sludinājumi</Link>
+            <Link href="/veikals" className="text-lg font-medium text-gray-700 hover:text-black">Ievietotie izsolēs</Link>
+            <Link href="/blogs" className="text-lg font-medium text-gray-700 hover:text-black"></Link>
+            <Link href="/faq" className="text-lg font-medium text-gray-700 hover:text-black"></Link>
           </div>
           <div className="flex items-center space-x-4">
             <Link href="/iegūt-visus" className="text-sm font-medium text-blue-600 hover:text-blue-500">View all</Link>
             <button className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">
-              🛒
+              
             </button>
           </div>
         </div>
@@ -160,3 +160,4 @@ export default function BerniemPage() {
     </div>
   )
 }
+
