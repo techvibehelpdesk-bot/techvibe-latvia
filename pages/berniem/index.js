@@ -52,102 +52,111 @@ export default function BerniemPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100 flex items-center justify-center">
-        <div className="text-6xl">👶 Ielādē...</div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-4xl text-gray-500">Ielādē sludinājumus...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100 py-8 px-4 text-amber-800">
-      <div className="max-w-7xl mx-auto">
-        
-        {/* Header */}
-        <div className="text-center mb-16 relative">
-          <Link 
-            href="/kategorijas" 
-            className="absolute left-0 top-0 bg-white/20 backdrop-blur-sm text-amber-800 px-6 py-3 rounded-full font-semibold no-underline hover:bg-white/30 transition-all"
-          >
-            ← Atpakaļ kategorijās
-          </Link>
-          
-          <div className="text-7xl mb-4">👶</div>
-          <h1 className="text-5xl md:text-6xl font-black mb-4 drop-shadow-lg">
-            Bērniem sludinājumi
-          </h1>
-          <p className="text-2xl opacity-90">
-            Rotaļlietas • Apģērbs • {sludinajumi.length} sludinājumi Rīgā
-          </p>
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* Navbar */}
+      <nav className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex space-x-8">
+            <Link href="/kategorijas" className="text-lg font-medium text-gray-700 hover:text-black">Best Sellers</Link>
+            <Link href="/veikals" className="text-lg font-medium text-gray-700 hover:text-black">Shop</Link>
+            <Link href="/blogs" className="text-lg font-medium text-gray-700 hover:text-black">Blog</Link>
+            <Link href="/faq" className="text-lg font-medium text-gray-700 hover:text-black">FAQ</Link>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Link href="/iegūt-visus" className="text-sm font-medium text-blue-600 hover:text-blue-500">View all</Link>
+            <button className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">
+              🛒
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900">Bērniem sludinājumi</h1>
+          <p className="text-lg text-gray-600">{sludinajumi.length} atrasti</p>
         </div>
 
         {/* Filtrs */}
-        <div className="bg-white/15 backdrop-blur-xl rounded-3xl p-6 mb-12 flex flex-wrap items-center gap-4">
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-12 flex flex-wrap items-center gap-4 shadow-sm">
           <input 
-            placeholder="Meklēt bērniem (rotaļlietas, apģērbs...)" 
+            placeholder="Meklēt rotaļlietas, apģērbu..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 min-w-[300px] px-6 py-4 rounded-full border-none bg-white/90 text-lg placeholder-gray-600 focus:outline-none focus:ring-4 focus:ring-white/50 transition-all"
+            className="flex-1 px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
-          <select className="px-6 py-4 rounded-full border-none bg-white/90 text-lg">
+          <select className="px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg">
             <option>Jaunākie</option>
             <option>Cena augoša</option>
             <option>Cena dilstoša</option>
           </select>
           <Link 
             href="/ievietot?kategorija=berniem"
-            className="bg-white text-amber-800 px-10 py-4 rounded-full font-bold no-underline whitespace-nowrap hover:shadow-xl hover:scale-105 transition-all shadow-lg"
+            className="bg-green-600 text-white px-10 py-3 rounded-xl font-bold hover:bg-green-700 transition-all shadow-md"
           >
-            ➕ Ievietot sludinājumu
+            ➕ Ievietot
           </Link>
         </div>
 
-        {/* PRODUCT CARD GRID – VIENS DIZAINS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
-          {console.log('DEBUG map – count:', sludinajumi.length)}
+        {/* Product Grid – 4 kolonnas kā attēlā */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
           {sludinajumi.map((item) => {
-            const firstImage =
-              (item.image_public_urls && item.image_public_urls[0]) ||
-              'https://via.placeholder.com/300x200/FF6B35/white?text=No+Image';
+            const firstImage = (item.image_public_urls && item.image_public_urls[0]) || 'https://via.placeholder.com/300x200/FFF5EE/white?text=Bērniem';
+            const rating = 4.5; // Piemērs no attēla
 
             return (
-              <ProductCard
-                key={item.id}
-                imageUrl={firstImage}
-                price={item.price ? `${item.price.toLocaleString()}€` : 'Dāvanā'}
-                title={item.title || 'Bez nosaukuma'}
-                description={`${item.location || 'Rīga'} • Bērniem`}
-                buttonText="Apskatīt sludinājumu"
-              />
+              <div key={item.id} className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-gray-100">
+                <div className="p-6">
+                  <img src={firstImage} alt={item.title} className="w-full h-48 object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform" />
+                  <div className="flex items-center mb-2">
+                    <div className="flex text-yellow-400 text-sm mr-2">★★★★☆</div>
+                    <span className="text-sm text-gray-500">({Math.floor(Math.random()*10)} reviews)</span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2 line-clamp-2">{item.title || 'Bērnu prece'}</h3>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">{item.description?.slice(0,100) || `${item.location || 'Rīga'} • Bērniem`}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-gray-900">
+                      {item.price ? `${item.price.toLocaleString()}€` : 'Dāvanā'}
+                    </span>
+                    <Link 
+                      href={`/sludinajums/${item.id}`}
+                      className="bg-green-600 text-white px-6 py-2 rounded-xl font-bold text-sm hover:bg-green-700 transition-all shadow-md whitespace-nowrap"
+                    >
+                      Apskatīt
+                    </Link>
+                  </div>
+                </div>
+              </div>
             );
           })}
         </div>
 
-        {/* CTA – ja nav / ir sludinājumi */}
-        {sludinajumi.length === 0 && (
-          <div className="text-center mt-16 p-12 bg-white/10 rounded-3xl backdrop-blur-xl">
-            <div className="text-9xl mb-4">👶</div>
-            <h2 className="text-4xl mb-4 font-bold">Nav sludinājumu bērniem</h2>
-            <Link
-              href="/ievietot?kategorija=berniem"
-              className="bg-white text-amber-800 px-16 py-6 rounded-full text-2xl font-bold no-underline shadow-2xl hover:scale-105 transition-all"
-            >
-              ➕ Publicē savu pirmo – BEZ MAKSAS!
-            </Link>
-          </div>
-        )}
-
-        {sludinajumi.length > 0 && (
-          <div className="text-center mt-16 p-12 bg-white/10 rounded-3xl backdrop-blur-xl">
-            <h2 className="text-4xl mb-4 font-bold">Publicēt savu sludinājumu!</h2>
-            <Link
-              href="/ievietot?kategorija=berniem"
-              className="bg-white text-amber-800 px-16 py-6 rounded-full text-2xl font-bold no-underline shadow-2xl hover:scale-105 transition-all"
-            >
-              ➕ Publicēt tagad – BEZ MAKSAS!
-            </Link>
-          </div>
-        )}
+        {/* CTA */}
+        <div className="text-center p-12 bg-gray-50 rounded-2xl border border-gray-200">
+          <h2 className="text-3xl font-bold mb-6">Nav atrada? Publicē pats!</h2>
+          <Link
+            href="/ievietot?kategorija=berniem"
+            className="bg-green-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:shadow-xl hover:bg-green-700 transition-all"
+          >
+            ➕ Publicēt bez maksas
+          </Link>
+        </div>
       </div>
+
+      {/* Footer – kā attēlā */}
+      <footer className="bg-gray-900 text-white py-8 mt-16 border-t border-gray-800">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p>&copy; 2026 TekVibe. Visas tiesības aizsargātas.</p>
+        </div>
+      </footer>
     </div>
   )
 }
