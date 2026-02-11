@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import ProductCard from '@/components/ProductCard'  // ← PIEVIENOTS
+import ProductCard from '../../components/ProductCard';  // ← LABOJUMS Pages Router
 
 export default function BerniemPage() {
   const [sludinajumi, setSludinajumi] = useState([])
@@ -73,7 +73,7 @@ export default function BerniemPage() {
             Bērniem sludinājumi
           </h1>
           <p className="text-2xl opacity-90">
-            RotaļliJas • Apģērbs • {sludinajumi.length} sludinājumi Rīgā
+            Rotaļlietas • Apģērbs • {sludinajumi.length} sludinājumi Rīgā
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export default function BerniemPage() {
           </Link>
         </div>
 
-        {/* PRODUCT CARDS GRID ← JAUNS DIZAINS */}
+        {/* PRODUCT CARDS ← VIENS DIZAINS VISIEM */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
           {sludinajumi.map((item) => {
             const firstImage = item.image_public_urls?.[0] || 'https://via.placeholder.com/300x200/FF6B35/white?text=No+Image';
