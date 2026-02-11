@@ -22,7 +22,7 @@ export default function KategorijaPage() {
       stavoklis: ["Jauns", "Lietots", "Detalās", "Cits", "Īrē/Iznomā", "Atdot par brīvu"],
     },
     auto: {
-      nosaukums: "Auto un moto",
+      nosaukums: "Auto",
       skaits: "2 567",
       sludinajumi: [
         { id: 1, virsraksts: "VW Golf 2019 1.5 TSI", cena: "12 500€", datums: "Šodien", zīmols: "VW" },
