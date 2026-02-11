@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import ProductCard from '../../components/ProductCard';  // ← LABOJUMS Pages Router
+import ProductCard from '../../components/ProductCard';
 
 export default function BerniemPage() {
   const [sludinajumi, setSludinajumi] = useState([])
@@ -42,6 +42,7 @@ export default function BerniemPage() {
       }
       
       setSludinajumi(filtered)
+      console.log('DEBUG berniem – sludinajumi:', filtered.length, filtered[0])
     } catch (err) {
       console.error('Error:', err)
     } finally {
@@ -49,11 +50,13 @@ export default function BerniemPage() {
     }
   }
 
-  if (loading) return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100 flex items-center justify-center">
-      <div className="text-6xl">👶 Ielādē...</div>
-    </div>
-  )
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100 flex items-center justify-center">
+        <div className="text-6xl">👶 Ielādē...</div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100 py-8 px-4 text-amber-800">
@@ -98,17 +101,20 @@ export default function BerniemPage() {
           </Link>
         </div>
 
-        {/* PRODUCT CARDS ← VIENS DIZAINS VISIEM */}
+        {/* PRODUCT CARD GRID – VIENS DIZAINS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+          {console.log('DEBUG map – count:', sludinajumi.length)}
           {sludinajumi.map((item) => {
-            const firstImage = item.image_public_urls?.[0] || 'https://via.placeholder.com/300x200/FF6B35/white?text=No+Image';
-            
+            const firstImage =
+              (item.image_public_urls && item.image_public_urls[0]) ||
+              'https://via.placeholder.com/300x200/FF6B35/white?text=No+Image';
+
             return (
-              <ProductCard 
+              <ProductCard
                 key={item.id}
                 imageUrl={firstImage}
                 price={item.price ? `${item.price.toLocaleString()}€` : 'Dāvanā'}
-                title={item.title}
+                title={item.title || 'Bez nosaukuma'}
                 description={`${item.location || 'Rīga'} • Bērniem`}
                 buttonText="Apskatīt sludinājumu"
               />
@@ -116,12 +122,12 @@ export default function BerniemPage() {
           })}
         </div>
 
-        {/* CTA */}
+        {/* CTA – ja nav / ir sludinājumi */}
         {sludinajumi.length === 0 && (
           <div className="text-center mt-16 p-12 bg-white/10 rounded-3xl backdrop-blur-xl">
             <div className="text-9xl mb-4">👶</div>
             <h2 className="text-4xl mb-4 font-bold">Nav sludinājumu bērniem</h2>
-            <Link 
+            <Link
               href="/ievietot?kategorija=berniem"
               className="bg-white text-amber-800 px-16 py-6 rounded-full text-2xl font-bold no-underline shadow-2xl hover:scale-105 transition-all"
             >
@@ -133,7 +139,7 @@ export default function BerniemPage() {
         {sludinajumi.length > 0 && (
           <div className="text-center mt-16 p-12 bg-white/10 rounded-3xl backdrop-blur-xl">
             <h2 className="text-4xl mb-4 font-bold">Publicēt savu sludinājumu!</h2>
-            <Link 
+            <Link
               href="/ievietot?kategorija=berniem"
               className="bg-white text-amber-800 px-16 py-6 rounded-full text-2xl font-bold no-underline shadow-2xl hover:scale-105 transition-all"
             >
