@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import ProductCard from '../../components/ProductCard';
+// import ProductCard from '../../components/ProductCard'; // Izņem, jo tagad inline cards
 
 export default function BerniemPage() {
   const [sludinajumi, setSludinajumi] = useState([])
@@ -66,13 +66,13 @@ export default function BerniemPage() {
           <div className="flex space-x-8">
             <Link href="/kategorijas" className="text-lg font-medium text-gray-700 hover:text-black">Izceltie sludinājumi</Link>
             <Link href="/veikals" className="text-lg font-medium text-gray-700 hover:text-black">Ievietotie izsolēs</Link>
-            <Link href="/blogs" className="text-lg font-medium text-gray-700 hover:text-black"></Link>
-            <Link href="/faq" className="text-lg font-medium text-gray-700 hover:text-black"></Link>
+            <Link href="/blogs" className="text-lg font-medium text-gray-700 hover:text-black">Blogs</Link>
+            <Link href="/faq" className="text-lg font-medium text-gray-700 hover:text-black">FAQ</Link>
           </div>
           <div className="flex items-center space-x-4">
             <Link href="/iegūt-visus" className="text-sm font-medium text-blue-600 hover:text-blue-500">View all</Link>
             <button className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200">
-              
+              🛒
             </button>
           </div>
         </div>
@@ -106,11 +106,10 @@ export default function BerniemPage() {
           </Link>
         </div>
 
-        {/* Product Grid – 4 kolonnas kā attēlā */}
+        {/* Product Grid AR SIZIŅAS POGU */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
           {sludinajumi.map((item) => {
             const firstImage = (item.image_public_urls && item.image_public_urls[0]) || 'https://via.placeholder.com/300x200/FFF5EE/white?text=Bērniem';
-            const rating = 4.5; // Piemērs no attēla
 
             return (
               <div key={item.id} className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-gray-100">
@@ -118,20 +117,35 @@ export default function BerniemPage() {
                   <img src={firstImage} alt={item.title} className="w-full h-48 object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform" />
                   <div className="flex items-center mb-2">
                     <div className="flex text-yellow-400 text-sm mr-2">★★★★☆</div>
-                    <span className="text-sm text-gray-500">({Math.floor(Math.random()*10)} reviews)</span>
+                    <span className="text-sm text-gray-500">(12 reviews)</span>
                   </div>
                   <h3 className="font-bold text-lg mb-2 line-clamp-2">{item.title || 'Bērnu prece'}</h3>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">{item.description?.slice(0,100) || `${item.location || 'Rīga'} • Bērniem`}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-gray-900">
-                      {item.price ? `${item.price.toLocaleString()}€` : 'Dāvanā'}
-                    </span>
-                    <Link 
-                      href={`/sludinajums/${item.id}`}
-                      className="bg-green-600 text-white px-6 py-2 rounded-xl font-bold text-sm hover:bg-green-700 transition-all shadow-md whitespace-nowrap"
-                    >
-                      Apskatīt
-                    </Link>
+                  <p className="text-gray-600 text-sm mb-6 line-clamp-2">{item.description?.slice(0,100) || `${item.location || 'Rīga'} • Bērniem`}</p>
+                  
+                  {/* CENA UN POGAS */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-gray-900">
+                        {item.price ? `${item.price.toLocaleString()}€` : 'Dāvanā'}
+                      </span>
+                    </div>
+                    <div className="flex space-x-2 pt-2">
+                      <Link 
+                        href={`/sludinajums/${item.id}`}
+                        className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all text-center shadow-md"
+                      >
+                        👁️ Apskatīt
+                      </Link>
+                      <button 
+                        onClick={() => {
+                          const sellerEmail = item.seller_email || 'info@tekvibe.lv';
+                          window.open(`mailto:${sellerEmail}?subject=Par sludinājumu: ${item.title}&body=Labdien! Interesējos par jūsu sludinājumu.`, '_blank');
+                        }} 
+                        className="flex-1 bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-md"
+                      >
+                        💬 Sazināties
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -151,7 +165,7 @@ export default function BerniemPage() {
         </div>
       </div>
 
-      {/* Footer – kā attēlā */}
+      {/* Footer */}
       <footer className="bg-gray-900 text-white py-8 mt-16 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <p>&copy; 2026 TekVibe. Visas tiesības aizsargātas.</p>
@@ -160,5 +174,3 @@ export default function BerniemPage() {
     </div>
   )
 }
-
-
