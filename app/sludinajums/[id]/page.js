@@ -9,6 +9,11 @@ export default function SludinajumaLapa({ params, searchParams }) {
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const [fullscreenIndex, setFullscreenIndex] = useState(0);
 
+  // JAUNIE STATE MODALAM
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [messageType, setMessageType] = useState('comment');
+  const [messageText, setMessageText] = useState('');
+
   useEffect(() => {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -60,6 +65,30 @@ export default function SludinajumaLapa({ params, searchParams }) {
     setCurrentImage((currentIdx + 1) % images.length);
   };
 
+  // SŪTĪT ZIŅU SUPABASE
+  const sendMessage = async () => {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    );
+
+    const { error } = await supabase
+      .from('comments')
+      .insert({
+        sludinajums_id: params.id,
+        type: messageType,
+        comment: messageText,
+        user_email: 'client@test.lv' // Vēlāk nomaini pret īsto user email
+      });
+
+    if (!error) {
+      setMessageText('');
+      alert('✅ Ziņa nosūtīta pārdevējam!');
+    } else {
+      alert('❌ Kļūda: ' + error.message);
+    }
+  };
+
   // KEYBOARD HANDLER
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -84,7 +113,7 @@ export default function SludinajumaLapa({ params, searchParams }) {
         
         {/* KREISĀ - ATTĒLI */}
         <div>
-          {/* HERO SLIDER - AR FULLSCREEN */}
+          {/* HERO SLIDER */}
           <div 
             style={{position: 'relative', height: '280px', marginBottom: '8px', borderRadius: '12px 12px 0 0', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', background: '#f0f0f0', cursor: 'pointer'}}
             onClick={(e) => handleHeroClick(e, currentImage)}
@@ -178,11 +207,21 @@ export default function SludinajumaLapa({ params, searchParams }) {
             </div>
           </div>
 
+          {/* CENAS DAĻA AR SAZINĀTIES */}
           <div style={{background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', padding: '32px', borderRadius: '16px', textAlign: 'center', boxShadow: '0 16px 32px rgba(16,185,129,0.3)'}}>
             <h1 style={{fontSize: '3.5rem', fontWeight: 900, marginBottom: '12px'}}>{sludinajums?.price} €</h1>
-            <button style={{background: 'rgba(255,255,255,0.95)', color: '#059669', padding: '16px 48px', fontSize: '1.2rem', fontWeight: 800, borderRadius: '12px', border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,0.2)', textTransform: 'uppercase'}}>
-              📞 Zvanīt +371 29 *** ***
-            </button>
+            <div style={{display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap'}}>
+              <button style={{background: 'rgba(255,255,255,0.95)', color: '#059669', padding: '16px 48px', fontSize: '1.2rem', fontWeight: 800, borderRadius: '12px', border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,0.2)', textTransform: 'uppercase'}}>
+                📞 Zvanīt +371 29 *** ***
+              </button>
+              <button 
+                type="button"
+                style={{background: 'rgba(59,130,246,0.95)', color: 'white', padding: '16px 32px', fontSize: '1.1rem', fontWeight: 700, borderRadius: '12px', border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(59,130,246,0.3)', textTransform: 'uppercase'}}
+                onClick={() => setIsChatOpen(true)}
+              >
+                💬 Sazināties
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -198,7 +237,6 @@ export default function SludinajumaLapa({ params, searchParams }) {
           onClick={closeFullscreen}
         >
           <div style={{position: 'relative', width: '90vw', height: '90vh', display: 'flex'}}>
-            {/* IEPRIEKŠĒJA BULTA */}
             <button 
               onClick={(e) => {e.stopPropagation(); prevImageFullscreen();}}
               style={{
@@ -214,7 +252,6 @@ export default function SludinajumaLapa({ params, searchParams }) {
               alt="Fullscreen"
             />
             
-            {/* NĀKAMĀ BULTA */}
             <button 
               onClick={(e) => {e.stopPropagation(); nextImageFullscreen();}}
               style={{
@@ -224,13 +261,85 @@ export default function SludinajumaLapa({ params, searchParams }) {
               }}
             >›</button>
             
-            {/* COUNTER */}
             <div style={{
               position: 'absolute', bottom: '30px', left: '50%', transform: 'translateX(-50%)',
               background: 'rgba(0,0,0,0.7)', color: 'white', padding: '12px 24px', borderRadius: '30px',
               fontSize: '1.2rem', fontWeight: 'bold', backdropFilter: 'blur(10px)'
             }}>
               {fullscreenIndex + 1} / {images.length}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SAZINĀTIES CHAT MODALIS */}
+      {isChatOpen && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.6)', zIndex: 1000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+        }}>
+          <div style={{
+            background: 'white', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '500px',
+            maxHeight: '80vh', overflowY: 'auto', boxShadow: '0 25px 50px rgba(0,0,0,0.25)'
+          }}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px'}}>
+              <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937'}}>
+                💬 Sazinies ar pārdevēju
+              </h2>
+              <button 
+                onClick={() => setIsChatOpen(false)}
+                style={{fontSize: '24px', background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280'}}
+              >
+                ×
+              </button>
+            </div>
+
+            <select 
+              value={messageType} 
+              onChange={(e) => setMessageType(e.target.value)}
+              style={{width: '100%', padding: '12px', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '16px', marginBottom: '16px'}}
+            >
+              <option value="comment">📝 Komentārs</option>
+              <option value="price_offer">💰 Kaulēt cenu</option>
+              <option value="request_photos">🖼️ Vēl bildes</option>
+              <option value="question">❓ Jautājums</option>
+            </select>
+
+            <textarea
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder="Raksti ziņu pārdevējam..."
+              style={{
+                width: '100%', height: '120px', padding: '16px', border: '2px solid #e5e7eb',
+                borderRadius: '8px', fontSize: '16px', fontFamily: 'inherit', resize: 'vertical',
+                marginBottom: '20px'
+              }}
+            />
+
+            <div style={{display: 'flex', gap: '12px'}}>
+              <button
+                type="button"
+                onClick={sendMessage}
+                disabled={!messageText.trim()}
+                style={{
+                  flex: 1, background: '#3b82f6', color: 'white', padding: '14px', borderRadius: '8px',
+                  border: 'none', fontSize: '16px', fontWeight: '600', cursor: messageText.trim() ? 'pointer' : 'not-allowed',
+                  opacity: messageText.trim() ? 1 : 0.6
+                }}
+              >
+                🚀 Nosūtīt ziņu
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsChatOpen(false)}
+                style={{
+                  flex: 1, background: '#6b7280', color: 'white', padding: '14px', borderRadius: '8px',
+                  border: 'none', fontSize: '16px', fontWeight: '600', cursor: 'pointer'
+                }}
+              >
+                ❌ Atcelt
+              </button>
             </div>
           </div>
         </div>
