@@ -2,12 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-// import ProductCard from '../../components/ProductCard'; // Izņem, jo tagad inline cards
+import { createClient } from '@supabase/supabase-js'
 
 export default function BerniemPage() {
   const [sludinajumi, setSludinajumi] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+
+  // MODAL STATE KATRAI POGAI
+  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [currentSludinajumsId, setCurrentSludinajumsId] = useState('')
+  const [currentSludinajumsTitle, setCurrentSludinajumsTitle] = useState('')
+  const [messageType, setMessageType] = useState('comment')
+  const [messageText, setMessageText] = useState('')
 
   useEffect(() => {
     fetchData()
@@ -47,6 +54,37 @@ export default function BerniemPage() {
       console.error('Error:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // ATVER MODAL konkrētam sludinājumam
+  const openChat = (id, title) => {
+    setCurrentSludinajumsId(id)
+    setCurrentSludinajumsTitle(title)
+    setIsChatOpen(true)
+  }
+
+  // SŪTĪT ZIŅU UZ SUPABASE
+  const sendMessage = async () => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const { error } = await supabase
+      .from('comments')
+      .insert({
+        sludinajums_id: currentSludinajumsId,
+        type: messageType,
+        comment: messageText,
+        user_email: 'client@test.lv' // Vēlāk no auth
+      })
+
+    if (!error) {
+      setMessageText('')
+      setIsChatOpen(false)
+      alert(`✅ Ziņa par "${currentSludinajumsTitle}" nosūtīta pārdevējam!`)
+    } else {
+      alert('❌ Kļūda: ' + error.message)
     }
   }
 
@@ -106,7 +144,7 @@ export default function BerniemPage() {
           </Link>
         </div>
 
-        {/* Product Grid AR SIZIŅAS POGU */}
+        {/* Product Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
           {sludinajumi.map((item) => {
             const firstImage = (item.image_public_urls && item.image_public_urls[0]) || 'https://via.placeholder.com/300x200/FFF5EE/white?text=Bērniem';
@@ -136,12 +174,12 @@ export default function BerniemPage() {
                       >
                         👁️ Apskatīt
                       </Link>
+                      
+                      {/* JAUNA SAZINĀTIES POGA AR MODAL */}
                       <button 
-                        onClick={() => {
-                          const sellerEmail = item.seller_email || 'info@tekvibe.lv';
-                          window.open(`mailto:${sellerEmail}?subject=Par sludinājumu: ${item.title}&body=Labdien! Interesējos par jūsu sludinājumu.`, '_blank');
-                        }} 
-                        className="flex-1 bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-md"
+                        type="button"
+                        onClick={() => openChat(item.id, item.title)}
+                        className="flex-1 bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-md flex items-center justify-center"
                       >
                         💬 Sazināties
                       </button>
@@ -171,6 +209,65 @@ export default function BerniemPage() {
           <p>&copy; 2026 TekVibe. Visas tiesības aizsargātas.</p>
         </div>
       </footer>
+
+      {/* SAZINĀTIES MODAL - PARĀDĀS UZ katras mazās pogas */}
+      {isChatOpen && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl border-4 border-emerald-100">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-800">
+                💬 Ziņa par: <span className="text-emerald-600">"{currentSludinajumsTitle}"</span>
+              </h2>
+              <button 
+                onClick={() => setIsChatOpen(false)}
+                className="text-3xl font-bold text-gray-500 hover:text-gray-700 p-2 -m-2 rounded-full hover:bg-gray-100"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* FILTŅI */}
+            <select 
+              value={messageType} 
+              onChange={(e) => setMessageType(e.target.value)}
+              className="w-full p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 bg-gray-50"
+            >
+              <option value="comment">📝 Komentārs</option>
+              <option value="price_offer">💰 Kaulēt cenu</option>
+              <option value="request_photos">🖼️ Vēl bildes</option>
+              <option value="question">❓ Jautājums</option>
+            </select>
+
+            {/* ZIŅAS LAUKS */}
+            <textarea
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder={`Sveiks! Interesējos par "${currentSludinajumsTitle}". ...`}
+              className="w-full h-32 p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 resize-vertical focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 bg-gray-50"
+              rows={4}
+            />
+
+            {/* POGAS */}
+            <div className="flex gap-4 pt-2">
+              <button
+                type="button"
+                onClick={sendMessage}
+                disabled={!messageText.trim()}
+                className="flex-1 bg-emerald-600 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-emerald-200"
+              >
+                🚀 Nosūtīt ziņu
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsChatOpen(false)}
+                className="flex-1 bg-gray-500 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-gray-600 transition-all shadow-lg focus:outline-none focus:ring-4 focus:ring-gray-200"
+              >
+                ❌ Atcelt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
