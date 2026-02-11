@@ -141,7 +141,7 @@ export default function BerniemPage() {
 
         {/* CTA */}
         <div className="text-center p-12 bg-gray-50 rounded-2xl border border-gray-200">
-          <h2 className="text-3xl font-bold mb-6">Nav atrada? Publicē pats!</h2>
+          <h2 className="text-3xl font-bold mb-6">Vēlies pārdot? Publicē pats!</h2>
           <Link
             href="/ievietot?kategorija=berniem"
             className="bg-green-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:shadow-xl hover:bg-green-700 transition-all"
@@ -160,4 +160,5 @@ export default function BerniemPage() {
     </div>
   )
 }
+
 
