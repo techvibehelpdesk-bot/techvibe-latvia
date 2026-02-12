@@ -9,7 +9,6 @@ export default function BlakusdarbsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
-  // CHAT MODAL
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [currentSludinajumsId, setCurrentSludinajumsId] = useState('')
   const [currentSludinajumsTitle, setCurrentSludinajumsTitle] = useState('')
@@ -49,7 +48,6 @@ export default function BlakusdarbsPage() {
       }
       
       setSludinajumi(filtered)
-      console.log('📋 BLAKUSDARBS OK:', filtered.length)
     } catch (err) {
       console.error('Blakusdarbs Error:', err)
     } finally {
@@ -83,7 +81,7 @@ export default function BlakusdarbsPage() {
       if (!error) {
         setMessageText('')
         setIsChatOpen(false)
-        alert(`✅ Ziņa par "${currentSludinajumsTitle}" nosūtīta!`)
+        alert(`✅ Ziņa nosūtīta!`)
       } else {
         alert('❌ Kļūda: ' + error.message)
       }
@@ -94,25 +92,25 @@ export default function BlakusdarbsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-        <div className="text-4xl text-white animate-pulse">Ielādē blakusdarbus...</div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-4xl text-gray-500 animate-pulse">Ielādē blakusdarbus...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-400 to-emerald-600 text-white">
-      {/* NAVIGĀCIJA */}
-      <nav className="bg-white/20 backdrop-blur-xl border-b border-white/20 px-6 py-6 shadow-lg">
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* NAVIGĀCIJA - IDENTISKA test-auto */}
+      <nav className="bg-white border-b border-gray-200 px-6 py-6 shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-center">
-          <div className="flex items-center gap-2 px-8 py-3 bg-white/30 border border-white/30 rounded-2xl shadow-xl backdrop-blur-sm">
-            <Link href="/kategorijas" className="text-lg font-semibold hover:text-emerald-200">
+          <div className="flex items-center gap-2 px-8 py-3 bg-gray-50 border border-gray-200 rounded-2xl shadow-md">
+            <Link href="/kategorijas" className="text-lg font-semibold text-gray-700 hover:text-gray-900">
               ← Visas kategorijas
             </Link>
-            <div className="w-px h-6 bg-white/50 mx-4"></div>
-            <span className="text-2xl font-bold text-white drop-shadow-lg">📋 Blakusdarbs</span>
-            <div className="w-px h-6 bg-white/50 mx-4"></div>
-            <Link href="/test-auto" className="text-lg font-semibold hover:text-emerald-200">
+            <div className="w-px h-6 bg-gray-300 mx-4"></div>
+            <span className="text-2xl font-bold text-blue-600">📋 Blakusdarbs</span>
+            <div className="w-px h-6 bg-gray-300 mx-4"></div>
+            <Link href="/test-auto" className="text-lg font-semibold text-gray-700 hover:text-gray-900">
               🚗 Auto →
             </Link>
           </div>
@@ -121,82 +119,74 @@ export default function BlakusdarbsPage() {
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex justify-between items-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold drop-shadow-lg">📋 Blakusdarbs</h1>
-          <p className="text-2xl drop-shadow-lg">{sludinajumi.length} atrasti</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">📋 Blakusdarbs</h1>
+          <p className="text-2xl text-gray-600">{sludinajumi.length} atrasti</p>
         </div>
 
-        {/* MEKĻĒŠANA */}
-        <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-3xl p-6 mb-12 flex flex-wrap items-center gap-4 shadow-2xl">
+        {/* MEKĻĒŠANA - IDENTISKA */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-12 flex flex-wrap items-center gap-4 shadow-sm">
           <input 
             placeholder="Meklēt React, dizainu, SEO..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 px-6 py-4 rounded-2xl border border-white/30 bg-white/50 text-lg placeholder-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/50"
+            className="flex-1 px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
-          <select className="px-6 py-4 rounded-2xl border border-white/30 bg-white/50 text-lg backdrop-blur-sm">
+          <select className="px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg">
             <option>Jaunākie</option>
             <option>Stundā augoša</option>
             <option>Stundā dilstoša</option>
           </select>
           <Link 
             href="/ievietot?kategorija=blakusdarbs"
-            className="bg-white text-emerald-600 px-10 py-4 rounded-2xl font-bold hover:bg-emerald-50 transition-all shadow-xl hover:shadow-2xl text-lg"
+            className="bg-blue-600 text-white px-10 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md"
           >
-            ➕ Piedāvāt
+            ➕ Ievietot
           </Link>
         </div>
 
-        {/* GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        {/* GRID - IDENTISKS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
           {sludinajumi.map((item) => {
             const firstImage = (item.image_public_urls && item.image_public_urls[0]) || 
-                              'https://images.unsplash.com/photo-1516321310764-b4a77b4d4fd7?w=400&auto=format&fit=crop';
+                              'https://via.placeholder.com/300x200/f8f9fa/6c757d?text=📋+Blakusdarbs';
 
             return (
-              <div key={item.id} className="group bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all border border-white/50 hover:-translate-y-2">
-                <div className="relative h-52 overflow-hidden">
+              <div key={item.id} className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-gray-100">
+                <div className="p-6">
                   <img 
                     src={firstImage} 
                     alt={item.title} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-48 object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform" 
                   />
-                  <div className="absolute top-4 right-4 bg-emerald-500/90 text-white px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm">
-                    Freelance
-                  </div>
-                </div>
-                <div className="p-8">
-                  <div className="flex items-center mb-4">
+                  <div className="flex items-center mb-2">
                     <div className="flex text-yellow-400 text-sm mr-2">★★★★☆</div>
-                    <span className="text-sm text-gray-600">(12 reviews)</span>
+                    <span className="text-sm text-gray-500">(12 reviews)</span>
                   </div>
-                  <h3 className="font-bold text-xl mb-3 line-clamp-2 leading-tight">{item.title || 'Blakusdarbs'}</h3>
-                  <p className="text-gray-700 text-sm mb-6 line-clamp-2">{item.description?.slice(0,100)}</p>
+                  <h3 className="font-bold text-lg mb-2 line-clamp-2">{item.title || 'Blakusdarbs'}</h3>
+                  <p className="text-gray-600 text-sm mb-6 line-clamp-2">
+                    {item.description?.slice(0,100) || `${item.location || 'Rīga'} • Blakusdarbs`}
+                  </p>
                   
-                  <div className="space-y-4 mb-6">
+                  <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-emerald-600 drop-shadow-lg">
+                      <span className="text-2xl font-bold text-gray-900">
                         {item.price ? `${item.price.toLocaleString()}€` : 'Dāvanā'}
                       </span>
-                      <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">
-                        {item.location || 'Rīga'}
-                      </span>
                     </div>
-                    <p className="text-sm text-gray-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : 'Jauns'}</p>
-                  </div>
-                  
-                  <div className="flex space-x-3">
-                    <Link 
-                      href={`/sludinajums/${item.id}`}
-                      className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg text-center"
-                    >
-                      👁️ Apskatīt
-                    </Link>
-                    <button 
-                      onClick={() => openChat(item.id, item.title)}
-                      className="flex-1 bg-emerald-600 text-white py-3 px-4 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-lg flex items-center justify-center"
-                    >
-                      💬 Sazināties
-                    </button>
+                    <div className="flex space-x-2 pt-2">
+                      <Link 
+                        href={`/sludinajums/${item.id}`}
+                        className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all text-center shadow-md"
+                      >
+                        👁️ Apskatīt
+                      </Link>
+                      <button 
+                        onClick={() => openChat(item.id, item.title)}
+                        className="flex-1 bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-green-700 transition-all shadow-md flex items-center justify-center"
+                      >
+                        💬 Sazināties
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -207,36 +197,36 @@ export default function BlakusdarbsPage() {
         {sludinajumi.length === 0 && (
           <div className="text-center py-24">
             <div className="text-6xl mb-8">📋</div>
-            <h2 className="text-3xl font-bold mb-4 drop-shadow-lg">Nav blakusdarbu</h2>
-            <Link href="/ievietot?kategorija=blakusdarbs" className="bg-white text-emerald-600 px-12 py-4 rounded-2xl text-xl font-bold shadow-xl hover:shadow-2xl">
-              Būt pirmais!
+            <h2 className="text-3xl font-bold mb-4">Nav blakusdarbu</h2>
+            <Link href="/ievietot?kategorija=blakusdarbs" className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:bg-blue-700">
+              ➕ Būt pirmais!
             </Link>
           </div>
         )}
 
-        {/* CTA */}
-        <div className="text-center p-16 bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl">
-          <h2 className="text-4xl font-bold mb-8 drop-shadow-lg">Piedāvā savu blakusdarbu!</h2>
+        {/* CTA - IDENTISKS */}
+        <div className="text-center p-12 bg-gray-50 rounded-2xl border border-gray-200">
+          <h2 className="text-3xl font-bold mb-6">Piedāvā savu blakusdarbu!</h2>
           <Link
             href="/ievietot?kategorija=blakusdarbs"
-            className="bg-white text-emerald-600 px-16 py-6 rounded-3xl text-2xl font-bold shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all inline-block"
+            className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all"
           >
             ➕ Publicēt bez maksas
           </Link>
         </div>
       </div>
 
-      {/* CHAT MODAL */}
+      {/* MODAL - IDENTISKS */}
       {isChatOpen && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-          <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-8 w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl border-4 border-emerald-200">
-            <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl border-4 border-green-100">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
               <h2 className="text-2xl font-bold text-gray-800">
-                💬 Ziņa par: <span className="text-emerald-600">"{currentSludinajumsTitle}"</span>
+                💬 Ziņa par: <span className="text-green-600">"{currentSludinajumsTitle}"</span>
               </h2>
               <button 
                 onClick={() => setIsChatOpen(false)}
-                className="text-3xl font-bold text-gray-500 hover:text-gray-700 p-2 -m-2 rounded-2xl hover:bg-gray-100"
+                className="text-3xl font-bold text-gray-500 hover:text-gray-700 p-2 -m-2 rounded-full hover:bg-gray-100"
               >
                 ×
               </button>
@@ -245,10 +235,11 @@ export default function BlakusdarbsPage() {
             <select 
               value={messageType} 
               onChange={(e) => setMessageType(e.target.value)}
-              className="w-full p-4 border-2 border-gray-200 rounded-2xl text-lg mb-6 focus:outline-none focus:border-emerald-500 bg-gray-50"
+              className="w-full p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-gray-50"
             >
               <option value="comment">📝 Komentārs</option>
               <option value="price_offer">💰 Kaulēt cenu</option>
+              <option value="request_photos">🖼️ Vēl bildes</option>
               <option value="question">❓ Jautājums</option>
             </select>
 
@@ -256,20 +247,21 @@ export default function BlakusdarbsPage() {
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
               placeholder={`Sveiks! Interesējos par "${currentSludinajumsTitle}". ...`}
-              className="w-full h-32 p-4 border-2 border-gray-200 rounded-2xl text-lg mb-8 resize-vertical focus:outline-none focus:border-emerald-500 bg-gray-50"
+              className="w-full h-32 p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 resize-vertical focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-gray-50"
+              rows={4}
             />
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 pt-2">
               <button
                 onClick={sendMessage}
                 disabled={!messageText.trim()}
-                className="flex-1 bg-emerald-600 text-white py-4 px-6 rounded-2xl text-lg font-bold hover:bg-emerald-700 disabled:opacity-50 transition-all shadow-xl"
+                className="flex-1 bg-green-600 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-green-200"
               >
-                🚀 Nosūtīt
+                🚀 Nosūtīt ziņu
               </button>
               <button
                 onClick={() => setIsChatOpen(false)}
-                className="flex-1 bg-gray-400 text-white py-4 px-6 rounded-2xl text-lg font-bold hover:bg-gray-500 transition-all shadow-xl"
+                className="flex-1 bg-gray-500 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-gray-600 transition-all shadow-lg focus:outline-none focus:ring-4 focus:ring-gray-200"
               >
                 ❌ Atcelt
               </button>
