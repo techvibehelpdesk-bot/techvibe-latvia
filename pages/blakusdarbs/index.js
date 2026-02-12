@@ -1,197 +1,282 @@
-import Link from 'next/link';
-import Head from 'next/head';
+'use client'
 
-export default function Blakusdarbs() {
-  const blakusdarbi = [
-    {
-      img: 'https://images.unsplash.com/photo-1516321310764-b4a77b4d4fd7?w=400',
-      title: 'React izstrādātājs freelance (20h/ned)',
-      rate: '€25-35/st',
-      skills: 'Next.js, Tailwind, Supabase',
-      location: 'Rīga (attālināti)',
-      date: '1h atpakaļ'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400',
-      title: 'Logo dizains Figma / Photoshop',
-      rate: '€50-150/projekts',
-      skills: 'UI/UX, Branding',
-      location: 'Attālināti',
-      date: '3h atpakaļ'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=400',
-      title: 'SEO optimizācija vietnēm',
-      rate: '€200-500/mēn',
-      skills: 'Google Analytics, Ahrefs',
-      location: 'Jūrmala (hibrīds)',
-      date: '6h atpakaļ'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400',
-      title: 'Sociālo mediju saturs (SMM)',
-      rate: '€15-25/st',
-      skills: 'Instagram, TikTok, Canva',
-      location: 'Attālināti',
-      date: '1 diena'
-    },
-    {
-      img: 'https://images.unsplash/photo-1522071820081-009f0129c71c?w=400',
-      title: 'Virtuālais asistents (10h/ned)',
-      rate: '€12-18/st',
-      skills: 'Google Workspace, Plānošana',
-      location: 'Rīga',
-      date: '2 dienas'
-    },
-    {
-      img: 'https://images.unsplash/photo-1552664730-d307ca884978?w=400',
-      title: 'Foto/video montāža Adobe Premiere',
-      rate: '€30-60/st',
-      skills: 'After Effects, Premiere Pro',
-      location: 'Daugavpils (attālināti)',
-      date: '5h atpakaļ'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { createClient } from '@supabase/supabase-js'
+
+export default function BlakusdarbsPage() {
+  const [sludinajumi, setSludinajumi] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+
+  // CHAT MODAL
+  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [currentSludinajumsId, setCurrentSludinajumsId] = useState('')
+  const [currentSludinajumsTitle, setCurrentSludinajumsTitle] = useState('')
+  const [messageType, setMessageType] = useState('comment')
+  const [messageText, setMessageText] = useState('')
+
+  useEffect(() => {
+    fetchData()
+  }, [search])
+
+  async function fetchData() {
+    try {
+      setLoading(true)
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+      const response = await fetch(`${supabaseUrl}/rest/v1/sludinajumi?select=*`, {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`
+        }
+      })
+
+      if (!response.ok) throw new Error('Fetch kļūda')
+      const data = await response.json()
+      
+      let filtered = data.filter(s => 
+        s.category?.toLowerCase().includes('blakusdarbs') && 
+        s.status === 'published'
+      )
+      
+      if (search) {
+        filtered = filtered.filter(s => 
+          s.title?.toLowerCase().includes(search.toLowerCase()) ||
+          s.description?.toLowerCase().includes(search.toLowerCase())
+        )
+      }
+      
+      setSludinajumi(filtered)
+      console.log('📋 BLAKUSDARBS OK:', filtered.length)
+    } catch (err) {
+      console.error('Blakusdarbs Error:', err)
+    } finally {
+      setLoading(false)
     }
-  ];
+  }
+
+  const openChat = (id, title) => {
+    setCurrentSludinajumsId(id)
+    setCurrentSludinajumsTitle(title)
+    setMessageText('')
+    setIsChatOpen(true)
+  }
+
+  const sendMessage = async () => {
+    if (!messageText.trim()) return
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      const supabase = createClient(supabaseUrl, supabaseKey)
+
+      const { error } = await supabase
+        .from('comments')
+        .insert({
+          sludinajums_id: currentSludinajumsId,
+          type: messageType,
+          comment: messageText.trim(),
+          user_email: 'client@test.lv'
+        })
+
+      if (!error) {
+        setMessageText('')
+        setIsChatOpen(false)
+        alert(`✅ Ziņa par "${currentSludinajumsTitle}" nosūtīta!`)
+      } else {
+        alert('❌ Kļūda: ' + error.message)
+      }
+    } catch (error) {
+      alert('❌ Kļūda sūtot ziņu')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
+        <div className="text-4xl text-white animate-pulse">Ielādē blakusdarbus...</div>
+      </div>
+    )
+  }
 
   return (
-    <>
-      <Head>
-        <title>Blakusdarbs - TechVibe.lv</title>
-      </Head>
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%)',
-        padding: '2rem 1rem',
-        color: 'white'
-      }}>
-        <div style={{maxWidth: '1400px', margin: '0 auto'}}>
-          
-          {/* Header */}
-          <div style={{
-            textAlign: 'center',
-            marginBottom: '4rem',
-            position: 'relative'
-          }}>
-            <Link href="/kategorijas" style={{
-              position: 'absolute', left: '0', top: '0',
-              background: 'rgba(255,255,255,0.2)', color: 'white',
-              padding: '0.75rem 1.5rem', borderRadius: '50px',
-              fontWeight: '600', textDecoration: 'none'
-            }}>← Atpakaļ kategorijās</Link>
-            
-            <div style={{fontSize: '6rem', marginBottom: '1rem'}}>📋</div>
-            <h1 style={{
-              fontSize: '4rem', fontWeight: 'bold',
-              textShadow: '0 4px 12px rgba(0,0,0,0.3)'
-            }}>Blakusdarbs</h1>
-            <p style={{fontSize: '1.5rem', opacity: 0.9}}>Freelance • Papilddarbs • Projekti • 2,156 sludinājumi</p>
-          </div>
-
-          {/* Filtrs */}
-          <div style={{
-            background: 'rgba(255,255,255,0.15)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '2rem',
-            padding: '1.5rem 2rem',
-            marginBottom: '3rem',
-            display: 'flex', flexWrap: 'wrap',
-            gap: '1rem', alignItems: 'center'
-          }}>
-            <input placeholder="Meklēt blakusdarbu..." style={{
-              flex: 1, minWidth: '300px',
-              padding: '1rem 1.5rem', borderRadius: '50px',
-              border: 'none', background: 'rgba(255,255,255,0.9)',
-              fontSize: '1.1rem'
-            }} />
-            <select style={{padding: '1rem 1.5rem', borderRadius: '50px', border: 'none'}}>
-              <option>Jaunākie</option>
-              <option>Stundā augoša</option>
-              <option>Stundā dilstoša</option>
-            </select>
-            <Link href="/ievietot?kategorija=blakusdarbs" style={{
-              background: 'white', color: '#10b981',
-              padding: '1rem 2.5rem', borderRadius: '50px',
-              fontWeight: 'bold', textDecoration: 'none', whiteSpace: 'nowrap'
-            }}>➕ Piedāvāt</Link>
-          </div>
-
-          {/* Blakusdarbi */}
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(370px, 1fr))', gap: '2rem'}}>
-            {blakusdarbi.map((job, i) => (
-              <Link key={i} href="/sludinajums/789" style={{
-                background: 'rgba(255,255,255,0.95)',
-                borderRadius: '2rem', overflow: 'hidden',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-                transition: 'all 0.4s', textDecoration: 'none',
-                color: 'initial', display: 'block'
-              }} className="group">
-                <div style={{
-                  height: '210px', backgroundImage: `url(${job.img})`,
-                  backgroundSize: 'cover', backgroundPosition: 'center',
-                  position: 'relative'
-                }}>
-                  <div style={{
-                    position: 'absolute', top: '1rem', right: '1rem',
-                    background: '#34d399', color: 'white',
-                    padding: '0.5rem 1rem', borderRadius: '50px',
-                    fontWeight: 'bold', fontSize: '0.875rem'
-                  }}>Freelance</div>
-                </div>
-                <div style={{padding: '2.5rem'}}>
-                  <h3 style={{
-                    fontSize: '1.4rem', fontWeight: 'bold',
-                    marginBottom: '1rem', lineHeight: '1.3'
-                  }}>{job.title}</h3>
-                  <div style={{display: 'flex', gap: '1rem', marginBottom: '1.5rem'}}>
-                    <span style={{
-                      background: 'rgba(52,211,153,0.3)',
-                      color: '#059669', padding: '0.5rem 1rem',
-                      borderRadius: '1rem', fontSize: '0.9rem',
-                      fontWeight: '600'
-                    }}>{job.skills}</span>
-                  </div>
-                  <div style={{
-                    display: 'flex', justifyContent: 'space-between',
-                    alignItems: 'center', marginBottom: '1rem'
-                  }}>
-                    <p style={{
-                      fontSize: '1.75rem', fontWeight: 'bold',
-                      color: '#10b981', margin: 0
-                    }}>{job.rate}</p>
-                    <span style={{
-                      background: 'rgba(255,255,255,0.5)',
-                      padding: '0.5rem 1rem', borderRadius: '1rem',
-                      fontSize: '0.9rem'
-                    }}>{job.location}</span>
-                  </div>
-                  <p style={{color: '#6b7280', fontSize: '0.95rem'}}>
-                    {job.date}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* CTA */}
-          <div style={{
-            textAlign: 'center', marginTop: '4rem',
-            padding: '3rem 2rem', background: 'rgba(255,255,255,0.1)',
-            borderRadius: '2rem', backdropFilter: 'blur(20px)'
-          }}>
-            <h2 style={{fontSize: '2.5rem', marginBottom: '1rem'}}>
-              Piedāvā savu blakusdarbu!
-            </h2>
-            <Link href="/ievietot?kategorija=blakusdarbs" style={{
-              background: 'white', color: '#10b981',
-              padding: '1.5rem 4rem', borderRadius: '50px',
-              fontSize: '1.5rem', fontWeight: 'bold',
-              textDecoration: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
-            }}>
-              ➕ Publicēt tagad – BEZ MAKSAS!
+    <div className="min-h-screen bg-gradient-to-br from-emerald-400 to-emerald-600 text-white">
+      {/* NAVIGĀCIJA */}
+      <nav className="bg-white/20 backdrop-blur-xl border-b border-white/20 px-6 py-6 shadow-lg">
+        <div className="max-w-7xl mx-auto flex justify-center">
+          <div className="flex items-center gap-2 px-8 py-3 bg-white/30 border border-white/30 rounded-2xl shadow-xl backdrop-blur-sm">
+            <Link href="/kategorijas" className="text-lg font-semibold hover:text-emerald-200">
+              ← Visas kategorijas
+            </Link>
+            <div className="w-px h-6 bg-white/50 mx-4"></div>
+            <span className="text-2xl font-bold text-white drop-shadow-lg">📋 Blakusdarbs</span>
+            <div className="w-px h-6 bg-white/50 mx-4"></div>
+            <Link href="/test-auto" className="text-lg font-semibold hover:text-emerald-200">
+              🚗 Auto →
             </Link>
           </div>
         </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold drop-shadow-lg">📋 Blakusdarbs</h1>
+          <p className="text-2xl drop-shadow-lg">{sludinajumi.length} atrasti</p>
+        </div>
+
+        {/* MEKĻĒŠANA */}
+        <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-3xl p-6 mb-12 flex flex-wrap items-center gap-4 shadow-2xl">
+          <input 
+            placeholder="Meklēt React, dizainu, SEO..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 px-6 py-4 rounded-2xl border border-white/30 bg-white/50 text-lg placeholder-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/50"
+          />
+          <select className="px-6 py-4 rounded-2xl border border-white/30 bg-white/50 text-lg backdrop-blur-sm">
+            <option>Jaunākie</option>
+            <option>Stundā augoša</option>
+            <option>Stundā dilstoša</option>
+          </select>
+          <Link 
+            href="/ievietot?kategorija=blakusdarbs"
+            className="bg-white text-emerald-600 px-10 py-4 rounded-2xl font-bold hover:bg-emerald-50 transition-all shadow-xl hover:shadow-2xl text-lg"
+          >
+            ➕ Piedāvāt
+          </Link>
+        </div>
+
+        {/* GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {sludinajumi.map((item) => {
+            const firstImage = (item.image_public_urls && item.image_public_urls[0]) || 
+                              'https://images.unsplash.com/photo-1516321310764-b4a77b4d4fd7?w=400&auto=format&fit=crop';
+
+            return (
+              <div key={item.id} className="group bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all border border-white/50 hover:-translate-y-2">
+                <div className="relative h-52 overflow-hidden">
+                  <img 
+                    src={firstImage} 
+                    alt={item.title} 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 right-4 bg-emerald-500/90 text-white px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm">
+                    Freelance
+                  </div>
+                </div>
+                <div className="p-8">
+                  <div className="flex items-center mb-4">
+                    <div className="flex text-yellow-400 text-sm mr-2">★★★★☆</div>
+                    <span className="text-sm text-gray-600">(12 reviews)</span>
+                  </div>
+                  <h3 className="font-bold text-xl mb-3 line-clamp-2 leading-tight">{item.title || 'Blakusdarbs'}</h3>
+                  <p className="text-gray-700 text-sm mb-6 line-clamp-2">{item.description?.slice(0,100)}</p>
+                  
+                  <div className="space-y-4 mb-6">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-emerald-600 drop-shadow-lg">
+                        {item.price ? `${item.price.toLocaleString()}€` : 'Dāvanā'}
+                      </span>
+                      <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">
+                        {item.location || 'Rīga'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : 'Jauns'}</p>
+                  </div>
+                  
+                  <div className="flex space-x-3">
+                    <Link 
+                      href={`/sludinajums/${item.id}`}
+                      className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg text-center"
+                    >
+                      👁️ Apskatīt
+                    </Link>
+                    <button 
+                      onClick={() => openChat(item.id, item.title)}
+                      className="flex-1 bg-emerald-600 text-white py-3 px-4 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-lg flex items-center justify-center"
+                    >
+                      💬 Sazināties
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {sludinajumi.length === 0 && (
+          <div className="text-center py-24">
+            <div className="text-6xl mb-8">📋</div>
+            <h2 className="text-3xl font-bold mb-4 drop-shadow-lg">Nav blakusdarbu</h2>
+            <Link href="/ievietot?kategorija=blakusdarbs" className="bg-white text-emerald-600 px-12 py-4 rounded-2xl text-xl font-bold shadow-xl hover:shadow-2xl">
+              Būt pirmais!
+            </Link>
+          </div>
+        )}
+
+        {/* CTA */}
+        <div className="text-center p-16 bg-white/20 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl">
+          <h2 className="text-4xl font-bold mb-8 drop-shadow-lg">Piedāvā savu blakusdarbu!</h2>
+          <Link
+            href="/ievietot?kategorija=blakusdarbs"
+            className="bg-white text-emerald-600 px-16 py-6 rounded-3xl text-2xl font-bold shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all inline-block"
+          >
+            ➕ Publicēt bez maksas
+          </Link>
+        </div>
       </div>
-    </>
-  );
+
+      {/* CHAT MODAL */}
+      {isChatOpen && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-8 w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl border-4 border-emerald-200">
+            <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-800">
+                💬 Ziņa par: <span className="text-emerald-600">"{currentSludinajumsTitle}"</span>
+              </h2>
+              <button 
+                onClick={() => setIsChatOpen(false)}
+                className="text-3xl font-bold text-gray-500 hover:text-gray-700 p-2 -m-2 rounded-2xl hover:bg-gray-100"
+              >
+                ×
+              </button>
+            </div>
+
+            <select 
+              value={messageType} 
+              onChange={(e) => setMessageType(e.target.value)}
+              className="w-full p-4 border-2 border-gray-200 rounded-2xl text-lg mb-6 focus:outline-none focus:border-emerald-500 bg-gray-50"
+            >
+              <option value="comment">📝 Komentārs</option>
+              <option value="price_offer">💰 Kaulēt cenu</option>
+              <option value="question">❓ Jautājums</option>
+            </select>
+
+            <textarea
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder={`Sveiks! Interesējos par "${currentSludinajumsTitle}". ...`}
+              className="w-full h-32 p-4 border-2 border-gray-200 rounded-2xl text-lg mb-8 resize-vertical focus:outline-none focus:border-emerald-500 bg-gray-50"
+            />
+
+            <div className="flex gap-4">
+              <button
+                onClick={sendMessage}
+                disabled={!messageText.trim()}
+                className="flex-1 bg-emerald-600 text-white py-4 px-6 rounded-2xl text-lg font-bold hover:bg-emerald-700 disabled:opacity-50 transition-all shadow-xl"
+              >
+                🚀 Nosūtīt
+              </button>
+              <button
+                onClick={() => setIsChatOpen(false)}
+                className="flex-1 bg-gray-400 text-white py-4 px-6 rounded-2xl text-lg font-bold hover:bg-gray-500 transition-all shadow-xl"
+              >
+                ❌ Atcelt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
