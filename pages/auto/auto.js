@@ -10,3 +10,19 @@ export default function AutoMinimal() {
     </div>
   )
 }
+// PIEVIENO BEIGĀS pirms </div>
+<script dangerouslySetInnerHTML={{
+  __html: `
+    console.log('🔍 AUTO DEBUG START');
+    console.log('ENV URL:', typeof process.env.NEXT_PUBLIC_SUPABASE_URL);
+    console.log('ENV KEY:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+    
+    fetch('/api/debug-env')
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('debug').textContent = JSON.stringify(data, null, 2);
+        console.log('ENV CHECK:', data);
+      })
+      .catch(e => console.error('API error:', e));
+  `
+}}/>
