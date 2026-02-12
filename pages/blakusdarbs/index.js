@@ -197,7 +197,7 @@ export default function BlakusdarbsPage() {
         {sludinajumi.length === 0 && (
           <div className="text-center py-24">
             <div className="text-6xl mb-8">📋</div>
-            <h2 className="text-3xl font-bold mb-4">Nav blakusdarbu</h2>
+            <h2 className="text-3xl font-bold mb-4">Nav pakalpojumu</h2>
             <Link href="/ievietot?kategorija=blakusdarbs" className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:bg-blue-700">
               ➕ Esi pirmais!
             </Link>
@@ -206,7 +206,7 @@ export default function BlakusdarbsPage() {
 
         {/* CTA - IDENTISKS */}
         <div className="text-center p-12 bg-gray-50 rounded-2xl border border-gray-200">
-          <h2 className="text-3xl font-bold mb-6">Piedāvā savu blakusdarbu!</h2>
+          <h2 className="text-3xl font-bold mb-6">Piedāvā savu pakalpojumu!</h2>
           <Link
             href="/ievietot?kategorija=blakusdarbs"
             className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all"
@@ -272,4 +272,5 @@ export default function BlakusdarbsPage() {
     </div>
   )
 }
+
 
