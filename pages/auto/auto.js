@@ -1,222 +1,234 @@
-'use client'
+import Head from 'next/head';
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { createClient } from '@supabase/supabase-js'
-
-export default function AutoPage() {
-  const [sludinajumi, setSludinajumi] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
-
-  // MODAL STATE - gatavs
-  const [isChatOpen, setIsChatOpen] = useState(false)
-  const [currentSludinajumsId, setCurrentSludinajumsId] = useState('')
-  const [currentSludinajumsTitle, setCurrentSludinajumsTitle] = useState('')
-  const [messageType, setMessageType] = useState('comment')
-  const [messageText, setMessageText] = useState('')
-
-  useEffect(() => {
-    fetchData()
-  }, [search])
-
-  // TAVA PERFECTA METODE - bez izmaiņām!
-  async function fetchData() {
-    try {
-      setLoading(true)
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-      const response = await fetch(`${supabaseUrl}/rest/v1/sludinajumi?select=*&status=eq.published`, {
-        headers: {
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`
-        }
-      })
-
-      if (!response.ok) throw new Error('Supabase fetch kļūda')
-      const data = await response.json()
-      
-      // AUTO FILTER KĀ BERNIEK
-      let filtered = data.filter(s => 
-        s.category?.toLowerCase().includes('auto')
-      )
-      
-      if (search.trim()) {
-        filtered = filtered.filter(s => 
-          s.title?.toLowerCase().includes(search.toLowerCase()) ||
-          s.description?.toLowerCase().includes(search.toLowerCase())
-        )
-      }
-      
-      setSludinajumi(filtered)
-      console.log('🚗 AUTO OK:', filtered.length)
-    } catch (err) {
-      console.error('❌ AUTO Error:', err)
-      setSludinajumi([])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // CHAT MODAL FUNCIJAS - pilnīgas
-  function openChat(sludinajumsId, title) {
-    setCurrentSludinajumsId(sludinajumsId)
-    setCurrentSludinajumsTitle(title)
-    setMessageText('')
-    setIsChatOpen(true)
-  }
-
-  async function sendMessage() {
-    if (!messageText.trim()) return
-
-    try {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      )
-
-      const { data, error } = await supabase
-        .from('messages') // Pieņem tabulu 'messages'
-        .insert({
-          sludinajums_id: currentSludinajumsId,
-          type: messageType,
-          text: messageText,
-          // Pievieno user_id ja vajag auth
-        })
-
-      if (error) throw error
-
-      setMessageText('')
-      alert('Ziņa nosūtīta!') // Vai refresh chats
-    } catch (err) {
-      console.error('Ziņas kļūda:', err)
-      alert('Kļūda sūtot ziņu')
-    }
-  }
-
-  if (loading) {
+export default function AutoPage({ sludinajumi, error }) {
+  if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-xl text-gray-600 animate-pulse">🚗 Ielādē auto sludinājumus...</div>
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center p-8">
+        <div className="text-center max-w-md">
+          <div className="text-6xl mb-6">❌</div>
+          <h1 className="text-3xl font-bold text-red-800 mb-4">Kļūda ielādējot sludinājumus</h1>
+          <p className="text-lg text-red-700">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-6 bg-red-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-600 transition-colors"
+          >
+            Ielādēt vēlreiz
+          </button>
+        </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto text-center mb-16">
-        <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
-          Auto sludinājumi
-        </h1>
-        <p className="text-xl text-gray-700 mb-8">{sludinajumi.length} auto atrasti</p>
-        
-        {/* Search */}
-        <div className="max-w-md mx-auto">
-          <input
-            type="text"
-            placeholder="Meklē auto pēc nosaukuma vai apraksta..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full p-4 text-lg rounded-2xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none shadow-lg transition-all duration-200"
-          />
-        </div>
-      </div>
-
-      {/* Grid */}
-      <div className="max-w-7xl mx-auto">
-        {sludinajumi.length === 0 ? (
-          <div className="text-center py-20">
-            <span className="text-6xl mb-8 block">🚗</span>
-            <h2 className="text-3xl font-bold text-gray-700 mb-4">Nav auto sludinājumu</h2>
-            <p className="text-lg text-gray-500">Mēģini citu meklēšanas vārdu vai pievieno pats!</p>
+    <>
+      <Head>
+        <title>Auto sludinājumi | Tekvibe</title>
+        <meta name="description" content={`${sludinajumi.length} auto sludinājumi no Supabase`} />
+      </Head>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="max-w-7xl mx-auto text-center mb-16">
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
+            🚗 Auto sludinājumi
+          </h1>
+          <p className="text-xl text-gray-700 mb-12">Atrasti {sludinajumi.length} auto</p>
+          
+          {/* Search - client-side filter */}
+          <div className="max-w-md mx-auto relative">
+            <input
+              id="search"
+              type="text"
+              placeholder="Meklē pēc nosaukuma vai apraksta..."
+              className="w-full p-5 pl-12 text-lg rounded-2xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none shadow-lg transition-all duration-200 pr-12"
+            />
+            <label htmlFor="search" className="absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-400 pointer-events-none">
+              🔍
+            </label>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {sludinajumi.map((s) => (
-              <div key={s.id} className="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden group">
-                <div className="h-48 bg-gradient-to-r from-gray-100 to-gray-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative overflow-hidden">
-                  {s.image_url ? (
-                    <img src={s.image_url} alt={s.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-4xl">🚗</span>
-                  )}
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{s.title}</h3>
-                  <p className="text-lg text-gray-600 mb-3 line-clamp-3">{s.description}</p>
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-2xl font-bold text-blue-600">
-                      {s.price || 'Cena nav norādīta'}
-                    </span>
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                      {s.category}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => openChat(s.id, s.title)}
-                      className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm"
-                    >
-                      💬 Rakstīt
-                    </button>
-                    <Link href={`/sludinajums/${s.id}`}>
-                      <span className="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center hover:bg-gray-300 transition-colors">
-                        👁️
+        </div>
+
+        {/* Grid */}
+        <div className="max-w-7xl mx-auto">
+          {sludinajumi.length === 0 ? (
+            <div className="text-center py-24">
+              <div className="text-7xl mb-8">🚗</div>
+              <h2 className="text-4xl font-bold text-gray-700 mb-6">Nav atrasti auto</h2>
+              <p className="text-xl text-gray-500 mb-8">Pagaidām nav publicēti auto sludinājumi</p>
+              <Link href="/pievienot" className="inline-block bg-gradient-to-r from-green-500 to-green-600 text-white px-12 py-5 rounded-2xl text-xl font-bold hover:from-green-600 hover:to-green-700 transition-all shadow-xl hover:shadow-2xl">
+                + Pievienot sludinājumu
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-20" id="sludinajumi-grid">
+              {sludinajumi.map((s) => (
+                <div key={s.id} className="group bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden hover:-translate-y-2">
+                  {/* Image */}
+                  <div className="h-56 relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 group-hover:scale-105 transition-transform duration-500">
+                    {s.image_url ? (
+                      <img 
+                        src={s.image_url} 
+                        alt={s.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-5xl">🚗</span>
+                      </div>
+                    )}
+                    <div className="absolute top-4 right-4">
+                      <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold uppercase tracking-wide">
+                        {s.status}
                       </span>
-                    </Link>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-8">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-2xl font-bold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors pr-4 flex-1">
+                        {s.title}
+                      </h3>
+                      <div className="text-3xl">{s.category === 'auto' ? '🚙' : '🚗'}</div>
+                    </div>
+                    
+                    <p className="text-gray-600 mb-6 line-clamp-3 text-lg leading-relaxed">{s.description}</p>
+                    
+                    <div className="space-y-3 mb-8">
+                      <div className="flex justify-between">
+                        <span className="text-3xl font-bold text-blue-600">{s.price || 'Cena vienošanās'}</span>
+                        <span className="text-sm text-gray-500">{s.location}</span>
+                      </div>
+                      {s.category && (
+                        <span className="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-xl text-sm font-semibold">
+                          {s.category}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="flex gap-3 pt-4 border-t">
+                      <Link 
+                        href={`/sludinajums/${s.id}`}
+                        className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-4 px-6 rounded-2xl font-bold text-center hover:from-emerald-600 hover:to-teal-700 transition-all duration-300 shadow-xl hover:shadow-2xl text-lg"
+                      >
+                        👁️ Skatīt
+                      </Link>
+                      <button className="w-14 h-14 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center">
+                        💬
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* CTA */}
+        <div className="max-w-4xl mx-auto text-center p-16 bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Gribi pārdot savu auto?</h2>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Pievieno sludinājumu bez maksas un atrodi pircēju dažu minūšu laikā!
+          </p>
+          <Link 
+            href="/pievienot"
+            className="inline-block bg-gradient-to-r from-orange-500 to-red-600 text-white px-16 py-6 rounded-3xl text-2xl font-bold hover:from-orange-600 hover:to-red-700 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-1"
+          >
+            + Pievienot auto
+          </Link>
+        </div>
       </div>
 
-      {/* CHAT MODAL */}
-      {isChatOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            {/* Header */}
-            <div className="p-6 border-b sticky top-0 bg-white">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">{currentSludinajumsTitle}</h2>
-              <button
-                onClick={() => setIsChatOpen(false)}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
-              >
-                ✕
-              </button>
-            </div>
+      <style jsx>{`
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
 
-            {/* Form */}
-            <div className="p-6 space-y-4">
-              <select
-                value={messageType}
-                onChange={(e) => setMessageType(e.target.value)}
-                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500"
-              >
-                <option value="comment">Komentārs</option>
-                <option value="question">Jautājums</option>
-                <option value="offer">Piedāvājums</option>
-              </select>
-              <textarea
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                placeholder="Raksti ziņu..."
-                rows={4}
-                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 resize-none"
-              />
-              <button
-                onClick={sendMessage}
-                className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-4 px-6 rounded-2xl font-bold hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                Nosūtīt ziņu
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  )
+      <script dangerouslySetInnerHTML={{
+        __html: `
+          document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search');
+            const grid = document.getElementById('sludinajumi-grid');
+            const items = grid?.querySelectorAll('[id*="sludinajums"]') || [];
+            
+            searchInput.addEventListener('input', function(e) {
+              const term = e.target.value.toLowerCase();
+              items.forEach(item => {
+                const title = item.querySelector('h3')?.textContent.toLowerCase() || '';
+                const desc = item.querySelector('p')?.textContent.toLowerCase() || '';
+                if (title.includes(term) || desc.includes(term)) {
+                  item.style.display = 'block';
+                } else {
+                  item.style.display = 'none';
+                }
+              });
+            });
+          });
+        `
+      }} />
+    </>
+  );
+}
+
+// SERVER-SIDE FETCH - SOLĪDA KĀ AKmens!
+export async function getServerSideProps() {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase ENV nav iestatīti Vercel');
+    }
+
+    const response = await fetch(
+      `${supabaseUrl}/rest/v1/sludinajumi?select=*&status=eq.published`,
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+        },
+        cache: 'no-store', // Fresh data katru reizi
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Supabase HTTP ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    
+    // TAVA AUTO FILTER LOĢIKA
+    const autoSludinajumi = data.filter(s => 
+      s.category?.toLowerCase().includes('auto')
+    );
+
+    console.log('🚗 Server: ielādēti', autoSludinajumi.length, 'auto');
+
+    return {
+      props: {
+        sludinajumi: autoSludinajumi,
+        error: null,
+      },
+    };
+  } catch (error) {
+    console.error('❌ Auto getServerSideProps:', error);
+    return {
+      props: {
+        sludinajumi: [],
+        error: `Kļūda: ${error.message}. Pārbaudi Vercel ENV vars.`,
+      },
+    };
+  }
 }
