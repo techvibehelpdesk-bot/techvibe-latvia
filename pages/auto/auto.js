@@ -1,165 +1,122 @@
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { createClient } from '@supabase/supabase-js'
 
-// BEZ 'use client' - kā tev berniem!
-export default function AutoPage() {
-  const [sludinajumi, setSludinajumi] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
-
-  // VISAS TAVAS MODAL STATE
-  const [isChatOpen, setIsChatOpen] = useState(false)
-  const [currentSludinajumsId, setCurrentSludinajumsId] = useState('')
-  const [currentSludinajumsTitle, setCurrentSludinajumsTitle] = useState('')
-  const [messageType, setMessageType] = useState('comment')
-  const [messageText, setMessageText] = useState('')
+export default function AutoDebug() {
+  const [debug, setDebug] = useState('Ielādē diagnostiku...')
+  const [rawData, setRawData] = useState(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetchData()
+    debugAll()
   }, [])
 
-  // TAVA EXAKTA METODE NO BERNIEM - AUTO!
-  async function fetchData() {
+  async function debugAll() {
     try {
-      setLoading(true)
+      console.log('🔍 DEBUG START')
+      
+      // 1. ENV CHECK
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
       const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      console.log('📍 URL:', supabaseUrl ? 'OK' : '❌ NULL!')
+      console.log('🔑 KEY:', supabaseKey ? 'OK (censored)' : '❌ NULL!')
+      
+      if (!supabaseUrl || !supabaseKey) {
+        throw new Error('ENV NULL - pievieno Vercel dashboard!')
+      }
 
-      const response = await fetch(`${supabaseUrl}/rest/v1/sludinajumi?select=*`, {
+      setDebug('1. ENV OK')
+
+      // 2. RAW FETCH BEZ FILTRA
+      const url = `${supabaseUrl}/rest/v1/sludinajumi?select=*`
+      console.log('🌐 Fetch URL:', url)
+      
+      const response = await fetch(url, {
         headers: {
           'apikey': supabaseKey,
           'Authorization': `Bearer ${supabaseKey}`
         }
       })
 
-      if (!response.ok) throw new Error('Fetch kļūda')
-      const data = await response.json()
+      console.log('📡 Response status:', response.status)
       
-      // EXAKTS TAVS FILTER BET AUTO
-      let filtered = data.filter(s => 
-        s.category?.toLowerCase().includes('auto') && 
-        s.status === 'published'
-      )
-      
-      if (search) {
-        filtered = filtered.filter(s => 
-          s.title?.toLowerCase().includes(search.toLowerCase()) ||
-          s.description?.toLowerCase().includes(search.toLowerCase())
-        )
+      if (!response.ok) {
+        const errText = await response.text()
+        console.error('❌ Response ERROR:', errText)
+        throw new Error(`HTTP ${response.status}: ${errText}`)
       }
+
+      const data = await response.json()
+      console.log('📊 RAW DATA COUNT:', data.length)
+      console.log('📋 PIRMIE 3 ieraksti:', data.slice(0,3))
       
-      setSludinajumi(filtered)
-      console.log('🚗 AUTO OK:', filtered.length)
+      setRawData(data)
+      setDebug(`2. RAW OK: ${data.length} ieraksti`)
+
+      // 3. AUTO FILTER TEST
+      const autoFiltered = data.filter(s => 
+        s.category?.toLowerCase().includes('auto') || 
+        s.title?.toLowerCase().includes('auto')
+      )
+      console.log('🚗 AUTO FILTER:', autoFiltered.length, autoFiltered.slice(0,2))
+      
+      setDebug(`3. AUTO: ${autoFiltered.length} atrasti`)
+
     } catch (err) {
-      console.error('AUTO Error:', err)
-      setSludinajumi([])
-    } finally {
-      setLoading(false)
+      console.error('💥 FULL ERROR:', err)
+      setError(err.message)
+      setDebug(`❌ ERROR: ${err.message}`)
     }
   }
 
-  // TAVAS FUNCIJAS - 100%
-  const openChat = (id, title) => {
-    setCurrentSludinajumsId(id)
-    setCurrentSludinajumsTitle(title)
-    setIsChatOpen(true)
-  }
-
-  const sendMessage = async () => {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    const supabase = createClient(supabaseUrl, supabaseKey)
-
-    const { error } = await supabase
-      .from('comments')
-      .insert({
-        sludinajums_id: currentSludinajumsId,
-        type: messageType,
-        comment: messageText,
-        user_email: 'client@test.lv'
-      })
-
-    if (!error) {
-      setMessageText('')
-      setIsChatOpen(false)
-      alert(`✅ Ziņa "${currentSludinajumsTitle}" nosūtīta!`)
-    } else {
-      alert('❌ ' + error.message)
-    }
-  }
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100"><div className="text-4xl">🚗 Ielādē...</div></div>
-  }
-
-  // TAVA UI NO BERNIEM - AUTO TĒMA
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* VISU TAVU HTML NO BERNIEM KODA - MAINOT VIEN TIK "Bērniem" → "Auto" */}
-      <nav className="bg-white border-b px-6 py-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex space-x-8">
-            <Link href="/kategorijas" className="text-lg font-medium text-gray-700 hover:text-black">← Atpakaļ</Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link href="/iegūt-visus" className="text-sm font-medium text-blue-600 hover:text-blue-500">View all</Link>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <h1 className="text-4xl font-bold mb-12">🚗 Auto sludinājumi ({sludinajumi.length})</h1>
-
-        {/* Search kā tev */}
-        <div className="bg-white border rounded-2xl p-6 mb-12 flex items-center gap-4">
-          <input 
-            placeholder="Meklēt auto..." 
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 px-6 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <Link href="/ievietot?kategorija=auto" className="bg-blue-600 text-white px-10 py-3 rounded-xl font-bold hover:bg-blue-700">
-            ➕ Ievietot
-          </Link>
-        </div>
-
-        {/* Grid kā tev */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {sludinajumi.map((item) => (
-            <div key={item.id} className="bg-white rounded-2xl shadow-md hover:shadow-xl border p-6">
-              <img src={item.image_public_urls?.[0] || 'https://via.placeholder.com/300?text=AUTO'} alt={item.title} className="w-full h-48 object-cover rounded-xl mb-4" />
-              <h3 className="font-bold text-lg mb-2">{item.title}</h3>
-              <p className="text-gray-600 text-sm mb-4">{item.description?.slice(0,100)}</p>
-              <div className="text-2xl font-bold text-blue-600 mb-4">{item.price}€</div>
-              <div className="flex gap-2">
-                <Link href={`/sludinajums/${item.id}`} className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-xl font-bold text-sm text-center">
-                  👁️ Apskatīt
-                </Link>
-                <button onClick={() => openChat(item.id, item.title)} className="flex-1 bg-green-600 text-white py-2 px-4 rounded-xl font-bold text-sm">
-                  💬 Sazināties
-                </button>
-              </div>
+    <div className="min-h-screen bg-gray-900 text-white p-8 font-mono text-sm">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-bold mb-8 text-blue-400">🔍 AUTO DEBUG</h1>
+        
+        <div className="bg-gray-800 rounded-2xl p-8 mb-8">
+          <h2 className="text-2xl mb-6">Status: <span className={`font-bold ${error ? 'text-red-400' : 'text-green-400'}`}>{debug}</span></h2>
+          
+          {error && (
+            <div className="bg-red-900/50 border border-red-500 p-6 rounded-xl">
+              <pre className="whitespace-pre-wrap text-red-300">{error}</pre>
             </div>
-          ))}
+          )}
+          
+          {rawData && (
+            <details className="mt-8">
+              <summary className="cursor-pointer p-4 bg-blue-900 rounded-xl mb-4 hover:bg-blue-800">📊 RAW DATA ({rawData.length})</summary>
+              <pre className="bg-gray-950 p-6 rounded-xl overflow-auto max-h-96 text-xs">
+                {JSON.stringify(rawData.slice(0,5), null, 2)}
+              </pre>
+            </details>
+          )}
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6 text-left">
+          <div className="bg-gray-800 p-6 rounded-2xl">
+            <h3 className="font-bold mb-4 text-green-400">1. Pārbaudi Console (F12)</h3>
+            <ul className="space-y-2">
+              <li>• URL: {process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅' : '❌'}</li>
+              <li>• KEY: {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅' : '❌'}</li>
+              <li>• Response: skaties Network tab</li>
+              <li>• Raw count: {rawData?.length || '?'}</li>
+            </ul>
+          </div>
+          
+          <div className="bg-gray-800 p-6 rounded-2xl">
+            <h3 className="font-bold mb-4 text-yellow-400">2. Ja 0 auto ierakstu:</h3>
+            <ul className="space-y-2 text-sm">
+              <li>• Supabase → Table sludinajumi</li>
+              <li>• Pievieno test: category="auto", status="published"</li>
+              <li>• Vai title satur "auto"</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-12 p-8 bg-green-900/30 border-2 border-green-500 rounded-3xl">
+          <h3 className="text-2xl font-bold mb-4 text-green-300">NEXT: Kad debug OK</h3>
+          <p>Copy console info man → uzrakstīšu FINAL kodu!</p>
         </div>
       </div>
-
-      {/* TAVA MODAL - EXAKTA KOPIJA */}
-      {isChatOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-6">💬 Ziņa par: {currentSludinajumsTitle}</h2>
-            <button onClick={() => setIsChatOpen(false)} className="absolute top-4 right-4 text-3xl">×</button>
-            <select value={messageType} onChange={(e) => setMessageType(e.target.value)} className="w-full p-3 border rounded-xl mb-4">
-              <option value="comment">Komentārs</option>
-              <option value="question">Jautājums</option>
-            </select>
-            <textarea value={messageText} onChange={(e) => setMessageText(e.target.value)} className="w-full p-4 border rounded-xl mb-6" rows="4" placeholder="Raksti ziņu..."/>
-            <button onClick={sendMessage} className="w-full bg-green-600 text-white py-4 rounded-xl font-bold">Nosūtīt</button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
