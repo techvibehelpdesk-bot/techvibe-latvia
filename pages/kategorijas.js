@@ -4,7 +4,7 @@ import Head from 'next/head';
 export default function Kategorijas() {
   const kategorijas = [
     // Transports (ss.com TOP)
-    { href: '/auto', emoji: '🚗', nosaukums: 'Auto', skaits: '5,247' },
+   { href: '/test-auto', emoji: '🚗', nosaukums: 'Auto', skaits: '5,247' },
     { href: '/moto', emoji: '🏍️', nosaukums: 'Moto transports', skaits: '1,892' },
     { href: '/velosipedi', emoji: '🚲', nosaukums: 'Velosipēdi', skaits: '856' },
     
