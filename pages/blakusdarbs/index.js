@@ -199,7 +199,7 @@ export default function BlakusdarbsPage() {
             <div className="text-6xl mb-8">📋</div>
             <h2 className="text-3xl font-bold mb-4">Nav blakusdarbu</h2>
             <Link href="/ievietot?kategorija=blakusdarbs" className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:bg-blue-700">
-              ➕ Būt pirmais!
+              ➕ Esi pirmais!
             </Link>
           </div>
         )}
@@ -272,3 +272,4 @@ export default function BlakusdarbsPage() {
     </div>
   )
 }
+
