@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
@@ -7,16 +9,16 @@ export default function TestAutoPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
+  // MODAL STATE
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [currentSludinajumsId, setCurrentSludinajumsId] = useState('')
   const [currentSludinajumsTitle, setCurrentSludinajumsTitle] = useState('')
   const [messageType, setMessageType] = useState('comment')
   const [messageText, setMessageText] = useState('')
-  const [sending, setSending] = useState(false)
 
   useEffect(() => {
     fetchData()
-  }, [search])
+  }, [search])  // React uz search izmaiņām
 
   async function fetchData() {
     try {
@@ -34,7 +36,6 @@ export default function TestAutoPage() {
       if (!response.ok) throw new Error('Fetch kļūda')
       const data = await response.json()
       
-      // AUTO FILTER
       let filtered = data.filter(s => 
         s.category?.toLowerCase().includes('auto') && 
         s.status === 'published'
@@ -51,7 +52,6 @@ export default function TestAutoPage() {
       console.log('🚗 AUTO OK:', filtered.length)
     } catch (err) {
       console.error('AUTO Error:', err)
-      setSludinajumi([])
     } finally {
       setLoading(false)
     }
@@ -64,134 +64,211 @@ export default function TestAutoPage() {
     setIsChatOpen(true)
   }
 
-  const closeChat = () => {
-    setIsChatOpen(false)
-    setCurrentSludinajumsId('')
-    setCurrentSludinajumsTitle('')
-  }
-
   const sendMessage = async () => {
     if (!messageText.trim()) return
 
-    setSending(true)
     try {
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
       const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
       const supabase = createClient(supabaseUrl, supabaseKey)
 
       const { error } = await supabase
-        .from('messages')  // Pieņemam tabula 'messages'
+        .from('comments')
         .insert({
           sludinajums_id: currentSludinajumsId,
           type: messageType,
-          text: messageText.trim(),
-          created_at: new Date().toISOString()
+          comment: messageText.trim(),
+          user_email: 'client@test.lv' // TODO: auth vēlāk
         })
 
-      if (error) throw error
-
-      setMessageText('')
-      alert('Ziņa nosūtīta!')  // TODO: Reāls paziņojums
+      if (!error) {
+        setMessageText('')
+        setIsChatOpen(false)
+        alert(`✅ Ziņa par "${currentSludinajumsTitle}" nosūtīta!`)
+        fetchData() // Refresh
+      } else {
+        alert('❌ Kļūda: ' + error.message)
+      }
     } catch (error) {
-      console.error('Ziņas kļūda:', error)
-      alert('Kļūda sūtot ziņu')
-    } finally {
-      setSending(false)
+      alert('❌ Kļūda sūtot ziņu')
     }
   }
 
-  if (loading) return <div className="p-8 text-center">Ielādē auto sludinājumus...</div>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-4xl text-gray-500 animate-pulse">Ielādē auto sludinājumus...</div>
+      </div>
+    )
+  }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-4xl font-bold text-center mb-8">🚗 Auto sludinājumi</h1>
-      
-      {/* Meklēšana */}
-      <div className="mb-8">
-        <input
-          type="text"
-          placeholder="Meklē auto pēc nosaukuma vai apraksta..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full p-4 border border-gray-300 rounded-xl text-lg"
-        />
-      </div>
-
-      {/* Sludinājumi */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {sludinajumi.map((s) => (
-          <div key={s.id} className="bg-white border rounded-xl p-6 shadow-md hover:shadow-xl transition">
-            <h3 className="text-xl font-bold mb-2">{s.title}</h3>
-            <p className="text-gray-600 mb-4 line-clamp-3">{s.description}</p>
-            <div className="flex justify-between items-center">
-              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                {s.category}
-              </span>
-              <button
-                onClick={() => openChat(s.id, s.title)}
-                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-              >
-                💬 Rakstīt
-              </button>
-            </div>
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* NAVIGĀCIJA KATEGORIJĀM */}
+      <nav className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100 px-6 py-6 shadow-sm">
+        <div className="max-w-7xl mx-auto flex justify-center">
+          <div className="flex items-center gap-2 px-8 py-3 bg-white border border-blue-200 rounded-2xl shadow-lg">
+            <Link href="/kategorijas" className="text-lg font-semibold text-gray-700 hover:text-blue-600">
+              ← Visas kategorijas
+            </Link>
+            <div className="w-px h-6 bg-gray-300 mx-4"></div>
+            <span className="text-2xl font-bold text-blue-600">🚗 AUTO</span>
+            <div className="w-px h-6 bg-gray-300 mx-4"></div>
+            <Link href="/majas" className="text-lg font-semibold text-gray-700 hover:text-green-600">
+              🏠 Mājas →
+            </Link>
           </div>
-        ))}
-      </div>
+        </div>
+      </nav>
 
-      {sludinajumi.length === 0 && !loading && (
-        <div className="text-center py-12">
-          <p className="text-xl text-gray-500 mb-4">Nav auto sludinājumu</p>
-          <Link href="/post-ad">
-            <a className="bg-blue-500 text-white px-6 py-3 rounded-xl inline-block">
-              + Publicēt auto sludinājumu
-            </a>
+      {/* GALVENĀ SATURA DAĻA - identiska berniem */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">🚗 Auto sludinājumi</h1>
+          <p className="text-2xl text-gray-600">{sludinajumi.length} atrasti</p>
+        </div>
+
+        {/* MEKLĒŠANA UN FILTŅI */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-12 flex flex-wrap items-center gap-4 shadow-sm">
+          <input 
+            placeholder="Meklēt BMW, Audi, Toyota..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <select className="px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg">
+            <option>Jaunākie</option>
+            <option>Cena augoša</option>
+            <option>Cena dilstoša</option>
+          </select>
+          <Link 
+            href="/ievietot?kategorija=auto"
+            className="bg-blue-600 text-white px-10 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md"
+          >
+            ➕ Ievietot auto
           </Link>
         </div>
-      )}
 
-      {/* Chat modālis */}
+        {/* GRID AR ATTĒLIEM UN LINKIEM */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+          {sludinajumi.map((item) => {
+            const firstImage = (item.image_public_urls && item.image_public_urls[0]) || 
+                              'https://via.placeholder.com/300x200/f8f9fa/6c757d?text=🚗+Auto';
+
+            return (
+              <div key={item.id} className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-gray-100">
+                <div className="p-6">
+                  <img 
+                    src={firstImage} 
+                    alt={item.title} 
+                    className="w-full h-48 object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform" 
+                  />
+                  <div className="flex items-center mb-2">
+                    <div className="flex text-yellow-400 text-sm mr-2">★★★★☆</div>
+                    <span className="text-sm text-gray-500">(12 reviews)</span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2 line-clamp-2">{item.title || 'Auto'}</h3>
+                  <p className="text-gray-600 text-sm mb-6 line-clamp-2">
+                    {item.description?.slice(0,100) || `${item.location || 'Rīga'} • Auto`}
+                  </p>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-gray-900">
+                        {item.price ? `${item.price.toLocaleString()}€` : 'Dāvanā'}
+                      </span>
+                    </div>
+                    <div className="flex space-x-2 pt-2">
+                      <Link 
+                        href={`/sludinajums/${item.id}`}
+                        className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all text-center shadow-md"
+                      >
+                        👁️ Apskatīt
+                      </Link>
+                      <button 
+                        onClick={() => openChat(item.id, item.title)}
+                        className="flex-1 bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-md flex items-center justify-center"
+                      >
+                        💬 Sazināties
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {sludinajumi.length === 0 && (
+          <div className="text-center py-24">
+            <div className="text-6xl mb-8">🚗</div>
+            <h2 className="text-3xl font-bold mb-4">Nav auto sludinājumu</h2>
+            <Link href="/ievietot?kategorija=auto" className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg">
+              Būt pirmais – publicē auto!
+            </Link>
+          </div>
+        )}
+
+        {/* CTA */}
+        <div className="text-center p-12 bg-gray-50 rounded-2xl border border-gray-200">
+          <h2 className="text-3xl font-bold mb-6">Pārdod savu auto ātri!</h2>
+          <Link
+            href="/ievietot?kategorija=auto"
+            className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all"
+          >
+            ➕ Publicēt bez maksas
+          </Link>
+        </div>
+      </div>
+
+      {/* MODAL - identisks berniem */}
       {isChatOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold">💬 Ziņa par: {currentSludinajumsTitle}</h3>
-              <button onClick={closeChat} className="text-2xl">&times;</button>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl border-4 border-emerald-100">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-800">
+                💬 Ziņa par: <span className="text-emerald-600">"{currentSludinajumsTitle}"</span>
+              </h2>
+              <button 
+                onClick={() => setIsChatOpen(false)}
+                className="text-3xl font-bold text-gray-500 hover:text-gray-700 p-2 -m-2 rounded-full hover:bg-gray-100"
+              >
+                ×
+              </button>
             </div>
 
-            <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-              <label className="block text-sm font-medium mb-2">Ziņas veids:</label>
-              <select
-                value={messageType}
-                onChange={(e) => setMessageType(e.target.value)}
-                className="w-full p-3 border rounded-lg"
-              >
-                <option value="comment">Komentārs</option>
-                <option value="question">Jautājums</option>
-                <option value="offer">Piedāvājums</option>
-              </select>
-            </div>
+            <select 
+              value={messageType} 
+              onChange={(e) => setMessageType(e.target.value)}
+              className="w-full p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 focus:outline-none focus:border-emerald-500"
+            >
+              <option value="comment">📝 Komentārs</option>
+              <option value="price_offer">💰 Kaulēt cenu</option>
+              <option value="request_photos">🖼️ Vēl bildes</option>
+              <option value="question">❓ Jautājums</option>
+            </select>
 
             <textarea
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
-              placeholder="Raksti ziņu šeit..."
-              rows="5"
-              className="w-full p-4 border border-gray-300 rounded-xl mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={`Sveiks! Interesējos par "${currentSludinajumsTitle}". ...`}
+              className="w-full h-32 p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 resize-vertical focus:outline-none focus:border-emerald-500"
+              rows={4}
             />
 
-            <div className="flex gap-3">
-              <button
-                onClick={closeChat}
-                className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-xl hover:bg-gray-400"
-              >
-                Atcelt
-              </button>
+            <div className="flex gap-4 pt-2">
               <button
                 onClick={sendMessage}
-                disabled={sending || !messageText.trim()}
-                className="flex-1 bg-green-500 text-white py-3 px-6 rounded-xl hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                disabled={!messageText.trim()}
+                className="flex-1 bg-emerald-600 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
               >
-                {sending ? 'Sūta...' : 'Nosūtīt ziņu'}
+                🚀 Nosūtīt ziņu
+              </button>
+              <button
+                onClick={() => setIsChatOpen(false)}
+                className="flex-1 bg-gray-500 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-gray-600 transition-all shadow-lg"
+              >
+                ❌ Atcelt
               </button>
             </div>
           </div>
