@@ -1,183 +1,280 @@
-import Link from 'next/link';
-import Head from 'next/head';
+'use client'
 
-export default function SadzivesTehnika() {
-  const sludinajumi = [
-    {
-      img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400',
-      title: 'Samsung ledusskapis RQ58R50752W 400L',
-      price: '€650',
-      location: 'Rīga, Pārdaugava',
-      date: '2h atpakaļ'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=400',
-      title: 'LG veļasmašīna F4WV308S2E 9kg',
-      price: '€420',
-      location: 'Jūrmala',
-      date: '5h atpakaļ'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400',
-      title: 'Bosch trauku mazgājamā DVU09T25N2',
-      price: '€380',
-      location: 'Daugavpils',
-      date: '1 diena'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400',
-      title: 'Electrolux plīts virsma EIV634',
-      price: '€285',
-      location: 'Liepāja',
-      date: '3 dienas'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1567306301408-9e2e8a9379d5?w=400',
-      title: 'Whirlpool vaiki EHBS98 370L',
-      price: '€720',
-      location: 'Rīga, Teika',
-      date: 'Vakardien'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1610945262588-3418479aa54e?w=400',
-      title: 'AEG cepeškrāsns BPK742320M',
-      price: '€510',
-      location: 'Ventspils',
-      date: '4h atpakaļ'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { createClient } from '@supabase/supabase-js'
+
+export default function SadzivesTehnikaPage() {
+  const [sludinajumi, setSludinajumi] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+
+  // MODAL STATE
+  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [currentSludinajumsId, setCurrentSludinajumsId] = useState('')
+  const [currentSludinajumsTitle, setCurrentSludinajumsTitle] = useState('')
+  const [messageType, setMessageType] = useState('comment')
+  const [messageText, setMessageText] = useState('')
+
+  useEffect(() => {
+    fetchData()
+  }, [search])
+
+  async function fetchData() {
+    try {
+      setLoading(true)
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+      const response = await fetch(`${supabaseUrl}/rest/v1/sludinajumi?select=*`, {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`
+        }
+      })
+
+      if (!response.ok) throw new Error('Fetch kļūda')
+      const data = await response.json()
+      
+      let filtered = data.filter(s => 
+        s.category?.toLowerCase().includes('sadzives-tehnika') && 
+        (s.status === 'published' || s.status === 'publicēts')
+      )
+      
+      if (search) {
+        filtered = filtered.filter(s => 
+          s.title?.toLowerCase().includes(search.toLowerCase()) ||
+          s.description?.toLowerCase().includes(search.toLowerCase())
+        )
+      }
+      
+      setSludinajumi(filtered)
+      console.log('⚡ SADZĪVES TEHNIKA OK:', filtered.length)
+    } catch (err) {
+      console.error('SADZĪVES Error:', err)
+    } finally {
+      setLoading(false)
     }
-  ];
+  }
+
+  const openChat = (id, title) => {
+    setCurrentSludinajumsId(id)
+    setCurrentSludinajumsTitle(title)
+    setMessageText('')
+    setIsChatOpen(true)
+  }
+
+  const sendMessage = async () => {
+    if (!messageText.trim()) return
+
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      const supabase = createClient(supabaseUrl, supabaseKey)
+
+      const { error } = await supabase
+        .from('comments')
+        .insert({
+          sludinajums_id: currentSludinajumsId,
+          type: messageType,
+          comment: messageText.trim(),
+          user_email: 'client@test.lv' // TODO: auth vēlāk
+        })
+
+      if (!error) {
+        setMessageText('')
+        setIsChatOpen(false)
+        alert(`✅ Ziņa par "${currentSludinajumsTitle}" nosūtīta!`)
+        fetchData()
+      } else {
+        alert('❌ Kļūda: ' + error.message)
+      }
+    } catch (error) {
+      alert('❌ Kļūda sūtot ziņu')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-4xl text-gray-500 animate-pulse">Ielādē sadzīves tehniku...</div>
+      </div>
+    )
+  }
 
   return (
-    <>
-      <Head>
-        <title>Sadzīves tehnika - TechVibe.lv</title>
-      </Head>
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #ff8a00 0%, #e65100 50%, #ff6d00 100%)',
-        padding: '2rem 1rem',
-        color: 'white'
-      }}>
-        <div style={{maxWidth: '1400px', margin: '0 auto'}}>
-          
-          {/* Header */}
-          <div style={{
-            textAlign: 'center',
-            marginBottom: '4rem',
-            position: 'relative'
-          }}>
-            <Link href="/kategorijas" style={{
-              position: 'absolute', left: '0', top: '0',
-              background: 'rgba(255,255,255,0.2)', color: 'white',
-              padding: '0.75rem 1.5rem', borderRadius: '50px',
-              fontWeight: '600', textDecoration: 'none'
-            }}>← Atpakaļ kategorijās</Link>
-            
-            <div style={{fontSize: '6rem', marginBottom: '1rem'}}>⚡</div>
-            <h1 style={{
-              fontSize: '4rem', fontWeight: 'bold',
-              textShadow: '0 4px 12px rgba(0,0,0,0.3)'
-            }}>Sadzīves tehnika</h1>
-            <p style={{fontSize: '1.5rem', opacity: 0.9}}>Ledusskapji • Plītis • Veļasmašīnas • 4,567 sludinājumi</p>
-          </div>
-
-          {/* Filtrs */}
-          <div style={{
-            background: 'rgba(255,255,255,0.15)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '2rem',
-            padding: '1.5rem 2rem',
-            marginBottom: '3rem',
-            display: 'flex', flexWrap: 'wrap',
-            gap: '1rem', alignItems: 'center'
-          }}>
-            <input placeholder="Meklēt sadzīves tehniku..." style={{
-              flex: 1, minWidth: '300px',
-              padding: '1rem 1.5rem', borderRadius: '50px',
-              border: 'none', background: 'rgba(255,255,255,0.9)',
-              fontSize: '1.1rem'
-            }} />
-            <select style={{padding: '1rem 1.5rem', borderRadius: '50px', border: 'none'}}>
-              <option>Jaunākie</option>
-              <option>Cena augoša</option>
-              <option>Cena dilstoša</option>
-            </select>
-            <Link href="/ievietot?kategorija=sadzives-tehnika" style={{
-              background: 'white', color: '#ff6d00',
-              padding: '1rem 2.5rem', borderRadius: '50px',
-              fontWeight: 'bold', textDecoration: 'none', whiteSpace: 'nowrap'
-            }}>➕ Ievietot</Link>
-          </div>
-
-          {/* Sludinājumi */}
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '2rem'}}>
-            {sludinajumi.map((ad, i) => (
-              <Link key={i} href="/sludinajums/123" style={{
-                background: 'rgba(255,255,255,0.95)',
-                borderRadius: '2rem', overflow: 'hidden',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-                transition: 'all 0.4s', textDecoration: 'none',
-                color: 'initial', display: 'block'
-              }} className="group">
-                <div style={{
-                  height: '220px', backgroundImage: `url(${ad.img})`,
-                  backgroundSize: 'cover', backgroundPosition: 'center',
-                  position: 'relative'
-                }}>
-                  <div style={{
-                    position: 'absolute', top: '1rem', right: '1rem',
-                    background: '#ff6d00', color: 'white',
-                    padding: '0.5rem 1rem', borderRadius: '50px',
-                    fontWeight: 'bold', fontSize: '0.875rem'
-                  }}>Jauns</div>
-                </div>
-                <div style={{padding: '2rem'}}>
-                  <h3 style={{
-                    fontSize: '1.5rem', fontWeight: 'bold',
-                    marginBottom: '1rem', lineHeight: '1.3'
-                  }}>{ad.title}</h3>
-                  <div style={{
-                    display: 'flex', justifyContent: 'space-between',
-                    alignItems: 'center', marginBottom: '1.5rem'
-                  }}>
-                    <p style={{
-                      fontSize: '2.25rem', fontWeight: 'bold',
-                      color: '#ff6d00', margin: 0
-                    }}>{ad.price}</p>
-                    <span style={{
-                      background: 'rgba(255,255,255,0.5)',
-                      padding: '0.5rem 1rem', borderRadius: '1rem',
-                      fontSize: '0.875rem'
-                    }}>{ad.location}</span>
-                  </div>
-                  <p style={{color: '#6b7280', fontSize: '0.95rem'}}>
-                    {ad.date}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* CTA beigās */}
-          <div style={{
-            textAlign: 'center', marginTop: '4rem',
-            padding: '3rem 2rem', background: 'rgba(255,255,255,0.1)',
-            borderRadius: '2rem', backdropFilter: 'blur(20px)'
-          }}>
-            <h2 style={{fontSize: '2.5rem', marginBottom: '1rem'}}>
-              Nav atradis ko meklē?
-            </h2>
-            <Link href="/ievietot?kategorija=sadzives-tehnika" style={{
-              background: 'white', color: '#ff6d00',
-              padding: '1.5rem 4rem', borderRadius: '50px',
-              fontSize: '1.5rem', fontWeight: 'bold',
-              textDecoration: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
-            }}>
-              ➕ Ievieto pats – BEZ MAKSAS!
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* NAVIGĀCIJA KATEGORIJĀM */}
+      <nav className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100 px-6 py-6 shadow-sm">
+        <div className="max-w-7xl mx-auto flex justify-center">
+          <div className="flex items-center gap-2 px-8 py-3 bg-white border border-blue-200 rounded-2xl shadow-lg">
+            <Link href="/kategorijas" className="text-lg font-semibold text-gray-700 hover:text-blue-600">
+              ← Visas kategorijas
+            </Link>
+            <div className="w-px h-6 bg-gray-300 mx-4"></div>
+            <span className="text-2xl font-bold text-blue-600">⚡ SADZĪVES TEHNIKA</span>
+            <div className="w-px h-6 bg-gray-300 mx-4"></div>
+            <Link href="/moto" className="text-lg font-semibold text-gray-700 hover:text-blue-600">
+              🏍️ Moto →
             </Link>
           </div>
         </div>
+      </nav>
+
+      {/* GALVENĀ SATURA DAĻA */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">⚡ Sadzīves tehnika</h1>
+          <p className="text-2xl text-gray-600">{sludinajumi.length} atrasti</p>
+        </div>
+
+        {/* MEKLĒŠANA UN FILTŅI */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-12 flex flex-wrap items-center gap-4 shadow-sm">
+          <input 
+            placeholder="Meklēt Samsung, LG, veļasmašīna, ledusskapis..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <select className="px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg">
+            <option>Jaunākie</option>
+            <option>Cena augoša</option>
+            <option>Cena dilstoša</option>
+          </select>
+          <Link 
+            href="/ievietot?kategorija=sadzives-tehnika"
+            className="bg-blue-600 text-white px-10 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md"
+          >
+            ➕ Ievietot tehniku
+          </Link>
+        </div>
+
+        {/* GRID AR KARTIŅĀM */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+          {sludinajumi.map((item) => {
+            const firstImage = (item.image_public_urls && item.image_public_urls[0]) || 
+                              (item.images && item.images[0]) ||
+                              'https://via.placeholder.com/300x200/f8f9fa/6c757d?text=⚡+Tehnika';
+
+            return (
+              <div key={item.id} className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-gray-100">
+                <div className="p-6">
+                  <img 
+                    src={firstImage} 
+                    alt={item.title} 
+                    className="w-full h-48 object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform" 
+                  />
+                  <div className="flex items-center mb-2">
+                    <div className="flex text-yellow-400 text-sm mr-2">★★★★☆</div>
+                    <span className="text-sm text-gray-500">(14 reviews)</span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2 line-clamp-2">{item.title || 'Sadzīves tehnika'}</h3>
+                  <p className="text-gray-600 text-sm mb-6 line-clamp-2">
+                    {item.description?.slice(0,100) || `${item.location || 'Rīga'} • Strādā kā jauna`}
+                  </p>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-gray-900">
+                        {item.price ? `${item.price.toLocaleString()}€` : 'Vienojamies'}
+                      </span>
+                    </div>
+                    <div className="flex space-x-2 pt-2">
+                      <Link 
+                        href={`/sludinajums/${item.id}`}
+                        className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all text-center shadow-md"
+                      >
+                        👁️ Apskatīt
+                      </Link>
+                      <button 
+                        onClick={() => openChat(item.id, item.title)}
+                        className="flex-1 bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-md flex items-center justify-center"
+                      >
+                        💬 Sazināties
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {sludinajumi.length === 0 && (
+          <div className="text-center py-24">
+            <div className="text-6xl mb-8">⚡</div>
+            <h2 className="text-3xl font-bold mb-4">Nav sadzīves tehnikas</h2>
+            <Link href="/ievietot?kategorija=sadzives-tehnika" className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg">
+              Nav atradis? Ievieto pats – BEZ MAKSAS!
+            </Link>
+          </div>
+        )}
+
+        {/* CTA */}
+        <div className="text-center p-12 bg-gray-50 rounded-2xl border border-gray-200">
+          <h2 className="text-3xl font-bold mb-6">Atjauno mājas tehniku ātri!</h2>
+          <Link
+            href="/ievietot?kategorija=sadzives-tehnika"
+            className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all"
+          >
+            ➕ Publicēt bez maksas
+          </Link>
+        </div>
       </div>
-    </>
-  );
+
+      {/* MODAL */}
+      {isChatOpen && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl border-4 border-emerald-100">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-800">
+                💬 Ziņa par: <span className="text-emerald-600">"{currentSludinajumsTitle}"</span>
+              </h2>
+              <button 
+                onClick={() => setIsChatOpen(false)}
+                className="text-3xl font-bold text-gray-500 hover:text-gray-700 p-2 -m-2 rounded-full hover:bg-gray-100"
+              >
+                ×
+              </button>
+            </div>
+
+            <select 
+              value={messageType} 
+              onChange={(e) => setMessageType(e.target.value)}
+              className="w-full p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 focus:outline-none focus:border-emerald-500"
+            >
+              <option value="comment">📝 Komentārs</option>
+              <option value="price_offer">💰 Kaulēt cenu</option>
+              <option value="request_photos">🖼️ Vairāk bilžu</option>
+              <option value="question">❓ Jautājums</option>
+            </select>
+
+            <textarea
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder={`Sveiks! Interesējos par "${currentSludinajumsTitle}". ...`}
+              className="w-full h-32 p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 resize-vertical focus:outline-none focus:border-emerald-500"
+              rows={4}
+            />
+
+            <div className="flex gap-4 pt-2">
+              <button
+                onClick={sendMessage}
+                disabled={!messageText.trim()}
+                className="flex-1 bg-emerald-600 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+              >
+                🚀 Nosūtīt ziņu
+              </button>
+              <button
+                onClick={() => setIsChatOpen(false)}
+                className="flex-1 bg-gray-500 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-gray-600 transition-all shadow-lg"
+              >
+                ❌ Atcelt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
