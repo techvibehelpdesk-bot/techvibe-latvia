@@ -1,125 +1,314 @@
-import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import Head from 'next/head';
-import Link from 'next/link';
+'use client'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export default function DatoriPage() {
+  const [sludinajumi, setSludinajumi] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
 
-export default function Datori() {
-  const [sludinajumi, setSludinajumi] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [currentSludinajumsId, setCurrentSludinajumsId] = useState('')
+  const [currentSludinajumsTitle, setCurrentSludinajumsTitle] = useState('')
+  const [messageType, setMessageType] = useState('comment')
+  const [messageText, setMessageText] = useState('')
 
   useEffect(() => {
-    fetchSludinajumi();
-  }, []);
+    fetchData()
+  }, [search])
 
-  const fetchSludinajumi = async () => {
+  async function fetchData() {
     try {
-      const { data, error } = await supabase
-        .from('sludinajumi')
-        .select('*')
-        .eq('category', 'datori')  // 💻 DATORI KATEGORIJA
-        .eq('status', 'publicēts')
-        .order('created_at', { ascending: false });
+      setLoading(true)
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-      if (error) throw error;
-      setSludinajumi(data || []);
-    } catch (error) {
-      console.error('Kļūda ielādējot datoru sludinājumus:', error);
+      const response = await fetch(
+        `${supabaseUrl}/rest/v1/sludinajumi?select=*`,
+        {
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+          },
+        }
+      )
+
+      if (!response.ok) throw new Error('Fetch kļūda')
+      const data = await response.json()
+
+      let filtered = data.filter(
+        (s) =>
+          s.category?.toLowerCase().includes('datori') &&
+          s.status === 'published'
+      )
+
+      if (search) {
+        filtered = filtered.filter(
+          (s) =>
+            s.title?.toLowerCase().includes(search.toLowerCase()) ||
+            s.description?.toLowerCase().includes(search.toLowerCase())
+        )
+      }
+
+      setSludinajumi(filtered)
+    } catch (err) {
+      console.error('Datori Error:', err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
+
+  const openChat = (id, title) => {
+    setCurrentSludinajumsId(id)
+    setCurrentSludinajumsTitle(title)
+    setMessageText('')
+    setIsChatOpen(true)
+  }
+
+  const sendMessage = async () => {
+    if (!messageText.trim()) return
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      const supabase = createClient(supabaseUrl, supabaseKey)
+
+      const { error } = await supabase.from('comments').insert({
+        sludinajums_id: currentSludinajumsId,
+        type: messageType,
+        comment: messageText.trim(),
+        user_email: 'client@test.lv',
+      })
+
+      if (!error) {
+        setMessageText('')
+        setIsChatOpen(false)
+        alert(`✅ Ziņa nosūtīta!`)
+      } else {
+        alert('❌ Kļūda: ' + error.message)
+      }
+    } catch (error) {
+      alert('❌ Kļūda sūtot ziņu')
+    }
+  }
 
   if (loading) {
-    return <div style={{minHeight: '100vh', background: 'linear-gradient(to bottom right, #ecfdf5, #6ee7b7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem'}}>💻 Ielādē datoru sludinājumus...</div>;
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-4xl text-gray-500 animate-pulse">
+          Ielādē datoru sludinājumus...
+        </div>
+      </div>
+    )
   }
 
   return (
-    <>
-      <Head>
-        <title>💻 Datori - TechVibe.lv</title>
-      </Head>
-      <div style={{minHeight: '100vh', background: 'linear-gradient(to bottom right, #ecfdf5, #6ee7b7)', padding: '2rem 1rem'}}>
-        <div style={{maxWidth: '1200px', margin: '0 auto'}}>
-          <div style={{marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
-            <h1 style={{fontSize: '2.5rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.5rem'}}>💻 Datori un tehnika</h1>
-            <p style={{fontSize: '1.25rem', color: '#6b7280', marginBottom: '1rem'}}>
-              {sludinajumi.length} datoru un tehnikas sludinājumi
-            </p>
-            <Link 
-              href="/ievietot" 
-              style={{
-                background: '#059669', color: 'white', padding: '0.75rem 2rem', borderRadius: '0.75rem', 
-                fontWeight: '600', textDecoration: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
-              }}
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* NAVIGĀCIJA */}
+      <nav className="bg-white border-b border-gray-200 px-6 py-6 shadow-sm">
+        <div className="max-w-7xl mx-auto flex justify-center">
+          <div className="flex items-center gap-2 px-8 py-3 bg-gray-50 border border-gray-200 rounded-2xl shadow-md">
+            <Link
+              href="/kategorijas"
+              className="text-lg font-semibold text-gray-700 hover:text-gray-900"
             >
-              ➕ Ievietot datoru sludinājumu
+              ← Visas kategorijas
+            </Link>
+            <div className="w-px h-6 bg-gray-300 mx-4" />
+            <span className="text-2xl font-bold text-blue-600">
+              💻 Datori un tehnika
+            </span>
+            <div className="w-px h-6 bg-gray-300 mx-4" />
+            <Link
+              href="/test-auto"
+              className="text-lg font-semibold text-gray-700 hover:text-gray-900"
+            >
+              🚗 Auto →
             </Link>
           </div>
+        </div>
+      </nav>
 
-          {sludinajumi.length === 0 ? (
-            <div style={{textAlign: 'center', padding: '5rem 1rem'}}>
-              <div style={{fontSize: '4rem', marginBottom: '1rem'}}>💻</div>
-              <h2 style={{fontSize: '2rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '1rem'}}>
-                Vēl nav datoru sludinājumu
-              </h2>
-              <Link href="/ievietot" style={{background: '#059669', color: 'white', padding: '0.75rem 2rem', borderRadius: '0.75rem', fontWeight: '600', textDecoration: 'none'}}>
-                Būt pirmais!
-              </Link>
-            </div>
-          ) : (
-            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem'}}>
-              {sludinajumi.map((sludinajums) => (
-                <div 
-                  key={sludinajums.id} 
-                  style={{
-                    background: 'white', borderRadius: '1rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
-                    transition: 'all 0.3s', overflow: 'hidden'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(0,0,0,0.25)';
-                    e.currentTarget.style.transform = 'scale(1.02)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)';
-                    e.currentTarget.style.transform = 'scale(1)';
-                  }}
-                >
-                  <div style={{height: '12rem', background: 'linear-gradient(to right, #3b82f6, #1d4ed8)', position: 'relative', overflow: 'hidden'}}>
-                    {sludinajums.images && sludinajums.images[0] ? (
-                      <img src={sludinajums.images[0]} alt={sludinajums.title} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
-                    ) : (
-                      <div style={{width: '100%', height: '100%', background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <span style={{color: '#1e40af', fontSize: '1.125rem'}}>Nav bildes</span>
-                      </div>
-                    )}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* VIRSRKASTS */}
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+            💻 Datori un tehnika
+          </h1>
+          <p className="text-2xl text-gray-600">
+            {sludinajumi.length} sludinājumi
+          </p>
+        </div>
+
+        {/* MEKLĒŠANA */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-12 flex flex-wrap items-center gap-4 shadow-sm">
+          <input
+            placeholder="Meklēt datorus, klaviatūras, monitorus..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <select className="px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg">
+            <option>Jaunākie</option>
+            <option>Cena augoša</option>
+            <option>Cena dilstoša</option>
+          </select>
+          <Link
+            href="/ievietot?kategorija=datori"
+            className="bg-blue-600 text-white px-10 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md"
+          >
+            ➕ Ievietot
+          </Link>
+        </div>
+
+        {/* GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+          {sludinajumi.map((item) => {
+            const firstImage =
+              (item.image_public_urls && item.image_public_urls[0]) ||
+              'https://via.placeholder.com/300x200/f8f9fa/6c757d?text=💻+Dators'
+
+            return (
+              <div
+                key={item.id}
+                className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-gray-100"
+              >
+                <div className="p-6">
+                  <img
+                    src={firstImage}
+                    alt={item.title}
+                    className="w-full h-48 object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform"
+                  />
+                  <div className="flex items-center mb-2">
+                    <div className="flex text-yellow-400 text-sm mr-2">
+                      ★★★★☆
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      (12 reviews)
+                    </span>
                   </div>
-                  <div style={{padding: '1.5rem'}}>
-                    <h3 style={{fontWeight: 'bold', fontSize: '1.25rem', color: '#1f2937', marginBottom: '0.5rem'}}>
-                      {sludinajums.title}
-                    </h3>
-                    <p style={{color: '#6b7280', marginBottom: '1rem'}}>
-                      {sludinajums.description}
-                    </p>
-                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                      <span style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#059669'}}>
-                        {sludinajums.price} €
+                  <h3 className="font-bold text-lg mb-2 line-clamp-2">
+                    {item.title || 'Dators'}
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-6 line-clamp-2">
+                    {item.description?.slice(0, 100) ||
+                      `${item.location || 'Rīga'} • Tehnika`}
+                  </p>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-gray-900">
+                        {item.price
+                          ? `${item.price.toLocaleString()}€`
+                          : 'Sazinies'}
                       </span>
-                      <span style={{fontSize: '0.875rem', color: '#6b7280'}}>
-                        {new Date(sludinajums.created_at).toLocaleDateString('lv-LV')}
-                      </span>
+                    </div>
+                    <div className="flex space-x-2 pt-2">
+                      <Link
+                        href={`/sludinajums/${item.id}`}
+                        className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all text-center shadow-md"
+                      >
+                        👁️ Apskatīt
+                      </Link>
+                      <button
+                        onClick={() => openChat(item.id, item.title)}
+                        className="flex-1 bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-green-700 transition-all shadow-md flex items-center justify-center"
+                      >
+                        💬 Sazināties
+                      </button>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            )
+          })}
+        </div>
+
+        {/* TUKŠS STĀVOKLIS */}
+        {sludinajumi.length === 0 && (
+          <div className="text-center py-24">
+            <div className="text-6xl mb-8">💻</div>
+            <h2 className="text-3xl font-bold mb-4">Vēl nav datoru sludinājumu</h2>
+            <Link
+              href="/ievietot?kategorija=datori"
+              className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:bg-blue-700"
+            >
+              ➕ Būt pirmais!
+            </Link>
+          </div>
+        )}
+
+        {/* CTA */}
+        <div className="text-center p-12 bg-gray-50 rounded-2xl border border-gray-200">
+          <h2 className="text-3xl font-bold mb-6">
+            Pārdod vai pērc datorus un tehniku!
+          </h2>
+          <Link
+            href="/ievietot?kategorija=datori"
+            className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all"
+          >
+            ➕ Publicēt bez maksas
+          </Link>
         </div>
       </div>
-    </>
-  );
+
+      {/* MODĀLIS */}
+      {isChatOpen && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl border-4 border-green-100">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-800">
+                💬 Ziņa par:{' '}
+                <span className="text-green-600">
+                  "{currentSludinajumsTitle}"
+                </span>
+              </h2>
+              <button
+                onClick={() => setIsChatOpen(false)}
+                className="text-3xl font-bold text-gray-500 hover:text-gray-700 p-2 -m-2 rounded-full hover:bg-gray-100"
+              >
+                ×
+              </button>
+            </div>
+
+            <select
+              value={messageType}
+              onChange={(e) => setMessageType(e.target.value)}
+              className="w-full p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-gray-50"
+            >
+              <option value="comment">📝 Komentārs</option>
+              <option value="price_offer">💰 Kaulēt cenu</option>
+              <option value="request_photos">🖼️ Vēl bildes</option>
+              <option value="question">❓ Jautājums</option>
+            </select>
+
+            <textarea
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder={`Sveiks! Interesējos par "${currentSludinajumsTitle}". ...`}
+              className="w-full h-32 p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 resize-vertical focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-gray-50"
+              rows={4}
+            />
+
+            <div className="flex gap-4 pt-2">
+              <button
+                onClick={sendMessage}
+                disabled={!messageText.trim()}
+                className="flex-1 bg-green-600 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-green-200"
+              >
+                🚀 Nosūtīt ziņu
+              </button>
+              <button
+                onClick={() => setIsChatOpen(false)}
+                className="flex-1 bg-gray-500 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-gray-600 transition-all shadow-lg focus:outline-none focus:ring-4 focus:ring-gray-200"
+              >
+                ❌ Atcelt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
