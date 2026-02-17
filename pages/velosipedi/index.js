@@ -1,159 +1,284 @@
-import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import Head from 'next/head';
-import Link from 'next/link';
+'use client'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export default function VelosipediPage() {
+  const [sludinajumi, setSludinajumi] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
 
-export default function Velosipedi() {
-  const [sludinajumi, setSludinajumi] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // MODAL STATE
+  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [currentSludinajumsId, setCurrentSludinajumsId] = useState('')
+  const [currentSludinajumsTitle, setCurrentSludinajumsTitle] = useState('')
+  const [messageType, setMessageType] = useState('comment')
+  const [messageText, setMessageText] = useState('')
 
   useEffect(() => {
-    fetchSludinajumi();
-  }, []);
+    fetchData()
+  }, [search])
 
-  const fetchSludinajumi = async () => {
+  async function fetchData() {
     try {
-      const { data, error } = await supabase
-        .from('sludinajumi')
-        .select('*')
-        .eq('category', 'velosipedi')
-        .eq('status', 'publicēts')
-        .order('created_at', { ascending: false });
+      setLoading(true)
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-      if (error) throw error;
-      setSludinajumi(data || []);
-    } catch (error) {
-      console.error('Kļūda ielādējot velosipēdus:', error);
+      const response = await fetch(`${supabaseUrl}/rest/v1/sludinajumi?select=*`, {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`
+        }
+      })
+
+      if (!response.ok) throw new Error('Fetch kļūda')
+      const data = await response.json()
+      
+      let filtered = data.filter(s => 
+        s.category?.toLowerCase().includes('velosipedi') && 
+        (s.status === 'published' || s.status === 'publicēts')
+      )
+      
+      if (search) {
+        filtered = filtered.filter(s => 
+          s.title?.toLowerCase().includes(search.toLowerCase()) ||
+          s.description?.toLowerCase().includes(search.toLowerCase())
+        )
+      }
+      
+      setSludinajumi(filtered)
+      console.log('🚲 VELOSIPĒDI OK:', filtered.length)
+    } catch (err) {
+      console.error('VELOSIPĒDI Error:', err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
+
+  const openChat = (id, title) => {
+    setCurrentSludinajumsId(id)
+    setCurrentSludinajumsTitle(title)
+    setMessageText('')
+    setIsChatOpen(true)
+  }
+
+  const sendMessage = async () => {
+    if (!messageText.trim()) return
+
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      const supabase = createClient(supabaseUrl, supabaseKey)
+
+      const { error } = await supabase
+        .from('comments')
+        .insert({
+          sludinajums_id: currentSludinajumsId,
+          type: messageType,
+          comment: messageText.trim(),
+          user_email: 'client@test.lv' // TODO: auth vēlāk
+        })
+
+      if (!error) {
+        setMessageText('')
+        setIsChatOpen(false)
+        alert(`✅ Ziņa par "${currentSludinajumsTitle}" nosūtīta!`)
+        fetchData()
+      } else {
+        alert('❌ Kļūda: ' + error.message)
+      }
+    } catch (error) {
+      alert('❌ Kļūda sūtot ziņu')
+    }
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-xl font-semibold text-gray-700">🚲 Ielādē velosipēdus...</p>
-        </div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-4xl text-gray-500 animate-pulse">Ielādē velosipēdus...</div>
       </div>
-    );
+    )
   }
 
   return (
-    <>
-      <Head>
-        <title>🚲 Velosipēdi - TechVibe.lv</title>
-        <meta name="description" content="Velosipēdi, skūteri un aksesuāri - pērc un pārdod Rīgā un Latvijā!" />
-      </Head>
-
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-4">
-              <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-700 bg-clip-text text-transparent">
-                TechVibe.lv
-              </Link>
-              <nav className="hidden md:flex space-x-8">
-                <Link href="/kategorijas" className="text-gray-700 hover:text-green-600 font-medium">Kategorijas</Link>
-                <Link href="/izsole" className="text-gray-700 hover:text-green-600 font-medium">Izsoles</Link>
-                <Link href="/pievienot" className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium">+ Pievienot sludinājumu</Link>
-              </nav>
-            </div>
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* NAVIGĀCIJA KATEGORIJĀM */}
+      <nav className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100 px-6 py-6 shadow-sm">
+        <div className="max-w-7xl mx-auto flex justify-center">
+          <div className="flex items-center gap-2 px-8 py-3 bg-white border border-blue-200 rounded-2xl shadow-lg">
+            <Link href="/kategorijas" className="text-lg font-semibold text-gray-700 hover:text-blue-600">
+              ← Visas kategorijas
+            </Link>
+            <div className="w-px h-6 bg-gray-300 mx-4"></div>
+            <span className="text-2xl font-bold text-blue-600">🚲 VELOSIPĒDI</span>
+            <div className="w-px h-6 bg-gray-300 mx-4"></div>
+            <Link href="/telefoni" className="text-lg font-semibold text-gray-700 hover:text-blue-600">
+              📱 Telefoni →
+            </Link>
           </div>
-        </header>
+        </div>
+      </nav>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-emerald-700 bg-clip-text text-transparent mb-4">
-              🚲 Velosipēdi & Skūteri
-            </h1>
-            <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-              Atrodi savu ideālo velosipēdu! Kalnu, šosejas, bērnu, elektriskie - viss vienā vietā.
-            </p>
-          </div>
-
-          {sludinajumi.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="mx-auto w-24 h-24 bg-green-100 rounded-2xl flex items-center justify-center mb-6">
-                <span className="text-3xl">🚲</span>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Vēl nav velosipēdu sludinājumu</h2>
-              <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                Esi pirmais! Pievieno savu velosipēdu vai skūteri tirdzniecībai.
-              </p>
-              <Link 
-                href="/pievienot" 
-                className="bg-green-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-green-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                + Pievienot sludinājumu
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {sludinajumi.map((sludinajums) => (
-                <Link 
-                  key={sludinajums.id} 
-                  href={`/sludinajums/${sludinajums.id}`}
-                  className="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 overflow-hidden"
-                >
-                  <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-emerald-50 group-hover:to-green-50 transition-all duration-300 flex items-center justify-center">
-                    {sludinajums.image_url ? (
-                      <img 
-                        src={sludinajums.image_url} 
-                        alt={sludinajums.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-4xl opacity-50">🚲</span>
-                    )}
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-green-600 transition-colors mb-2 line-clamp-2">
-                      {sludinajums.title}
-                    </h3>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-2xl font-bold text-green-600">
-                        {sludinajums.price ? `${sludinajums.price.toLocaleString()} €` : 'Sazinies'}
-                      </span>
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
-                        {sludinajums.location || 'Rīga'}
-                      </span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-500 mb-3">
-                      <span className="flex items-center mr-4">
-                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                        Jauns
-                      </span>
-                      <span className="flex items-center">
-                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                        </svg>
-                        {new Date(sludinajums.created_at).toLocaleDateString('lv-LV')}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}  
-            </div>
-          )}
+      {/* GALVENĀ SATURA DAĻA */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">🚲 Velosipēdi & Skūteri</h1>
+          <p className="text-2xl text-gray-600">{sludinajumi.length} atrasti</p>
         </div>
 
-        {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 mt-20">
-          <div className="max-w-7xl mx-auto px-4 py-12 text-center text-gray-600">
-            <p>&copy; 2026 TechVibe.lv - Tava sludinājumu platforma Latvijā 🚀</p>
+        {/* MEKLĒŠANA UN FILTŅI */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-12 flex flex-wrap items-center gap-4 shadow-sm">
+          <input 
+            placeholder="Meklēt kalnu, šosejas, bērnu, elektro..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <select className="px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg">
+            <option>Jaunākie</option>
+            <option>Cena augoša</option>
+            <option>Cena dilstoša</option>
+          </select>
+          <Link 
+            href="/ievietot?kategorija=velosipedi"
+            className="bg-blue-600 text-white px-10 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md"
+          >
+            ➕ Ievietot velosipēdu
+          </Link>
+        </div>
+
+        {/* GRID AR KARTIŅĀM */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+          {sludinajumi.map((item) => {
+            const firstImage = (item.image_public_urls && item.image_public_urls[0]) || 
+                              (item.images && item.images[0]) || 
+                              (item.image_url) ||
+                              'https://via.placeholder.com/300x200/f8f9fa/6c757d?text=🚲+Velosipēds';
+
+            return (
+              <div key={item.id} className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-gray-100">
+                <div className="p-6">
+                  <img 
+                    src={firstImage} 
+                    alt={item.title} 
+                    className="w-full h-48 object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform" 
+                  />
+                  <div className="flex items-center mb-2">
+                    <div className="flex text-yellow-400 text-sm mr-2">★★★★☆</div>
+                    <span className="text-sm text-gray-500">(11 reviews)</span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2 line-clamp-2">{item.title || 'Velosipēds'}</h3>
+                  <p className="text-gray-600 text-sm mb-6 line-clamp-2">
+                    {item.description?.slice(0,100) || `${item.location || 'Rīga'} • Pedāļi kā jauni`}
+                  </p>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-gray-900">
+                        {item.price ? `${item.price.toLocaleString()}€` : 'Vienojamies'}
+                      </span>
+                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
+                        {item.location || 'Rīga'}
+                      </span>
+                    </div>
+                    <div className="flex space-x-2 pt-2">
+                      <Link 
+                        href={`/sludinajums/${item.id}`}
+                        className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all text-center shadow-md"
+                      >
+                        👁️ Apskatīt
+                      </Link>
+                      <button 
+                        onClick={() => openChat(item.id, item.title)}
+                        className="flex-1 bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-md flex items-center justify-center"
+                      >
+                        💬 Sazināties
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {sludinajumi.length === 0 && (
+          <div className="text-center py-24">
+            <div className="text-6xl mb-8">🚲</div>
+            <h2 className="text-3xl font-bold mb-4">Nav velosipēdu sludinājumu</h2>
+            <Link href="/ievietot?kategorija=velosipedi" className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg">
+              Esi pirmais! Pievieno savu velosipēdu
+            </Link>
           </div>
-        </footer>
+        )}
+
+        {/* CTA */}
+        <div className="text-center p-12 bg-gray-50 rounded-2xl border border-gray-200">
+          <h2 className="text-3xl font-bold mb-6">Atrodi ideālo velosipēdu!</h2>
+          <Link
+            href="/ievietot?kategorija=velosipedi"
+            className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all"
+          >
+            ➕ Publicēt bez maksas
+          </Link>
+        </div>
       </div>
-    </>
-  );
+
+      {/* MODAL */}
+      {isChatOpen && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl border-4 border-emerald-100">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-800">
+                💬 Ziņa par: <span className="text-emerald-600">"{currentSludinajumsTitle}"</span>
+              </h2>
+              <button 
+                onClick={() => setIsChatOpen(false)}
+                className="text-3xl font-bold text-gray-500 hover:text-gray-700 p-2 -m-2 rounded-full hover:bg-gray-100"
+              >
+                ×
+              </button>
+            </div>
+
+            <select 
+              value={messageType} 
+              onChange={(e) => setMessageType(e.target.value)}
+              className="w-full p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 focus:outline-none focus:border-emerald-500"
+            >
+              <option value="comment">📝 Komentārs</option>
+              <option value="price_offer">💰 Kaulēt cenu</option>
+              <option value="request_photos">🖼️ Vairāk bilžu</option>
+              <option value="question">❓ Jautājums</option>
+            </select>
+
+            <textarea
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder={`Sveiks! Interesējos par "${currentSludinajumsTitle}". ...`}
+              className="w-full h-32 p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 resize-vertical focus:outline-none focus:border-emerald-500"
+              rows={4}
+            />
+
+            <div className="flex gap-4 pt-2">
+              <button
+                onClick={sendMessage}
+                disabled={!messageText.trim()}
+                className="flex-1 bg-emerald-600 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+              >
+                🚀 Nosūtīt ziņu
+              </button>
+              <button
+                onClick={() => setIsChatOpen(false)}
+                className="flex-1 bg-gray-500 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-gray-600 transition-all shadow-lg"
+              >
+                ❌ Atcelt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
