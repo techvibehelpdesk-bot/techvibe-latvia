@@ -1,194 +1,314 @@
-import Link from 'next/link';
-import Head from 'next/head';
+'use client'
 
-export default function DarbsVakances() {
-  const vakances = [
-    {
-      img: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400',
-      title: 'Full Stack izstrādātājs (React/Node.js)',
-      company: 'TechStartup LV',
-      salary: '€2,500 - €4,000',
-      location: 'Rīga (hibrīds)',
-      date: '2h atpakaļ'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400',
-      title: 'Grafiskais dizainers (UI/UX)',
-      company: 'DesignHub',
-      salary: '€1,800 - €2,800',
-      location: 'Rīga, centrs',
-      date: '5h atpakaļ'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=400',
-      title: 'Pārdevējs veikala (pilna slodze)',
-      company: 'Maxima',
-      salary: '€1,100 + prēmijas',
-      location: 'Daugavpils',
-      date: '1 diena'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400',
-      title: 'Marketing speciālists (SEO/SMM)',
-      company: 'DigitalPro',
-      salary: '€2,000 - €3,200',
-      location: 'Jūrmala (attālināti)',
-      date: '3 dienas'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400',
-      title: 'Loģistikas vadītājs',
-      company: 'CargoExpress',
-      salary: '€2,800 - €3,800',
-      location: 'Liepāja',
-      date: 'Vakardien'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400',
-      title: 'Buchgalters (puse slodzes)',
-      company: 'AccountLV',
-      salary: '€900 - €1,400',
-      location: 'Rīga, Pārdaugava',
-      date: '4h atpakaļ'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { createClient } from '@supabase/supabase-js'
+
+export default function DarbsVakancesPage() {
+  const [sludinajumi, setSludinajumi] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+
+  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [currentSludinajumsId, setCurrentSludinajumsId] = useState('')
+  const [currentSludinajumsTitle, setCurrentSludinajumsTitle] = useState('')
+  const [messageType, setMessageType] = useState('comment')
+  const [messageText, setMessageText] = useState('')
+
+  useEffect(() => {
+    fetchData()
+  }, [search])
+
+  async function fetchData() {
+    try {
+      setLoading(true)
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+      const response = await fetch(
+        `${supabaseUrl}/rest/v1/sludinajumi?select=*`,
+        {
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+          },
+        }
+      )
+
+      if (!response.ok) throw new Error('Fetch kļūda')
+      const data = await response.json()
+
+      let filtered = data.filter(
+        (s) =>
+          s.category?.toLowerCase().includes('darbs-vakances') &&
+          s.status === 'published'
+      )
+
+      if (search) {
+        filtered = filtered.filter(
+          (s) =>
+            s.title?.toLowerCase().includes(search.toLowerCase()) ||
+            s.description?.toLowerCase().includes(search.toLowerCase())
+        )
+      }
+
+      setSludinajumi(filtered)
+    } catch (err) {
+      console.error('Darbs & Vakances Error:', err)
+    } finally {
+      setLoading(false)
     }
-  ];
+  }
+
+  const openChat = (id, title) => {
+    setCurrentSludinajumsId(id)
+    setCurrentSludinajumsTitle(title)
+    setMessageText('')
+    setIsChatOpen(true)
+  }
+
+  const sendMessage = async () => {
+    if (!messageText.trim()) return
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      const supabase = createClient(supabaseUrl, supabaseKey)
+
+      const { error } = await supabase.from('comments').insert({
+        sludinajums_id: currentSludinajumsId,
+        type: messageType,
+        comment: messageText.trim(),
+        user_email: 'client@test.lv',
+      })
+
+      if (!error) {
+        setMessageText('')
+        setIsChatOpen(false)
+        alert(`✅ Ziņa nosūtīta!`)
+      } else {
+        alert('❌ Kļūda: ' + error.message)
+      }
+    } catch (error) {
+      alert('❌ Kļūda sūtot ziņu')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-4xl text-gray-500 animate-pulse">
+          Ielādē vakances...
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <>
-      <Head>
-        <title>Darbs & Vakances - TechVibe.lv</title>
-      </Head>
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #10b981 0%, #047857 50%, #059669 100%)',
-        padding: '2rem 1rem',
-        color: 'white'
-      }}>
-        <div style={{maxWidth: '1400px', margin: '0 auto'}}>
-          
-          {/* Header */}
-          <div style={{
-            textAlign: 'center',
-            marginBottom: '4rem',
-            position: 'relative'
-          }}>
-            <Link href="/kategorijas" style={{
-              position: 'absolute', left: '0', top: '0',
-              background: 'rgba(255,255,255,0.2)', color: 'white',
-              padding: '0.75rem 1.5rem', borderRadius: '50px',
-              fontWeight: '600', textDecoration: 'none'
-            }}>← Atpakaļ kategorijās</Link>
-            
-            <div style={{fontSize: '6rem', marginBottom: '1rem'}}>💼</div>
-            <h1 style={{
-              fontSize: '4rem', fontWeight: 'bold',
-              textShadow: '0 4px 12px rgba(0,0,0,0.3)'
-            }}>Darbs & Vakances</h1>
-            <p style={{fontSize: '1.5rem', opacity: 0.9}}>IT • Pārdošana • Administrācija • 12,024 sludinājumi</p>
-          </div>
-
-          {/* Filtrs */}
-          <div style={{
-            background: 'rgba(255,255,255,0.15)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '2rem',
-            padding: '1.5rem 2rem',
-            marginBottom: '3rem',
-            display: 'flex', flexWrap: 'wrap',
-            gap: '1rem', alignItems: 'center'
-          }}>
-            <input placeholder="Meklēt darbu vai vakances..." style={{
-              flex: 1, minWidth: '300px',
-              padding: '1rem 1.5rem', borderRadius: '50px',
-              border: 'none', background: 'rgba(255,255,255,0.9)',
-              fontSize: '1.1rem'
-            }} />
-            <select style={{padding: '1rem 1.5rem', borderRadius: '50px', border: 'none'}}>
-              <option>Jaunākās</option>
-              <option>Alga augoša</option>
-              <option>Alga dilstoša</option>
-            </select>
-            <Link href="/ievietot?kategorija=darbs-vakances" style={{
-              background: 'white', color: '#10b981',
-              padding: '1rem 2.5rem', borderRadius: '50px',
-              fontWeight: 'bold', textDecoration: 'none', whiteSpace: 'nowrap'
-            }}>➕ Ievietot</Link>
-          </div>
-
-          {/* Vakances */}
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '2rem'}}>
-            {vakances.map((job, i) => (
-              <Link key={i} href="/sludinajums/456" style={{
-                background: 'rgba(255,255,255,0.95)',
-                borderRadius: '2rem', overflow: 'hidden',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-                transition: 'all 0.4s', textDecoration: 'none',
-                color: 'initial', display: 'block'
-              }} className="group">
-                <div style={{
-                  height: '200px', backgroundImage: `url(${job.img})`,
-                  backgroundSize: 'cover', backgroundPosition: 'center',
-                  position: 'relative'
-                }}>
-                  <div style={{
-                    position: 'absolute', top: '1rem', right: '1rem',
-                    background: '#10b981', color: 'white',
-                    padding: '0.5rem 1rem', borderRadius: '50px',
-                    fontWeight: 'bold', fontSize: '0.875rem'
-                  }}>Vakance</div>
-                </div>
-                <div style={{padding: '2.5rem'}}>
-                  <h3 style={{
-                    fontSize: '1.5rem', fontWeight: 'bold',
-                    marginBottom: '1rem', lineHeight: '1.3'
-                  }}>{job.title}</h3>
-                  <p style={{
-                    fontSize: '1.125rem', color: '#374151',
-                    marginBottom: '1rem', fontWeight: '600'
-                  }}>{job.company}</p>
-                  <div style={{
-                    display: 'flex', justifyContent: 'space-between',
-                    alignItems: 'center', marginBottom: '1.5rem'
-                  }}>
-                    <p style={{
-                      fontSize: '1.75rem', fontWeight: 'bold',
-                      color: '#10b981', margin: 0
-                    }}>{job.salary}</p>
-                    <span style={{
-                      background: 'rgba(16,185,129,0.2)',
-                      color: '#10b981', padding: '0.5rem 1rem',
-                      borderRadius: '1rem', fontSize: '0.95rem',
-                      fontWeight: '600'
-                    }}>{job.location}</span>
-                  </div>
-                  <p style={{color: '#6b7280', fontSize: '0.95rem'}}>
-                    {job.date}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* CTA */}
-          <div style={{
-            textAlign: 'center', marginTop: '4rem',
-            padding: '3rem 2rem', background: 'rgba(255,255,255,0.1)',
-            borderRadius: '2rem', backdropFilter: 'blur(20px)'
-          }}>
-            <h2 style={{fontSize: '2.5rem', marginBottom: '1rem'}}>
-              Meklē darbu? Vai meklē darbinieku?
-            </h2>
-            <Link href="/ievietot?kategorija=darbs-vakances" style={{
-              background: 'white', color: '#10b981',
-              padding: '1.5rem 4rem', borderRadius: '50px',
-              fontSize: '1.5rem', fontWeight: 'bold',
-              textDecoration: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
-            }}>
-              ➕ Publicē sludinājumu tagad!
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* NAVIGĀCIJA */}
+      <nav className="bg-white border-b border-gray-200 px-6 py-6 shadow-sm">
+        <div className="max-w-7xl mx-auto flex justify-center">
+          <div className="flex items-center gap-2 px-8 py-3 bg-gray-50 border border-gray-200 rounded-2xl shadow-md">
+            <Link
+              href="/kategorijas"
+              className="text-lg font-semibold text-gray-700 hover:text-gray-900"
+            >
+              ← Visas kategorijas
+            </Link>
+            <div className="w-px h-6 bg-gray-300 mx-4" />
+            <span className="text-2xl font-bold text-blue-600">
+              💼 Darbs &amp; vakances
+            </span>
+            <div className="w-px h-6 bg-gray-300 mx-4" />
+            <Link
+              href="/test-auto"
+              className="text-lg font-semibold text-gray-700 hover:text-gray-900"
+            >
+              🚗 Auto →
             </Link>
           </div>
         </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* VIRSRKASTS */}
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+            💼 Darbs &amp; vakances
+          </h1>
+          <p className="text-2xl text-gray-600">
+            {sludinajumi.length} atrasti
+          </p>
+        </div>
+
+        {/* MEKLĒŠANA */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-12 flex flex-wrap items-center gap-4 shadow-sm">
+          <input
+            placeholder="Meklēt darbu vai vakances..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <select className="px-6 py-3 rounded-xl border border-gray-300 bg-gray-50 text-lg">
+            <option>Jaunākās</option>
+            <option>Alga augoša</option>
+            <option>Alga dilstoša</option>
+          </select>
+          <Link
+            href="/ievietot?kategorija=darbs-vakances"
+            className="bg-blue-600 text-white px-10 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md"
+          >
+            ➕ Ievietot
+          </Link>
+        </div>
+
+        {/* GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+          {sludinajumi.map((item) => {
+            const firstImage =
+              (item.image_public_urls && item.image_public_urls[0]) ||
+              'https://via.placeholder.com/300x200/f8f9fa/6c757d?text=💼+Darbs'
+
+            return (
+              <div
+                key={item.id}
+                className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-gray-100"
+              >
+                <div className="p-6">
+                  <img
+                    src={firstImage}
+                    alt={item.title}
+                    className="w-full h-48 object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform"
+                  />
+                  <div className="flex items-center mb-2">
+                    <div className="flex text-yellow-400 text-sm mr-2">
+                      ★★★★☆
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      (12 reviews)
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2 line-clamp-2">
+                    {item.title || 'Vakance'}
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-6 line-clamp-2">
+                    {item.description?.slice(0, 100) ||
+                      `${item.location || 'Rīga'} • Vakance`}
+                  </p>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-gray-900">
+                        {item.price
+                          ? `${item.price.toLocaleString()}€`
+                          : 'Alga pēc vienošanās'}
+                      </span>
+                    </div>
+                    <div className="flex space-x-2 pt-2">
+                      <Link
+                        href={`/sludinajums/${item.id}`}
+                        className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all text-center shadow-md"
+                      >
+                        👁️ Apskatīt
+                      </Link>
+                      <button
+                        onClick={() => openChat(item.id, item.title)}
+                        className="flex-1 bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-green-700 transition-all shadow-md flex items-center justify-center"
+                      >
+                        💬 Sazināties
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* TUKŠS STĀVOKLIS */}
+        {sludinajumi.length === 0 && (
+          <div className="text-center py-24">
+            <div className="text-6xl mb-8">💼</div>
+            <h2 className="text-3xl font-bold mb-4">Nav vakanču</h2>
+            <Link
+              href="/ievietot?kategorija=darbs-vakances"
+              className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:bg-blue-700"
+            >
+              ➕ Esi pirmais!
+            </Link>
+          </div>
+        )}
+
+        {/* CTA */}
+        <div className="text-center p-12 bg-gray-50 rounded-2xl border border-gray-200">
+          <h2 className="text-3xl font-bold mb-6">
+            Meklē darbu? Vai meklē darbinieku?
+          </h2>
+          <Link
+            href="/ievietot?kategorija=darbs-vakances"
+            className="bg-blue-600 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-lg hover:shadow-xl hover:bg-blue-700 transition-all"
+          >
+            ➕ Publicē sludinājumu tagad!
+          </Link>
+        </div>
       </div>
-    </>
-  );
+
+      {/* MODĀLIS */}
+      {isChatOpen && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl border-4 border-green-100">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-800">
+                💬 Ziņa par:{' '}
+                <span className="text-green-600">
+                  "{currentSludinajumsTitle}"
+                </span>
+              </h2>
+              <button
+                onClick={() => setIsChatOpen(false)}
+                className="text-3xl font-bold text-gray-500 hover:text-gray-700 p-2 -m-2 rounded-full hover:bg-gray-100"
+              >
+                ×
+              </button>
+            </div>
+
+            <select
+              value={messageType}
+              onChange={(e) => setMessageType(e.target.value)}
+              className="w-full p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-gray-50"
+            >
+              <option value="comment">📝 Komentārs</option>
+              <option value="price_offer">💰 Kaulēt cenu</option>
+              <option value="request_photos">🖼️ Vēl bildes</option>
+              <option value="question">❓ Jautājums</option>
+            </select>
+
+            <textarea
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder={`Sveiki! Interesējos par "${currentSludinajumsTitle}". ...`}
+              className="w-full h-32 p-4 border-2 border-gray-200 rounded-xl text-lg mb-6 resize-vertical focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-gray-50"
+              rows={4}
+            />
+
+            <div className="flex gap-4 pt-2">
+              <button
+                onClick={sendMessage}
+                disabled={!messageText.trim()}
+                className="flex-1 bg-green-600 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-green-200"
+              >
+                🚀 Nosūtīt ziņu
+              </button>
+              <button
+                onClick={() => setIsChatOpen(false)}
+                className="flex-1 bg-gray-500 text-white py-4 px-6 rounded-xl text-lg font-bold hover:bg-gray-600 transition-all shadow-lg focus:outline-none focus:ring-4 focus:ring-gray-200"
+              >
+                ❌ Atcelt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
