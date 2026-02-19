@@ -109,9 +109,20 @@ export default function VisiSludinajumi() {
             className="px-4 py-3 border rounded-lg"
           >
             <option value="visi">Visas kategorijas</option>
+            <option value="auto">Auto</option>
+            <option value="mebeles">Mēbeles</option>
+            <option value="moto transports">Moto transports</option>
+            <option value="velosipēdi">Velosipēdi</option>
+            <option value="dzīvokļi">Dzīvokļi</option>
+            <option value="mājas vasarnīcas">Mājas vasarnīcas</option>
+            <option value="būvmatreāli">Būvmatreāli</option>
             <option value="telefoni">Telefoni</option>
             <option value="datori">Datori</option>
-            <option value="auto">Auto</option>
+            <option value="sadzīves tehnika">Sadzīves tehnika</option>
+            <option value="darbs&vakances">Darbs & vakances</option>
+            <option value="blakusdarbs">Blakusdarbs</option>
+            <option value="bērni">Bērni</option>
+            <option value="dažādi">Dažādi</option>
           </select>
           <Link href="/ievietot" className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-medium">
             Ievietot sludinājumu
