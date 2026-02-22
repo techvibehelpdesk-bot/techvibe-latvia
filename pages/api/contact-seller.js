@@ -17,18 +17,18 @@ export default async function handler(req, res) {
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 1. Iegūstam sludinājumu (lai pārbaudītu, ka eksistē)
-    const { data: adData, error: adError } = await supabase
+    // Pārbaudām sludinājumu
+    const { data: adData } = await supabase
       .from('sludinajumi')
-      .select('id, seller_email, title')  // Pievienoju seller_email un title
+      .select('id')
       .eq('id', sludinajums_id)
       .single();
 
-    if (adError || !adData) {
+    if (!adData) {
       return res.status(404).json({ error: 'Sludinājums nav atrasts' });
     }
 
-    // 2. Saglabājam ziņu comments tabulā
+    // Saglabājam kā komentāru (bez type lauka)
     const { error: insertError } = await supabase
       .from('comments')
       .insert([
@@ -36,23 +36,18 @@ export default async function handler(req, res) {
           sludinajums_id: sludinajums_id,
           user_email: sender_email,
           user_name: sender_name,
-          comment: message,
-          type: 'message_to_seller'  // Atšķiram no parastajiem komentāriem
+          comment: `[ZIŅA PIRCĒJAM] ${message}`  // Atzīmējam kā ziņu
         }
       ]);
 
     if (insertError) {
       console.error('Insert error:', insertError);
-      return res.status(500).json({ error: 'Ziņa netika saglabāta DB' });
+      return res.status(500).json({ error: 'Ziņa netika saglabāta' });
     }
 
-    res.status(200).json({ 
-      success: true, 
-      message: 'Ziņa nosūtīta un saglabāta!', 
-      seller_email: adData.seller_email  // Debug info
-    });
+    res.status(200).json({ success: true, message: 'Ziņa nosūtīta un saglabāta!' });
   } catch (error) {
     console.error('API error:', error);
-    res.status(500).json({ error: 'Server error: ' + error.message });
+    res.status(500).json({ error: 'Server error' });
   }
 }
