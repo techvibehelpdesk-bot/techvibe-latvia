@@ -12,13 +12,13 @@ export default function VisiSludinajumi() {
   const [sludinajumi, setSludinajumi] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  // NOŅEM filter state - tagad izmanto navigāciju
   const [showModal, setShowModal] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
   const [userEmail, setUserEmail] = useState('')
+  const [userName, setUserName] = useState('')  // Pievienoju vārdu
   const [commentText, setCommentText] = useState('')
 
-  // Kategoriju saraksts navigācijai (pielāgo savām vajadzībām)
+  // Kategoriju saraksts navigācijai
   const kategorijas = [
     { name: 'Auto', slug: 'auto' },
     { name: 'Mēbeles', slug: 'mebeles' },
@@ -54,7 +54,6 @@ export default function VisiSludinajumi() {
     setLoading(false)
   }
 
-  // Tagad tikai meklēšana, bez kategoriju filtra
   const filteredSludinajumi = sludinajumi.filter(item => 
     item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.description?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -65,23 +64,39 @@ export default function VisiSludinajumi() {
     setShowModal(true)
   }
 
+  // ✅ JAUNA sendComment funkcija - izmanto API route
   const sendComment = async () => {
-    if (!userEmail || !commentText) return alert('Aizpildi visus laukus!')
+    if (!userName || !userEmail || !commentText) {
+      return alert('Aizpildi visus laukus! *')
+    }
 
-    const { error } = await supabase.from('comments').insert({
-      sludinajums_id: selectedId,
-      type: 'contact',
-      comment: commentText,
-      user_email: userEmail
-    })
+    try {
+      const response = await fetch('/api/contact-seller', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sludinajums_id: selectedId,
+          sender_name: userName,
+          sender_email: userEmail,
+          message: commentText
+        })
+      })
 
-    if (!error) {
-      alert('Ziņa nosūtīta pārdevējam!')
-      setShowModal(false)
-      setUserEmail('')
-      setCommentText('')
-    } else {
-      alert('Kļūda sūtot ziņu')
+      const result = await response.json()
+
+      if (response.ok) {
+        alert('✅ Ziņa nosūtīta pārdevējam un saglabāta!');
+        setShowModal(false)
+        setUserName('')
+        setUserEmail('')
+        setCommentText('')
+        // Refresh sludinājumus
+        fetchSludinajumi()
+      } else {
+        alert('❌ Kļūda: ' + (result.error || 'Neizdevās nosūtīt'))
+      }
+    } catch (error) {
+      alert('❌ Kļūda sūtot ziņu: ' + error.message)
     }
   }
 
@@ -95,7 +110,6 @@ export default function VisiSludinajumi() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Uzlabota navigācija ar visām kategorijām */}
       <nav className="bg-white border-b px-6 py-4 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold">TechVibe</Link>
@@ -117,7 +131,6 @@ export default function VisiSludinajumi() {
         </div>
       </nav>
 
-      {/* Meklēšana + kategoriju navigācija */}
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="mb-8">
           <input
@@ -129,7 +142,6 @@ export default function VisiSludinajumi() {
           />
         </div>
 
-        {/* Kategoriju navigācijas pogas */}
         <div className="flex flex-wrap gap-3 mb-8 overflow-x-auto pb-4 -mb-4 scrollbar-hide">
           <Link href="/sludinajumi" className="px-6 py-3 bg-blue-100 text-blue-800 rounded-full font-medium hover:bg-blue-200 whitespace-nowrap">
             Visas kategorijas
@@ -145,7 +157,6 @@ export default function VisiSludinajumi() {
           ))}
         </div>
 
-        {/* Pārējais kods paliek IDENTISKS */}
         {filteredSludinajumi.length === 0 && (
           <div className="text-center py-24">
             <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-6 flex items-center justify-center">📭</div>
@@ -198,7 +209,6 @@ export default function VisiSludinajumi() {
         </div>
       </div>
 
-      {/* CTA un modālis paliek identiski */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 py-16 text-center border-t">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl font-bold mb-6">Gribi pārdot ātri?</h2>
@@ -209,40 +219,56 @@ export default function VisiSludinajumi() {
         </div>
       </div>
 
+      {/* Uzlabota modāļa forma */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-bold mb-6">Sazināties ar pārdevēju</h3>
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <h3 className="text-2xl font-bold mb-6 text-gray-800">💬 Sazināties ar pārdevēju</h3>
             <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Tavs vārds *"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
               <input
                 type="email"
                 placeholder="Tavs e-pasts *"
                 value={userEmail}
                 onChange={(e) => setUserEmail(e.target.value)}
-                className="w-full p-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <textarea
                 placeholder="Ko vēlies teikt pārdevējam? *"
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 rows="4"
-                className="w-full p-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
               />
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={sendComment}
-                  disabled={!userEmail || !commentText}
-                  className="flex-1 bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  disabled={!userName || !userEmail || !commentText}
+                  className="flex-1 bg-blue-600 text-white py-4 px-6 rounded-xl font-bold text-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
                 >
                   Nosūtīt ziņu
                 </button>
                 <button
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 bg-gray-200 py-4 rounded-xl font-bold hover:bg-gray-300 transition-colors"
+                  onClick={() => {
+                    setShowModal(false)
+                    setUserName('')
+                    setUserEmail('')
+                    setCommentText('')
+                  }}
+                  className="flex-1 bg-gray-200 py-4 px-6 rounded-xl font-bold text-lg hover:bg-gray-300 transition-all"
                 >
                   Atcelt
                 </button>
               </div>
+              <p className="text-xs text-gray-500 text-center mt-2">
+                Ziņa tiks saglabāta un nosūtīta pārdevējam
+              </p>
             </div>
           </div>
         </div>
