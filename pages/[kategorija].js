@@ -1,23 +1,20 @@
-// app/sludinajumi/[kategorija]/page.tsx
+// pages/[kategorija].js
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-interface Props {
-  params: Promise<{ kategorija: string }>
-}
-
-export default async function KategorijasSludinajumi({ params }: Props) {
-  const { kategorija } = await params
+export default async function KategorijasSludinajumi({ params }) {
+  const kategorija = params.kategorija;
+  
   const { data: sludinajumi } = await supabase
     .from('sludinajumi')
     .select('*')
     .eq('status', 'published')
     .eq('category', kategorija)
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: false });
 
   return (
     <div className="min-h-screen bg-white">
