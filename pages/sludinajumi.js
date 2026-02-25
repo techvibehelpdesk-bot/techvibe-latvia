@@ -122,7 +122,7 @@ export default function VisiSludinajumi() {
 
   // ✅ JAUNA 3. funkcija: Dalīties WhatsApp
   const shareWhatsApp = (item) => {
-    const message = `Skaties TechVibe sludinājumu! 👀\n\n${item.title}\n${item.price ? `${item.price}€` : 'Cena vienojoties'}\n\nApskati: ${window.location.origin}/sludinajums/${item.id}`
+    const message = `Skaties TechVibe sludinājumu! 👀\\n\\n${item.title}\\n${item.price ? `${item.price}€` : 'Cena vienojoties'}\\n\\nApskati: ${window.location.origin}/sludinajums/${item.id}`
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank')
   }
 
@@ -272,6 +272,18 @@ export default function VisiSludinajumi() {
                   >
                     <span>📱</span>
                   </button>
+                </div>
+
+                {/* ✅ JAUNA IZSOLES POGA RINDA PĒC shareWhatsApp */}
+                <div className="flex gap-2 pt-2">
+                  {/* ✅ JAUNA IZSOLES POGA */}
+                  <Link
+                    href={`/izsole/${item.id}`}
+                    className="flex-1 bg-gradient-to-r from-purple-500 to-pink-600 text-white py-3 px-3 rounded-xl font-bold text-sm hover:from-purple-600 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 flex items-center justify-center space-x-1"
+                    title="Aukcionēt šo preci"
+                  >
+                    <span>⚡</span><span>Izsoles</span>
+                  </Link>
                 </div>
               </div>
             </div>
