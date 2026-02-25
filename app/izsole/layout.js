@@ -1,5 +1,3 @@
-import './globals.css';  // Ja ir, vai izveido tukšu
-
 export const metadata = {
   title: 'Techvibe Izsoles',
   description: 'Izsoļu sistēma',
@@ -8,7 +6,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="lv">
-      <body className="antialiased">{children}</body>
+      <body>{children}</body>
     </html>
   );
 }
