@@ -1,3 +1,13 @@
+const { data: adCheck, error: checkError } = await supabase
+  .from('sludinajumi')
+  .select('id')
+  .eq('id', sludinajums_id)  // sludinajums_id no props/state
+  .single();
+
+if (checkError || !adCheck) {
+  console.error('Sludinājums nav atrasts:', checkError);
+  return { error: 'Sludinājums neeksistē' };
+}
 'use client';
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
