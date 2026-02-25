@@ -2,9 +2,10 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 export default function IzsoleLapa() {
   const [currentBid, setCurrentBid] = useState(10);
@@ -18,8 +19,8 @@ export default function IzsoleLapa() {
   const fetchHighestBid = async () => {
     try {
       const { data, error } = await supabase
-        .from('current_bid')  // TAVA TABULA!
-        .select('amount')
+        .from('izsole')  // TAVA TABULA!
+        .select('amount')  // Pieņem, ka ir 'amount' kolonna
         .order('amount', { ascending: false })
         .limit(1);
       
@@ -36,25 +37,26 @@ export default function IzsoleLapa() {
   const handleBid = async () => {
     const newBid = parseFloat(myBid);
     if (newBid <= currentBid) {
-      alert('Bid jābūt lielāks par €' + currentBid.toFixed(2));
+      alert('Bid jābūt lielāks!');
       return;
     }
 
     try {
       const { error } = await supabase
-        .from('current_bid')
-        .insert([{ amount: newBid, bidder: 'TestUser' }]);  // Bez item_id ja nav kolonnas
+        .from('izsole')
+        .insert([{ amount: newBid, bidder: 'TestUser' }]);
       
       if (error) throw error;
-      setMyBid('');
       setCurrentBid(newBid);
-      alert(`✅ Bid veiksmīgs: €${newBid.toFixed(2)}`);
+      setMyBid('');
+      alert(`✅ €${newBid.toFixed(2)} saglabāts izsole tabulā!`);
+      fetchHighestBid();  // Refresh
     } catch (error) {
       alert('Kļūda: ' + error.message);
     }
   };
 
-  if (loading) return <div className="text-center p-8 text-xl">Ielādē no Supabase...</div>;
+  if (loading) return <div className="text-center p-8">Connecting to izsole tabula...</div>;
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -70,20 +72,15 @@ export default function IzsoleLapa() {
               value={myBid}
               onChange={(e) => setMyBid(e.target.value)}
               placeholder="Piedāvājums"
-              className="flex-1 p-3 border-2 border-gray-300 rounded-lg text-lg focus:border-blue-500"
+              className="flex-1 p-3 border-2 border-gray-300 rounded-lg text-lg"
               step="0.01"
               min={currentBid + 0.01}
             />
-            <button
-              onClick={handleBid}
-              className="bg-blue-500 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-600 text-lg"
-              disabled={loading}
-            >
+            <button onClick={handleBid} className="bg-blue-500 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-600">
               Piedāvāt!
             </button>
           </div>
-          
-          <p className="text-xs text-gray-400">SOLIS #3 tavā current_bid tabulā</p>
+          <p className="text-xs bg-green-100 p-2 rounded">SOLIS #3: izsole tabula</p>
         </div>
       </div>
     </div>
