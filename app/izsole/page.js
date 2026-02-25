@@ -2,45 +2,91 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export default function IzsolePage({ params }) {
-  const sludinajums_id = params.id;  // pieņem, ka nāk no dynamic route [id]
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Supabase env nav iestatīti .env.local');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+export default function IzsolePage() {
+  const sludinajums_id = '550e8400-e29b-41d4-a716-446655440000';  // HARDCODE testam
   const [currentBid, setCurrentBid] = useState(0);
-  // citas state...
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleBidSubmit = async (newBid) => {  // event handler funkcija
-    // Validācija pirms insert
+  // Fetch current bid on load
+  useEffect(() => {
+    fetchCurrentBid();
+  }, []);
+
+  const fetchCurrentBid = async () => {
+    const { data, error } = await supabase
+      .from('izsole')
+      .select('current_bid')
+      .eq('sludinajums_id', sludinajums_id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+    if (data) setCurrentBid(data.current_bid);
+    if (error) console.log('Nav bidu vēl');
+  };
+
+  const handleBidSubmit = async () => {
+    setLoading(true);
+    setError('');
+    console.log('Validējam ID:', sludinajums_id);
+
+    // Validācija
     const { data: adCheck, error: checkError } = await supabase
       .from('sludinajumi')
-      .select('id')
+      .select('id, title')
       .eq('id', sludinajums_id)
       .single();
 
+    console.log('Sludinājums check:', adCheck, checkError);
+
     if (checkError || !adCheck) {
-      console.error('Sludinājums nav atrasts:', checkError);
-      alert('Sludinājums neeksistē');  // vai setError state
-      return;  // tagad return OK iekšā funkcijā
+      setError(`Sludinājums ${sludinajums_id} neeksistē: ${checkError?.message}`);
+      setLoading(false);
+      return;
     }
 
-    // Insert ja OK
-    const { data, error } = await supabase
+    // Insert bid (update current_bid)
+    const { data: bidData, error: bidError } = await supabase
       .from('izsole')
-      .insert({ current_bid: newBid, sludinajums_id: sludinajums_id })
+      .insert({ 
+        current_bid: currentBid + 10,  // +10 no current
+        sludinajums_id 
+      })
       .select()
       .single();
 
-    if (error) {
-      console.error('Bid kļūda:', error);
+    console.log('Bid rezultāts:', bidData, bidError);
+
+    if (bidError) {
+      setError(`Bid kļūda: ${bidError.message}`);
     } else {
-      setCurrentBid(newBid);
+      setCurrentBid(bidData.current_bid);
+      alert('Bid veiksmīgs!');
     }
+    setLoading(false);
   };
 
   return (
-    <div>
-      {/* Tava JSX */}
-      <button onClick={() => handleBidSubmit(100)}>Veikt bid 100</button>
+    <div style={{ padding: '2rem', maxWidth: '600px', margin: 'auto' }}>
+      <h1>Izsole ID: {sludinajums_id}</h1>
+      <p>Pašreizējais bids: €{currentBid.toFixed(2)}</p>
+      {error && <p style={{ color: 'red' }}>Kļūda: {error}</p>}
+      <button 
+        onClick={handleBidSubmit} 
+        disabled={loading}
+        style={{ padding: '1rem 2rem', fontSize: '1.2rem' }}
+      >
+        {loading ? 'Veicu bid...' : `Veikt bid €${(currentBid + 10).toFixed(2)}`}
+      </button>
     </div>
   );
 }
