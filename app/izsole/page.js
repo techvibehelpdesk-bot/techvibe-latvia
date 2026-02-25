@@ -1,20 +1,54 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function IzsoleLapa() {
   const [currentBid, setCurrentBid] = useState(10);
   const [myBid, setMyBid] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const handleBid = () => {
+  useEffect(() => {
+    fetchHighestBid();
+  }, []);
+
+  const fetchHighestBid = async () => {
+    const { data, error } = await supabase
+      .from('bids')
+      .select('amount')
+      .order('amount', { ascending: false })
+      .limit(1);
+    
+    if (data && data[0]) {
+      setCurrentBid(data[0].amount);
+    }
+    setLoading(false);
+  };
+
+  const handleBid = async () => {
     const newBid = parseFloat(myBid);
-    if (newBid > currentBid) {
-      setCurrentBid(newBid);
-      setMyBid('');
-      alert(`Veiksmīgs bid! Jaunā cena: €${newBid.toFixed(2)}`);
+    if (newBid <= currentBid) {
+      alert('Bid jābūt lielāks!');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('bids')
+      .insert([{ item_id: 'bike1', amount: newBid, bidder: 'TestUser' }]);
+    
+    if (error) {
+      alert('Kļūda: ' + error.message);
     } else {
-      alert('Bid jābūt lielāks par €' + currentBid.toFixed(2));
+      setMyBid('');
+      setCurrentBid(newBid);
+      alert(`✅ Bid veiksmīgs: €${newBid.toFixed(2)}`);
     }
   };
+
+  if (loading) return <div className="text-center p-8">Ielādē no Supabase...</div>;
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -23,7 +57,6 @@ export default function IzsoleLapa() {
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">Jauns velosipēds 🚲</h2>
           <p className="text-4xl font-bold text-green-600 mb-8">€{currentBid.toFixed(2)}</p>
-          <p className="text-sm text-gray-500 mb-6">Ievadi lielāku summu:</p>
           
           <div className="flex gap-3 mb-6">
             <input
@@ -38,12 +71,13 @@ export default function IzsoleLapa() {
             <button
               onClick={handleBid}
               className="bg-blue-500 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-600 text-lg"
+              disabled={loading}
             >
               Piedāvāt!
             </button>
           </div>
           
-          <p className="text-xs text-gray-400">SOLIS #2 lokāls state – refresh lapu, cena saglabājas lokāli</p>
+          <p className="text-xs text-gray-400">SOLIS #3 Supabase – refresh saglabā bid!</p>
         </div>
       </div>
     </div>
