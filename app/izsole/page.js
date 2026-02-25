@@ -16,39 +16,45 @@ export default function IzsoleLapa() {
   }, []);
 
   const fetchHighestBid = async () => {
-    const { data, error } = await supabase
-      .from('bids')
-      .select('amount')
-      .order('amount', { ascending: false })
-      .limit(1);
-    
-    if (data && data[0]) {
-      setCurrentBid(data[0].amount);
+    try {
+      const { data, error } = await supabase
+        .from('current_bid')  // TAVA TABULA!
+        .select('amount')
+        .order('amount', { ascending: false })
+        .limit(1);
+      
+      if (data && data[0]) {
+        setCurrentBid(data[0].amount);
+      }
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleBid = async () => {
     const newBid = parseFloat(myBid);
     if (newBid <= currentBid) {
-      alert('Bid jābūt lielāks!');
+      alert('Bid jābūt lielāks par €' + currentBid.toFixed(2));
       return;
     }
 
-    const { error } = await supabase
-      .from('bids')
-      .insert([{ item_id: 'bike1', amount: newBid, bidder: 'TestUser' }]);
-    
-    if (error) {
-      alert('Kļūda: ' + error.message);
-    } else {
+    try {
+      const { error } = await supabase
+        .from('current_bid')
+        .insert([{ amount: newBid, bidder: 'TestUser' }]);  // Bez item_id ja nav kolonnas
+      
+      if (error) throw error;
       setMyBid('');
       setCurrentBid(newBid);
       alert(`✅ Bid veiksmīgs: €${newBid.toFixed(2)}`);
+    } catch (error) {
+      alert('Kļūda: ' + error.message);
     }
   };
 
-  if (loading) return <div className="text-center p-8">Ielādē no Supabase...</div>;
+  if (loading) return <div className="text-center p-8 text-xl">Ielādē no Supabase...</div>;
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -77,7 +83,7 @@ export default function IzsoleLapa() {
             </button>
           </div>
           
-          <p className="text-xs text-gray-400">SOLIS #3 Supabase – refresh saglabā bid!</p>
+          <p className="text-xs text-gray-400">SOLIS #3 tavā current_bid tabulā</p>
         </div>
       </div>
     </div>
