@@ -364,4 +364,3 @@ export default function SludinajumaLapa({ params, searchParams }) {
     </div>
   );
 }
-pārtaisi kodu pilnība
